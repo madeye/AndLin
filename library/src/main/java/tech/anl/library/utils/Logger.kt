@@ -57,7 +57,7 @@ interface Logger {
  * they still show up in bug reports.
  */
 class LogcatLogger : Logger {
-    private val tag = "UserLAnd"
+    private val tag = "ServerBox"
 
     override fun initialize(context: Context?) = Unit
 

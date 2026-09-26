@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="droid_files_pick_folder">To let AndLin use /sdcard/%1$s, open the “%1$s” folder and tap “Use this folder”.</string>
-    <string name="droid_files_declined">AndLin was not given access to /sdcard/%1$s.</string>
-    <string name="droid_files_other_folder">That folder does not contain /sdcard/%1$s, so AndLin still cannot use it.</string>
-    <string name="droid_files_wrong_volume">AndLin can only use folders on internal shared storage.</string>
-    <string name="droid_files_no_picker">This device has no folder picker, so AndLin cannot ask for access to shared storage.</string>
+    <string name="droid_files_pick_folder">To let ServerBox use /sdcard/%1$s, open the “%1$s” folder and tap “Use this folder”.</string>
+    <string name="droid_files_declined">ServerBox was not given access to /sdcard/%1$s.</string>
+    <string name="droid_files_other_folder">That folder does not contain /sdcard/%1$s, so ServerBox still cannot use it.</string>
+    <string name="droid_files_wrong_volume">ServerBox can only use folders on internal shared storage.</string>
+    <string name="droid_files_no_picker">This device has no folder picker, so ServerBox cannot ask for access to shared storage.</string>
 </resources>

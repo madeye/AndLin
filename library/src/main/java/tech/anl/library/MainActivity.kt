@@ -483,7 +483,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         if (item.itemId == R.id.terms_and_conditions) {
             val intent = Intent(
                 "android.intent.action.VIEW",
-                Uri.parse("https://userland.tech/eula")
+                Uri.parse("https://github.com/madeye/AndLin/blob/master/LICENSE")
             )
             startActivity(intent)
         }
@@ -503,7 +503,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun sendWikiIntent() {
         val intent = Intent(
             "android.intent.action.VIEW",
-            Uri.parse("https://github.com/CypherpunkArmory/UserLAnd/wiki")
+            Uri.parse("https://github.com/madeye/AndLin#readme")
         )
         startActivity(intent)
     }
@@ -643,7 +643,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     /*
     XSDL has a different flow than starting SSH/VNC session.  It sends an intent to XSDL with
-        with a display value.  Then XSDL sends an intent to open UserLAnd signalling
+        with a display value.  Then XSDL sends an intent to open ServerBox signalling
         that it has an xserver listening.  We set the initial display number as an environment variable
         then start a twm process to connect to XSDL's xserver.
     */
@@ -719,7 +719,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                 getFilesystemFlavor(state.flavors, state.executionTypes)
             }
             is AppServiceTypePreferenceRequired -> {
-                // AndLin sessions are SSH terminals unless desktop sessions are switched on.
+                // ServerBox sessions are SSH terminals unless desktop sessions are switched on.
                 if (!DesktopSupport.isEnabled(this))
                     viewModel.submitAppServiceType(ServiceType.Ssh)
                 else if (BuildConfig.USE_DEFAULT_SERVICE_TYPE)
@@ -947,6 +947,11 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun getCredentials() {
         val dialog = AlertDialog.Builder(this)
         val dialogView = this.layoutInflater.inflate(R.layout.dia_app_credentials, null)
+        // Suggested defaults; the user can change them before continuing.
+        val suggestedPassword = DefaultCredentials.randomPassword()
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_username).setText(DefaultCredentials.USERNAME)
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_password).setText(suggestedPassword)
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_vnc_password).setText(suggestedPassword)
         dialog.setView(dialogView)
         dialog.setCancelable(true)
         dialog.setPositiveButton(R.string.button_continue, null)

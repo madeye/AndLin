@@ -7,9 +7,9 @@ plugins {
     id 'de.undercouch.download'
 }
 
-// AndLin is a Linux server first. -PandlinVnc=false builds it without the VNC viewer and
+// ServerBox is a Linux server first. -PserverboxVnc=false builds it without the VNC viewer and
 // every desktop-session option.
-ext.andlinVnc = (findProperty('andlinVnc') ?: 'true').toString().toBoolean()
+ext.serverboxVnc = (findProperty('serverboxVnc') ?: 'true').toString().toBoolean()
 
 android {
     namespace 'tech.anl.library'
@@ -17,8 +17,8 @@ android {
     compileSdkVersion 35
 
     defaultConfig {
-        // Whether the VNC desktop viewer is built in; see andlinVnc in the root gradle.properties.
-        buildConfigField 'boolean', 'VNC_ENABLED', "$andlinVnc"
+        // Whether the VNC desktop viewer is built in; see serverboxVnc in the root gradle.properties.
+        buildConfigField 'boolean', 'VNC_ENABLED', "$serverboxVnc"
         minSdkVersion 26
         targetSdkVersion 35
 
@@ -38,7 +38,7 @@ android {
     // cannot resolve a variant of this module for them.
     flavorDimensions "app"
     productFlavors {
-        AndLin { dimension "app" }
+        ServerBox { dimension "app" }
     }
 
     buildFeatures {
@@ -56,7 +56,7 @@ android {
     }
 
     sourceSets {
-        main.java.srcDirs += andlinVnc ? 'src/vnc/java' : 'src/novnc/java'
+        main.java.srcDirs += serverboxVnc ? 'src/vnc/java' : 'src/novnc/java'
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
@@ -138,7 +138,7 @@ dependencies {
 
     api project(':CustomLibrary')
     implementation project(':terminal')
-    if (andlinVnc) {
+    if (serverboxVnc) {
         implementation project(':vnc')
     }
 

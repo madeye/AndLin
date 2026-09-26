@@ -62,7 +62,7 @@ class CompanionControlClient(context: Context, val app: CompanionApp) : Companio
             try {
                 context.startService(intent)
             } catch (e2: Exception) {
-                throw CompanionUnreachableException("${app.packageName} can't be started while UserLAnd is in the background", e2)
+                throw CompanionUnreachableException("${app.packageName} can't be started while ServerBox is in the background", e2)
             }
         } catch (e: SecurityException) {
             throw CompanionUnreachableException("Not allowed to start ${app.packageName}", e)

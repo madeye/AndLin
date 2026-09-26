@@ -46,7 +46,7 @@ class ServerService : Service(), CoroutineScope {
         const val SERVER_SERVICE_RESULT: String = "tech.anl.library.ServerService.RESULT"
 
         // Session ids to bring back after a reboot when "Start on boot" is on.
-        private const val AUTOSTART_SESSIONS_KEY = "andlin_autostart_session_ids"
+        private const val AUTOSTART_SESSIONS_KEY = "serverbox_autostart_session_ids"
         private const val SESSION_WATCH_INTERVAL_MS = 5_000L
         // Restarting a server that died unexpectedly: at most this many times per window.
         private const val MAX_RESTARTS = 3
@@ -92,7 +92,7 @@ class ServerService : Service(), CoroutineScope {
     override fun onCreate() {
         broadcaster = LocalBroadcastManager.getInstance(this)
         notificationManager.createServiceNotificationChannel()
-        AndlinScripts.install(this, anlFiles.supportDir)
+        ServerBoxScripts.install(this, anlFiles.supportDir)
         try {
             droidFilesServer.start()
         } catch (err: Exception) {
@@ -187,7 +187,7 @@ class ServerService : Service(), CoroutineScope {
         if (!keepSessionsRunning()) return
         if (wakeLock == null) {
             val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AndLin:sessions").apply {
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ServerBox:sessions").apply {
                 setReferenceCounted(false)
                 acquire()
             }
@@ -195,7 +195,7 @@ class ServerService : Service(), CoroutineScope {
         if (wifiLock == null) {
             val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             @Suppress("DEPRECATION")
-            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "AndLin:sessions").apply {
+            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "ServerBox:sessions").apply {
                 setReferenceCounted(false)
                 acquire()
             }
@@ -447,9 +447,9 @@ class ServerService : Service(), CoroutineScope {
 
     private fun startSshClient(session: Session) {
         val home = File(filesDir, "terminal_home").apply { mkdirs() }
-        // Generated inside the guest by andlin_startSSHServer.sh and authorized for the default
+        // Generated inside the guest by serverbox_startSSHServer.sh and authorized for the default
         // user, so the terminal still gets in when password logins are turned off.
-        val clientKey = File(filesDir, "${session.filesystemId}/support/andlin_client_key")
+        val clientKey = File(filesDir, "${session.filesystemId}/support/serverbox_client_key")
         val sshPort = vmEndpoints[session.id]?.sshPort ?: 2022
         val arguments = mutableListOf("-y", "-y", "-p", sshPort.toString())
         if (clientKey.exists()) arguments += listOf("-i", clientKey.absolutePath)

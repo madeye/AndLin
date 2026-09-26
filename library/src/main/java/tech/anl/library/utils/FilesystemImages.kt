@@ -7,7 +7,7 @@ import java.util.Locale
 /**
  * Maps a distribution and flavor to the OCI image its filesystem is built from.
  *
- * Headless server images are AndLin's own (github.com/madeye/AndLin-Images). The desktop
+ * Headless server images are ServerBox's own (github.com/madeye/AndLin-Images). The desktop
  * flavors keep using the upstream UserLAnd images, which carry the X server, VNC server and
  * desktop environments. Callers pass the result through [RegistryMirror] to pick a registry.
  */
@@ -19,7 +19,7 @@ object FilesystemImages {
         val distro = distribution.lowercase(Locale.ENGLISH)
         val tag = tagFor(ociTag, distro)
         return when (flavor.lowercase(Locale.ENGLISH)) {
-            FilesystemFlavor.SERVER, "" -> "$SERVER_IMAGE_NAMESPACE/andlin-$distro:$tag"
+            FilesystemFlavor.SERVER, "" -> "$SERVER_IMAGE_NAMESPACE/serverbox-$distro:$tag"
             FilesystemFlavor.DEFAULT -> "$DESKTOP_IMAGE_NAMESPACE/userland-$distro:$tag"
             else -> "$DESKTOP_IMAGE_NAMESPACE/userland-${distro}_${flavor.lowercase(Locale.ENGLISH)}:$tag"
         }

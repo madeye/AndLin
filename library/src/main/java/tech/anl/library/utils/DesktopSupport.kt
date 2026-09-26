@@ -6,7 +6,7 @@ import tech.anl.library.BuildConfig
 import tech.anl.library.desktop.DesktopViewer
 
 /**
- * AndLin is a Linux server first: sessions are SSH terminals, and filesystems are the headless
+ * ServerBox is a Linux server first: sessions are SSH terminals, and filesystems are the headless
  * server images. Graphical desktops (VNC, the XFCE/LXDE images, GUI-only apps) appear only when
  * the build includes the viewer and the user has switched desktop support on in settings.
  */

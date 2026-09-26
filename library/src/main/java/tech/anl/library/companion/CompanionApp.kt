@@ -9,7 +9,7 @@ import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.utils.defaultSharedPreferences
 
 /**
- * The separately installed apps that host UserLAnd's VM backends. Each exposes an exported control
+ * The separately installed apps that host ServerBox's VM backends. Each exposes an exported control
  * service with a TCP control socket on localhost; see [CompanionControlClient].
  */
 enum class CompanionApp(
