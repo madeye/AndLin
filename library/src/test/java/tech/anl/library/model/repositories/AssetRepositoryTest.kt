@@ -208,16 +208,9 @@ class AssetRepositoryTest {
             assetRepository.generateDownloadRequirements(filesystem, assetList, filesystemNeedsExtraction)
         }
 
-        // NOTE: getRegularAssetDownloadRequirements() (pre-existing, not part of this pass's
-        // scope) shadows the outer `versionCode`/`url` vars with `val` inside its `else`
-        // branch, so the values it fetches from GithubApiClient never make it into the
-        // returned DownloadMetadata; both fields come back empty. This is unrelated to the
-        // GithubApiClient constructor/behavior change made in this pass -- it reproduces with
-        // a plain mocked GithubApiClient regardless of DEFAULT_RELEASE. Asserting the actual,
-        // current (buggy) behavior here so the suite reflects what the code does today.
         var expectedDownloadMetadata = mutableListOf<DownloadMetadata>()
         if (!BuildConfig.FILESYSTEM_ONLY_ASSET) {
-            expectedDownloadMetadata.add(DownloadMetadata(assetsTarName, repo, "", ""))
+            expectedDownloadMetadata.add(DownloadMetadata(assetsTarName, repo, remoteVersion, url))
         }
 
         assertEquals(expectedDownloadMetadata, result)
@@ -239,12 +232,9 @@ class AssetRepositoryTest {
             assetRepository.generateDownloadRequirements(filesystem, assetList, filesystemNeedsExtraction)
         }
 
-        // See the note above in the "out of date" test: getRegularAssetDownloadRequirements()
-        // shadows versionCode/url with local `val`s in its else branch, so both fields are
-        // always empty here regardless of what GithubApiClient returns.
         var expectedDownloadMetadata = mutableListOf<DownloadMetadata>()
         if (!BuildConfig.FILESYSTEM_ONLY_ASSET) {
-            expectedDownloadMetadata.add(DownloadMetadata(assetsTarName, repo, "", ""))
+            expectedDownloadMetadata.add(DownloadMetadata(assetsTarName, repo, remoteVersion, url))
         }
         assertEquals(expectedDownloadMetadata, result)
     }

@@ -66,7 +66,7 @@ class LocalServerManagerTest {
     @Test
     fun `Calling startServer with an SSH session should use the appropriate command`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh)
-        val command = "/support/startSSHServer.sh"
+        val command = "/support/common/andlin_startSSHServer.sh"
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -88,7 +88,7 @@ class LocalServerManagerTest {
     @Test
     fun `If starting an ssh server fails, an error is logged and -1 is returned`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh)
-        val command = "/support/startSSHServer.sh"
+        val command = "/support/common/andlin_startSSHServer.sh"
 
         val reason = "reason"
         whenever(mockBusyboxExecutor.executeProotCommand(
@@ -112,10 +112,121 @@ class LocalServerManagerTest {
     }
 
     @Test
+    fun `Starting an SSH server passes the username and a localhost address by default`() {
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
+        val command = "/support/common/andlin_startSSHServer.sh"
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "ANDLIN_SSH_ADDRESS" to "127.0.0.1")
+
+        whenever(mockBusyboxExecutor.executeProotCommand(
+                eq(command),
+                eq(filesystemDirName),
+                eq(false),
+                eq(env),
+                anyOrNull(),
+                anyOrNull()))
+                .thenReturn(OngoingExecution(mockProcess))
+
+        createSshPidFile()
+
+        val result = localServerManager.startServer(session)
+
+        assertEquals(fakePid, result)
+    }
+
+    @Test
+    fun `Starting an SSH server listens on LAN when the preference is set`() {
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
+        val command = "/support/common/andlin_startSSHServer.sh"
+        whenever(mockSharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)).thenReturn(true)
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "ANDLIN_SSH_ADDRESS" to "0.0.0.0")
+
+        whenever(mockBusyboxExecutor.executeProotCommand(
+                eq(command),
+                eq(filesystemDirName),
+                eq(false),
+                eq(env),
+                anyOrNull(),
+                anyOrNull()))
+                .thenReturn(OngoingExecution(mockProcess))
+
+        createSshPidFile()
+
+        val result = localServerManager.startServer(session)
+
+        assertEquals(fakePid, result)
+    }
+
+    @Test
+    fun `Starting an SSH server includes authorized keys when the preference is set`() {
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
+        val command = "/support/common/andlin_startSSHServer.sh"
+        whenever(mockSharedPreferences.getString("pref_ssh_authorized_keys", "")).thenReturn("ssh-ed25519 AAAA...")
+        val env = hashMapOf(
+                "INITIAL_USERNAME" to "user",
+                "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
+                "ANDLIN_AUTHORIZED_KEYS" to "ssh-ed25519 AAAA..."
+        )
+
+        whenever(mockBusyboxExecutor.executeProotCommand(
+                eq(command),
+                eq(filesystemDirName),
+                eq(false),
+                eq(env),
+                anyOrNull(),
+                anyOrNull()))
+                .thenReturn(OngoingExecution(mockProcess))
+
+        createSshPidFile()
+
+        val result = localServerManager.startServer(session)
+
+        assertEquals(fakePid, result)
+    }
+
+    @Test
+    fun `Starting an SSH server restricts to key-only auth when the preference is set`() {
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
+        val command = "/support/common/andlin_startSSHServer.sh"
+        whenever(mockSharedPreferences.getBoolean("pref_ssh_disable_password", false)).thenReturn(true)
+        val env = hashMapOf(
+                "INITIAL_USERNAME" to "user",
+                "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
+                "ANDLIN_SSH_KEYS_ONLY" to "1"
+        )
+
+        whenever(mockBusyboxExecutor.executeProotCommand(
+                eq(command),
+                eq(filesystemDirName),
+                eq(false),
+                eq(env),
+                anyOrNull(),
+                anyOrNull()))
+                .thenReturn(OngoingExecution(mockProcess))
+
+        createSshPidFile()
+
+        val result = localServerManager.startServer(session)
+
+        assertEquals(fakePid, result)
+    }
+
+    @Test
     fun `Calling startServer with a VNC session should use the appropriate command`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "userland", geometry = "10x10")
         val command = "/support/startVNCServer.sh"
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_VNC_PASSWORD" to "userland", "DIMENSIONS" to "10x10", "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME, "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}", "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}", "HAS_CAMERA" to "0")
+        val env = hashMapOf(
+                "INITIAL_USERNAME" to "user",
+                "INITIAL_VNC_PASSWORD" to "userland",
+                "DIMENSIONS" to "10x10",
+                "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
+                "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
+                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}",
+                "HAS_CAMERA" to "0",
+                "HAS_MICROPHONE" to "0",
+                "VNC_DISPLAY" to BuildConfig.VNC_DISPLAY,
+                "VERSION_CODE" to BuildConfig.VERSION_CODE,
+                "VERSION_NAME" to BuildConfig.VERSION_NAME
+        )
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -140,7 +251,19 @@ class LocalServerManagerTest {
     fun `If starting a vnc server fails, an error is logged and -1 is returned`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "userland", geometry = "10x10")
         val command = "/support/startVNCServer.sh"
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_VNC_PASSWORD" to "userland", "DIMENSIONS" to "10x10", "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME, "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}", "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}", "HAS_CAMERA" to "0")
+        val env = hashMapOf(
+                "INITIAL_USERNAME" to "user",
+                "INITIAL_VNC_PASSWORD" to "userland",
+                "DIMENSIONS" to "10x10",
+                "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
+                "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
+                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}",
+                "HAS_CAMERA" to "0",
+                "HAS_MICROPHONE" to "0",
+                "VNC_DISPLAY" to BuildConfig.VNC_DISPLAY,
+                "VERSION_CODE" to BuildConfig.VERSION_CODE,
+                "VERSION_NAME" to BuildConfig.VERSION_NAME
+        )
 
         val reason = "reason"
         whenever(mockBusyboxExecutor.executeProotCommand(

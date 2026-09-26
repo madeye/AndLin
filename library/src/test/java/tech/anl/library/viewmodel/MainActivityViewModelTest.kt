@@ -362,7 +362,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun `Updates last selected session and filesystem and submits check credentials event when app database entries are fetched`() {
+    fun `Updates last selected session and filesystem and submits check filesystem flavor event when app database entries are fetched`() {
         makeAppSelections()
 
         appsStartupStateLiveData.postValue(DatabaseEntriesFetched(selectedFilesystem, selectedSession))
@@ -371,8 +371,32 @@ class MainActivityViewModelTest {
         assertEquals(selectedSession, mainActivityViewModel.lastSelectedSession)
 
         runBlocking {
+            verify(mockAppsStartupFsm).submitEvent(CheckFilesystemFlavor(selectedApp, selectedFilesystem), mainActivityViewModel)
+        }
+    }
+
+    @Test
+    fun `Submits check credentials event once the filesystem flavor is set`() {
+        makeAppSelections()
+        appsStartupStateLiveData.postValue(DatabaseEntriesFetched(selectedFilesystem, selectedSession))
+
+        appsStartupStateLiveData.postValue(FilesystemFlavorSet)
+
+        runBlocking {
             verify(mockAppsStartupFsm).submitEvent(CheckAppsFilesystemCredentials(selectedFilesystem), mainActivityViewModel)
         }
+    }
+
+    @Test
+    fun `Posts FilesystemFlavorSelectionRequired when the flavor step requires user input`() {
+        makeAppSelections()
+        appsStartupStateLiveData.postValue(DatabaseEntriesFetched(selectedFilesystem, selectedSession))
+
+        val flavors = listOf(FilesystemFlavor.serverFlavor)
+        val executionTypes = listOf(ExecutionType.PROOT)
+        appsStartupStateLiveData.postValue(FilesystemFlavorRequired(selectedFilesystem, flavors, executionTypes))
+
+        verify(mockStateObserver).onChanged(FilesystemFlavorSelectionRequired(flavors, executionTypes))
     }
 
     @Test

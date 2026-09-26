@@ -142,8 +142,8 @@ class AssetRepository(
             url = defaultSharedPreferences.getString("pref_filesystem", BuildConfig.DEFAULT_FILESYSTEM_URL)!!
             url += "/${anlFiles.getArchType()}-${filename}"
         } else {
-            val versionCode = githubApiClient.getLatestReleaseVersion(repo)
-            val url = githubApiClient.getAssetEndpoint(filename, repo)
+            versionCode = githubApiClient.getLatestReleaseVersion(repo)
+            url = githubApiClient.getAssetEndpoint(filename, repo)
         }
         val downloadMetadata = DownloadMetadata(filename, repo, versionCode, url)
         downloadRequirements.add(downloadMetadata)

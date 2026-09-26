@@ -17,6 +17,7 @@ import tech.anl.customlibrary.BuildConfig
 import tech.anl.library.model.daos.FilesystemDao
 import tech.anl.library.model.daos.SessionDao
 import tech.anl.library.model.entities.Asset
+import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.model.entities.Filesystem
 import tech.anl.library.model.entities.Session
 import tech.anl.library.model.repositories.AssetRepository
@@ -780,5 +781,57 @@ class SessionStartupFsmTest {
         runBlocking { sessionFsm.submitEvent(ExtractFilesystem(filesystem), this) }
 
         verify(mockStateObserver).onChanged(ExtractionFailed("Unknown reason."))
+    }
+
+    // --- AVF (VM) filesystems skip the legacy per-release asset pipeline entirely ---
+
+    private val avfFilesystem = Filesystem(id = -1, distributionType = assetType, executionType = ExecutionType.AVF)
+
+    @Test
+    fun `RetrieveAssetLists immediately succeeds with an empty list for AVF filesystems`() {
+        sessionFsm.setState(SessionIsReadyForPreparation(inactiveSession, avfFilesystem))
+        sessionFsm.getState().observeForever(mockStateObserver)
+
+        runBlocking { sessionFsm.submitEvent(RetrieveAssetLists(avfFilesystem), this) }
+
+        verify(mockStateObserver).onChanged(RetrievingAssetLists)
+        verify(mockStateObserver).onChanged(AssetListsRetrievalSucceeded(emptyList()))
+        verifyBlocking(mockAssetRepository, never()) { getAssetList(any()) }
+    }
+
+    @Test
+    fun `GenerateDownloads immediately reports NoDownloadsRequired for AVF filesystems`() {
+        sessionFsm.setState(AssetListsRetrievalSucceeded(assetList))
+        sessionFsm.getState().observeForever(mockStateObserver)
+
+        runBlocking { sessionFsm.submitEvent(GenerateDownloads(avfFilesystem, assetList), this) }
+
+        verify(mockStateObserver).onChanged(GeneratingDownloadRequirements)
+        verify(mockStateObserver).onChanged(NoDownloadsRequired)
+        verifyBlocking(mockAssetRepository, never()) { generateDownloadRequirements(any(), any(), any()) }
+    }
+
+    @Test
+    fun `VerifyFilesystemAssets immediately succeeds for AVF filesystems`() {
+        sessionFsm.setState(NoDownloadsRequired)
+        sessionFsm.getState().observeForever(mockStateObserver)
+
+        runBlocking { sessionFsm.submitEvent(VerifyFilesystemAssets(avfFilesystem), this) }
+
+        verify(mockStateObserver).onChanged(VerifyingFilesystemAssets)
+        verify(mockStateObserver).onChanged(FilesystemAssetVerificationSucceeded)
+        verify(mockFilesystemManager, never()).areAllRequiredAssetsPresent(any(), any())
+        verify(mockAssetRepository, never()).getDistributionAssetsForExistingFilesystem(any())
+    }
+
+    @Test
+    fun `ExtractFilesystem completes immediately for AVF filesystems without extracting anything`() {
+        sessionFsm.setState(StorageVerificationCompletedSuccessfully)
+        sessionFsm.getState().observeForever(mockStateObserver)
+
+        runBlocking { sessionFsm.submitEvent(ExtractFilesystem(avfFilesystem), this) }
+
+        verify(mockStateObserver).onChanged(ExtractionHasCompletedSuccessfully)
+        verifyBlocking(mockFilesystemManager, never()) { extractFilesystem(any(), any()) }
     }
 }
