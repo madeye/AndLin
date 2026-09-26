@@ -45,8 +45,8 @@ class AppDetailsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        activityContext = activity!!
-        viewModel.viewState.observe(this, Observer<AppDetailsViewState> { viewState ->
+        activityContext = requireActivity()
+        viewModel.viewState.observe(viewLifecycleOwner, Observer<AppDetailsViewState> { viewState ->
             viewState?.let {
                 handleViewStateChange(viewState)
             }

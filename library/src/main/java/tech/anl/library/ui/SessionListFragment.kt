@@ -82,7 +82,7 @@ class SessionListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityContext = activity!! as MainActivity
+        activityContext = requireActivity() as MainActivity
 
         sessionListViewModel.getSessionsAndFilesystems().observe(viewLifecycleOwner, sessionsAndFilesystemsChangeObserver)
 
@@ -132,7 +132,10 @@ class SessionListFragment : Fragment() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val menuInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = menuInfo.position
-        return when (val selectedItem = fragSessionListBinding.listSessions.adapter.getItem(position) as SessionListItem) {
+        // The list may have been replaced by a LiveData update while the menu was open.
+        val adapter = fragSessionListBinding.listSessions.adapter
+        if (position < 0 || position >= adapter.count) return true
+        return when (val selectedItem = adapter.getItem(position) as SessionListItem) {
             is SessionSeparatorItem -> true
             is SessionItem -> {
                 val session = selectedItem.session

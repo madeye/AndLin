@@ -97,7 +97,7 @@ class FilesystemListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        activityContext = activity!! as MainActivity
+        activityContext = requireActivity() as MainActivity
         filesystemListViewModel.getAllFilesystems().observe(viewLifecycleOwner, filesystemChangeObserver)
         filesystemListViewModel.getViewState().observe(viewLifecycleOwner, viewStateObserver)
         filesystemListViewModel.getAllActiveSessions().observe(viewLifecycleOwner, activeSessionObserver)
@@ -108,7 +108,7 @@ class FilesystemListFragment : Fragment() {
         super.onCreateContextMenu(menu, v, menuInfo)
         val menuInfoInt = menuInfo as AdapterView.AdapterContextMenuInfo
         val position = menuInfoInt.position
-        val filesystem = filesystemList[position]
+        val filesystem = filesystemList.getOrNull(position) ?: return
         activityContext.menuInflater.inflate(R.menu.context_menu_filesystems, menu)
         if (filesystem.isProtected)
             menu.removeItem(R.id.menu_item_filesystem_delete)
@@ -117,7 +117,8 @@ class FilesystemListFragment : Fragment() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val menuInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = menuInfo.position
-        val filesystem = filesystemList[position]
+        // The list may have been replaced by a LiveData update while the menu was open.
+        val filesystem = filesystemList.getOrNull(position) ?: return true
         when (item.itemId) {
             R.id.menu_item_filesystem_edit -> editFilesystem(filesystem)
             R.id.menu_item_filesystem_delete -> deleteFilesystem(filesystem)

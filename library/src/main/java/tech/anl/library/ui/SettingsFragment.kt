@@ -20,8 +20,8 @@ import tech.anl.library.utils.defaultSharedPreferences
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private val prootDebugLogger by lazy {
-        val anlFiles = AnlFiles(activity!!, activity!!.applicationInfo.nativeLibraryDir)
-        ProotDebugLogger(activity!!.defaultSharedPreferences, anlFiles)
+        val anlFiles = AnlFiles(requireActivity(), requireActivity().applicationInfo.nativeLibraryDir)
+        ProotDebugLogger(requireActivity().defaultSharedPreferences, anlFiles)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -35,7 +35,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val clearAutoStartPreference: Preference = findPreference("pref_clear_auto_start")!!
         clearAutoStartPreference.setOnPreferenceClickListener {
-            val prefs = activity!!.getSharedPreferences("apps", Context.MODE_PRIVATE)
+            val prefs = requireActivity().getSharedPreferences("apps", Context.MODE_PRIVATE)
             with(prefs.edit()) {
                 remove("AutoApp")
                 apply()
@@ -46,7 +46,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val hideSessionsFilesystemsPreference: CheckBoxPreference = findPreference("pref_hide_sessions_filesystems")!!
         hideSessionsFilesystemsPreference.setOnPreferenceChangeListener { preference, newValue ->
             if (newValue is Boolean) {
-                val bottomNavView = activity!!.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+                val bottomNavView = requireActivity().findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
                     R.id.bottom_nav_view
                 )
                 if (newValue) {

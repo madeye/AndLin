@@ -335,6 +335,6 @@
     <string name="pref_title_enable_barcode_size_check">Barcode Größe prüfen</string>
     <string name="pref_summary_enable_barcode_size_check">Benutzer darauf hinweisen, die Kamera näher zu bewegen, wenn der erkannte Barcode zu klein ist</string>
     <string name="pref_title_minimum_barcode_width">Minimale Barcode Höhe</string>
-    <string name="pref_summary_minimum_barcode_width">Relativ zur Breite, Wertebereich von 20% bis 80% (nur zutreffend wenn die Prüfung der Barcode Größe aktiv ist)</string>
+    <string name="pref_summary_minimum_barcode_width" formatted="false">Relativ zur Breite, Wertebereich von 20% bis 80% (nur zutreffend wenn die Prüfung der Barcode Größe aktiv ist)</string>
 
 </resources>

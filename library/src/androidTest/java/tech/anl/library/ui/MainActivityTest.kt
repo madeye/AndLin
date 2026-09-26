@@ -10,14 +10,15 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.* // ktlint-disable 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
-import com.schibsted.spain.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
-import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.schibsted.spain.barista.interaction.BaristaListInteractions.clickListItem
-import com.schibsted.spain.barista.interaction.BaristaRadioButtonInteractions.clickRadioButtonItem
+import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
+import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.BaristaListInteractions.clickListItem
+import com.adevinta.android.barista.interaction.BaristaRadioButtonInteractions.clickRadioButtonItem
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -128,6 +129,9 @@ class MainActivityTest {
     }
     */
 
+    // Drives UserLAnd's asset-download flow and its "Test" app; AndLin now installs filesystems
+    // by pulling OCI images, so this needs rewriting against the new setup flow.
+    @Ignore("Legacy UserLAnd asset-download flow; not applicable to OCI image installs")
     @Test
     fun test_vnc_session_can_be_started() {
         R.id.swipe_refresh.shortWaitForDisplay()

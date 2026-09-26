@@ -36,7 +36,7 @@ class AppsRepository(
     }
 
     suspend fun refreshData(scope: CoroutineScope) {
-        val distributionsList = mutableSetOf<String>()
+        val distributionsList = java.util.Collections.synchronizedSet(mutableSetOf<String>())
         refreshStatus.postValue(RefreshStatus.ACTIVE)
         val jobs = mutableListOf<Job>()
 
