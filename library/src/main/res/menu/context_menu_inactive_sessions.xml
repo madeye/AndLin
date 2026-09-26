@@ -9,4 +9,8 @@
     <item
         android:id="@+id/menu_item_session_delete"
         android:title="@string/delete" />
+
+    <item
+        android:id="@+id/menu_item_session_copy_ssh"
+        android:title="@string/session_copy_ssh_command" />
 </menu>
