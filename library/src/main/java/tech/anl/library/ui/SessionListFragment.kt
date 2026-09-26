@@ -2,11 +2,16 @@ package tech.anl.library.ui
 
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.* // ktlint-disable no-wildcard-imports
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import tech.anl.library.databinding.FragSessionListBinding
@@ -14,8 +19,12 @@ import tech.anl.library.MainActivity
 import tech.anl.library.R
 import tech.anl.library.ServerService
 import tech.anl.library.model.entities.Filesystem
+import tech.anl.library.model.entities.ServiceType
 import tech.anl.library.model.entities.Session
 import tech.anl.library.model.repositories.AnlDatabase
+import tech.anl.library.utils.NetworkAddresses
+import tech.anl.library.utils.SshServerInfo
+import tech.anl.library.utils.defaultSharedPreferences
 import tech.anl.library.viewmodel.SessionListViewModel
 import tech.anl.library.viewmodel.SessionListViewModelFactory
 
@@ -105,6 +114,8 @@ class SessionListFragment : Fragment() {
                 doCreateSessionContextMenu(session, menu)
                 if (session.isProtected)
                     menu.removeItem(R.id.menu_item_session_delete)
+                if (session.serviceType != ServiceType.Ssh)
+                    menu.removeItem(R.id.menu_item_session_copy_ssh)
             }
         }
     }
@@ -135,8 +146,21 @@ class SessionListFragment : Fragment() {
             R.id.menu_item_session_stop_session -> stopService(session)
             R.id.menu_item_session_edit -> editSession(session)
             R.id.menu_item_session_delete -> deleteSession(session)
+            R.id.menu_item_session_copy_ssh -> copySshCommand(session)
             else -> super.onContextItemSelected(item)
         }
+    }
+
+    private fun copySshCommand(session: Session): Boolean {
+        val info = SshServerInfo.forSession(session, activityContext.defaultSharedPreferences, NetworkAddresses.lanAddress())
+            ?: return true
+        val clipboard = activityContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("ssh", info.command))
+        // Android 13+ shows its own copy confirmation.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            Toast.makeText(activityContext, R.string.session_ssh_command_copied, Toast.LENGTH_SHORT).show()
+        }
+        return true
     }
 
     private fun stopService(session: Session): Boolean {

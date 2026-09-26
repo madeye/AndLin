@@ -5,4 +5,7 @@
         android:id="@+id/menu_item_session_stop_session"
         android:title="@string/stop_session" />
 
+    <item
+        android:id="@+id/menu_item_session_copy_ssh"
+        android:title="@string/session_copy_ssh_command" />
 </menu>

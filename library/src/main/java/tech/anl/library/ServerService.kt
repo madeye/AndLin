@@ -48,6 +48,10 @@ class ServerService : Service(), CoroutineScope {
         // Session ids to bring back after a reboot when "Start on boot" is on.
         private const val AUTOSTART_SESSIONS_KEY = "andlin_autostart_session_ids"
         private const val SESSION_WATCH_INTERVAL_MS = 5_000L
+        // Restarting a server that died unexpectedly: at most this many times per window.
+        private const val MAX_RESTARTS = 3
+        private const val RESTART_WINDOW_MS = 10 * 60_000L
+        private const val RESTART_DELAY_MS = 2_000L
 
         fun autostartSessionIds(context: Context): Set<Long> =
             context.defaultSharedPreferences.getStringSet(AUTOSTART_SESSIONS_KEY, emptySet())!!
@@ -55,6 +59,8 @@ class ServerService : Service(), CoroutineScope {
     }
 
     private val activeSessions: MutableMap<Long, Session> = mutableMapOf()
+    // Session id -> when its server was last restarted after dying unexpectedly.
+    private val restartTimes = mutableMapOf<Long, MutableList<Long>>()
 
     private lateinit var lastSession: Session
 
@@ -114,7 +120,14 @@ class ServerService : Service(), CoroutineScope {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        when (intent?.getStringExtra("type")) {
+        // Android restarting the service after killing the process (START_STICKY): bring back the
+        // sessions that were running, as after a reboot.
+        if (intent == null) {
+            this.launch { startAutostartSessions() }
+            return START_STICKY
+        }
+
+        when (intent.getStringExtra("type")) {
             "start" -> {
                 val session: Session = intent.getParcelableExtra("session")!!
                 val launchClient = intent.getBooleanExtra("launchClient", true)
@@ -387,10 +400,31 @@ class ServerService : Service(), CoroutineScope {
             .putExtra("sessionId", session.id)
             .putExtra("killedByHost", KillReport.wasKilledByHost(report))
         broadcaster.sendBroadcast(intent)
+        if (restartAfterDeath(session)) return
         if (activeSessions.isEmpty()) {
             releaseLocks()
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
+    }
+
+    /**
+     * A server is meant to keep answering, so when "Keep sessions running" is on, a session whose
+     * server died without being stopped is started again (without opening a client), unless it
+     * already died [MAX_RESTARTS] times within [RESTART_WINDOW_MS]. Returns whether it restarts.
+     */
+    private fun restartAfterDeath(session: Session): Boolean {
+        if (!keepSessionsRunning()) return false
+        val now = System.currentTimeMillis()
+        val times = restartTimes.getOrPut(session.id) { mutableListOf() }
+        times.removeAll { now - it > RESTART_WINDOW_MS }
+        if (times.size >= MAX_RESTARTS) return false
+        times += now
+        launch {
+            delay(RESTART_DELAY_MS)
+            if (session.id in deliberatelyStopped) return@launch
+            startSession(session, launchClient = false)
+        }
+        return true
     }
 
     private fun stopApp(app: App) {

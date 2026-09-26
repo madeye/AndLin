@@ -1,12 +1,6 @@
 package tech.anl.library.ui
 
-import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.PowerManager
-import android.provider.Settings
 import android.widget.Toast
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -94,20 +88,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    @SuppressLint("BatteryLife") // A background server is the use case this exemption exists for.
     private fun requestBatteryOptimizationExemption() {
-        val context = requireContext()
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
-            Toast.makeText(context, R.string.pref_battery_optimization_done, Toast.LENGTH_SHORT).show()
+        if (BackgroundRunPrompt.isIgnoringBatteryOptimizations(requireContext())) {
+            Toast.makeText(requireContext(), R.string.pref_battery_optimization_done, Toast.LENGTH_SHORT).show()
             return
         }
-        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}"))
-        try {
-            startActivity(intent)
-        } catch (err: ActivityNotFoundException) {
-            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-        }
+        BackgroundRunPrompt.requestExemption(requireActivity())
     }
 
     private fun hidePrefs() {

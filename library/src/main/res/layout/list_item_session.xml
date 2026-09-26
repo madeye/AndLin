@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="72dp" >
+    android:layout_height="wrap_content"
+    android:minHeight="72dp" >
 
     <TextView
         android:id="@+id/text_list_item_session_name"
@@ -16,8 +17,23 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/layout_service_type"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/guide_row_top"
+        app:layout_constraintBottom_toBottomOf="@id/guide_row_bottom" />
+
+    <!-- The first 72dp line; the SSH server info (if any) goes below it. -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_row_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_row_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="72dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_service_type"
@@ -26,8 +42,8 @@
         android:layout_margin="8dp"
         app:layout_constraintStart_toEndOf="@id/text_list_item_session_name"
         app:layout_constraintEnd_toStartOf="@id/text_list_item_filesystem_name"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" >
+        app:layout_constraintTop_toTopOf="@id/guide_row_top"
+        app:layout_constraintBottom_toBottomOf="@id/guide_row_bottom" >
 
         <TextView
             android:id="@+id/text_list_item_service_type"
@@ -59,8 +75,8 @@
         android:layout_margin="8dp"
         app:layout_constraintEnd_toStartOf="@id/image_list_item_filesystem_icon"
         app:layout_constraintStart_toEndOf="@id/layout_service_type"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/guide_row_top"
+        app:layout_constraintBottom_toBottomOf="@id/guide_row_bottom" />
 
     <ImageView
         android:id="@+id/image_list_item_filesystem_icon"
@@ -69,8 +85,26 @@
         android:layout_marginEnd="24dp"
         android:layout_marginStart="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="@id/guide_row_top"
+        app:layout_constraintBottom_toBottomOf="@id/guide_row_bottom"/>
+
+    <!-- SSH sessions: how to connect (address, port, user, password). -->
+    <TextView
+        android:id="@+id/text_list_item_server_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="monospace"
+        android:textSize="13sp"
+        android:lineSpacingExtra="2dp"
+        android:textIsSelectable="false"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/guide_row_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
