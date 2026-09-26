@@ -2,11 +2,13 @@
 # ServerBox's SSH server launcher, run as root inside the guest by LocalServerManager.
 #
 # Environment (all optional):
-#   INITIAL_USERNAME        user whose ~/.ssh/authorized_keys receives SERVERBOX_AUTHORIZED_KEYS
+#   INITIAL_USERNAME           user whose ~/.ssh/authorized_keys receives SERVERBOX_AUTHORIZED_KEYS
 #   SERVERBOX_SSH_ADDRESS      address to listen on; 127.0.0.1 (default) keeps SSH on this device
 #   SERVERBOX_SSH_PORT         port to listen on (default 2022)
 #   SERVERBOX_AUTHORIZED_KEYS  newline-separated public keys to add
 #   SERVERBOX_SSH_KEYS_ONLY    1 to refuse password logins
+#   RESOLV, HOSTS, HOSTNAME    contents of /etc/resolv.conf, /etc/hosts and /etc/hostname
+#   INITIAL_PASSWORD           password for INITIAL_USERNAME if the user has to be created
 #
 # Before starting dropbear it runs every executable in /etc/serverbox/autostart.d, in name order,
 # in the background with output in /var/log/serverbox-autostart.log. That is the place for
@@ -14,6 +16,11 @@
 
 unset LD_LIBRARY_PATH
 unset LD_PRELOAD
+
+# Android has no resolv.conf for PRoot to bind; the app passes the network's DNS servers.
+[ -n "$RESOLV" ] && printf '%s\n' "$RESOLV" > /etc/resolv.conf
+[ -n "$HOSTS" ] && printf '%s\n' "$HOSTS" > /etc/hosts
+[ -n "$HOSTNAME" ] && printf '%s\n' "$HOSTNAME" > /etc/hostname
 
 address="${SERVERBOX_SSH_ADDRESS:-127.0.0.1}"
 port="${SERVERBOX_SSH_PORT:-2022}"
