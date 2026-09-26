@@ -17,7 +17,7 @@ import tech.anl.library.model.daos.SessionDao
 import tech.anl.library.model.entities.App
 import tech.anl.library.model.entities.ExecutionTypeConverter
 
-@Database(entities = [Session::class, Filesystem::class, App::class], version = 10, exportSchema = true)
+@Database(entities = [Session::class, Filesystem::class, App::class], version = 11, exportSchema = true)
 @TypeConverters(ExecutionTypeConverter::class)
 abstract class AnlDatabase : RoomDatabase() {
 
@@ -48,7 +48,8 @@ abstract class AnlDatabase : RoomDatabase() {
                                 Migration6To7(),
                                 Migration7To8(),
                                 Migration8To9(),
-                                Migration9To10()
+                                Migration9To10(),
+                                Migration10To11()
                         )
                         .addCallback(object : RoomDatabase.Callback() {
                             override fun onOpen(db: SupportSQLiteDatabase) {
@@ -171,5 +172,17 @@ class Migration9To10 : Migration(9, 10) {
         database.execSQL("ALTER TABLE filesystem ADD COLUMN flavor TEXT NOT NULL DEFAULT 'default'")
         database.execSQL("ALTER TABLE filesystem ADD COLUMN executionType TEXT NOT NULL DEFAULT 'PROOT'")
         database.execSQL("ALTER TABLE apps ADD COLUMN supportsStandalone TEXT NOT NULL DEFAULT 'false'")
+    }
+}
+
+/**
+ * The default username was "userland" before the app became ServerBox. Move filesystems and
+ * sessions that still use it to "serverbox"; startSSHServer.sh renames the user inside the
+ * filesystem to match (see serverbox/renameLegacyUser.sh). Custom usernames are left alone.
+ */
+class Migration10To11 : Migration(10, 11) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("UPDATE filesystem SET defaultUsername = 'serverbox' WHERE defaultUsername = 'userland'")
+        database.execSQL("UPDATE session SET username = 'serverbox' WHERE username = 'userland'")
     }
 }
