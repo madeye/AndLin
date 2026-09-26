@@ -7,5 +7,5 @@
     <string name="execution_type_avf">Virtual Machine</string>
     <string name="execution_type_qemu">QEMU Emulation</string>
     <string name="pro_feature_label">%1$s (Pro)</string>
-    <string name="pro_feature_required">That option needs AndLin Pro.</string>
+    <string name="pro_feature_required">That option needs ServerBox Pro.</string>
 </resources>

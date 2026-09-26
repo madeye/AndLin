@@ -20,4 +20,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Alpine Linux in AndLin!"
+echo "Welcome to Alpine Linux in ServerBox!"

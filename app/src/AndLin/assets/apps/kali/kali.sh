@@ -34,4 +34,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Kali in AndLin!"
+echo "Welcome to Kali in ServerBox!"

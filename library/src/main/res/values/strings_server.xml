@@ -23,22 +23,22 @@
     <string name="session_copy_ssh_command">Copy SSH command</string>
     <string name="session_ssh_command_copied">SSH command copied</string>
     <string name="background_prompt_title">Keep servers running</string>
-    <string name="background_prompt_message">With the screen off, Android may pause AndLin, and your servers stop answering. Allow AndLin to run without battery restrictions to keep them up.</string>
-    <string name="background_prompt_xiaomi">On Xiaomi phones, also open AndLin\'s app settings: set Battery saver to \"No restrictions\" and turn on Autostart.</string>
+    <string name="background_prompt_message">With the screen off, Android may pause ServerBox, and your servers stop answering. Allow ServerBox to run without battery restrictions to keep them up.</string>
+    <string name="background_prompt_xiaomi">On Xiaomi phones, also open ServerBox\'s app settings: set Battery saver to \"No restrictions\" and turn on Autostart.</string>
     <string name="background_prompt_allow">Allow</string>
     <string name="background_prompt_later">Not now</string>
     <string name="background_prompt_app_settings">App settings</string>
     <string name="pref_desktop_category">Desktop (VNC)</string>
     <string name="pref_enable_desktop_title">Enable desktop sessions</string>
-    <string name="pref_enable_desktop_summary">Offer graphical desktops (XFCE, LXDE) over VNC and show GUI-only apps. Off by default: AndLin sessions are SSH terminals.</string>
+    <string name="pref_enable_desktop_summary">Offer graphical desktops (XFCE, LXDE) over VNC and show GUI-only apps. Off by default: ServerBox sessions are SSH terminals.</string>
     <string name="desktop_unavailable">Desktop sessions are turned off. Enable them under Settings → Desktop (VNC).</string>
     <string name="flavor_server">Server (headless)</string>
     <string name="vm_backend_unavailable">This filesystem runs in a virtual machine, which this device or build doesn\'t support.</string>
     <string name="vm_stop_failed">The virtual machine didn\'t confirm it stopped.</string>
     <string name="vm_terminal_banner">Booting virtual machine, please wait…</string>
     <string name="pref_battery_optimization_title">Ignore battery optimization</string>
-    <string name="pref_battery_optimization_summary">Let Android keep AndLin running in the background. Needed on many devices for servers to stay up.</string>
-    <string name="pref_battery_optimization_done">AndLin is already exempt from battery optimization.</string>
+    <string name="pref_battery_optimization_summary">Let Android keep ServerBox running in the background. Needed on many devices for servers to stay up.</string>
+    <string name="pref_battery_optimization_done">ServerBox is already exempt from battery optimization.</string>
     <string name="pref_phantom_process_fix_title">Stop Android killing session processes</string>
     <string name="pref_phantom_process_fix_summary">Turn off Android 12+\'s phantom process killer through Wireless debugging.</string>
 </resources>
