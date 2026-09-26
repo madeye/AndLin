@@ -26,6 +26,7 @@ import tech.anl.library.R
 import tech.anl.library.model.repositories.AnlDatabase
 import tech.anl.library.utils.PermissionHandler
 import tech.anl.library.utils.CredentialValidator
+import tech.anl.library.utils.DefaultCredentials
 import tech.anl.library.utils.AnlFiles
 import tech.anl.library.utils.preferences.AppsPreferences
 import tech.anl.library.viewmodel.*
@@ -128,6 +129,12 @@ class FilesystemEditFragment : Fragment() {
     }
 
     private fun setupTextInputs() {
+        if (!editExisting && filesystem.defaultUsername.isEmpty() && filesystem.defaultPassword.isEmpty()) {
+            val suggestedPassword = DefaultCredentials.randomPassword()
+            filesystem.defaultUsername = DefaultCredentials.USERNAME
+            filesystem.defaultPassword = suggestedPassword
+            if (filesystem.defaultVncPassword.isEmpty()) filesystem.defaultVncPassword = suggestedPassword
+        }
         fragFilesystemEditBinding.inputFilesystemName.setText(filesystem.name)
         fragFilesystemEditBinding.inputFilesystemUsername.setText(filesystem.defaultUsername)
         fragFilesystemEditBinding.inputFilesystemPassword.setText(filesystem.defaultPassword)

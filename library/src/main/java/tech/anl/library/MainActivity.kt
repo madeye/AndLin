@@ -947,6 +947,11 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun getCredentials() {
         val dialog = AlertDialog.Builder(this)
         val dialogView = this.layoutInflater.inflate(R.layout.dia_app_credentials, null)
+        // Suggested defaults; the user can change them before continuing.
+        val suggestedPassword = DefaultCredentials.randomPassword()
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_username).setText(DefaultCredentials.USERNAME)
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_password).setText(suggestedPassword)
+        dialogView.findViewById<TextInputEditText>(R.id.text_input_vnc_password).setText(suggestedPassword)
         dialog.setView(dialogView)
         dialog.setCancelable(true)
         dialog.setPositiveButton(R.string.button_continue, null)
