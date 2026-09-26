@@ -188,14 +188,17 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val downloadManagerWrapper = DownloadManagerWrapper(downloadManager)
         val assetDownloader = AssetDownloader(assetPreferences, downloadManagerWrapper, anlFiles)
 
-        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles, { DesktopSupport.isEnabled(this) })
+        val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice(this) }
+        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles,
+            { DesktopSupport.isEnabled(this) }, executionTypeSupported)
         val sessionStartupFsm = SessionStartupFsm(
             anlDatabase,
             assetRepository,
             filesystemManager,
             assetDownloader,
             storageCalculator,
-            OciFilesystemSetup(this, anlFiles)
+            OciFilesystemSetup(this, anlFiles),
+            executionTypeSupported
         )
         ViewModelProvider(this, MainActivityViewModelFactory(appsStartupFsm, sessionStartupFsm))                .get(MainActivityViewModel::class.java)
     }

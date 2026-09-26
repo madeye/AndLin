@@ -783,6 +783,50 @@ class SessionStartupFsmTest {
         verify(mockStateObserver).onChanged(ExtractionFailed("Unknown reason."))
     }
 
+    // --- VM filesystems fall back to PRoot on devices that can't run their backend ---
+
+    private fun fsmForFilesystem(fs: Filesystem, vmSupported: Boolean): SessionStartupFsm {
+        whenever(mockFilesystemDao.getAllFilesystems()).thenReturn(MutableLiveData<List<Filesystem>>().apply { postValue(listOf(fs)) })
+        return SessionStartupFsm(
+                mockAnlDatabase,
+                mockAssetRepository,
+                mockFilesystemManager,
+                mockAssetDownloader,
+                mockStorageCalculator,
+                executionTypeSupported = { !it.isVm || vmSupported },
+                logger = mockLogger
+        )
+    }
+
+    @Test
+    fun `An AVF filesystem falls back to PROOT on selection when AVF is unsupported`() {
+        val fs = Filesystem(id = -1, distributionType = assetType, executionType = ExecutionType.AVF)
+        val fsm = fsmForFilesystem(fs, vmSupported = false)
+        fsm.setState(WaitingForSessionSelection)
+        fsm.getState().observeForever(mockStateObserver)
+        activeSessionLiveData.postValue(listOf())
+
+        runBlocking { fsm.submitEvent(SessionSelected(inactiveSession), this) }
+
+        assertEquals(ExecutionType.PROOT, fs.executionType)
+        verify(mockFilesystemDao).updateFilesystem(fs)
+        verify(mockStateObserver).onChanged(SessionIsReadyForPreparation(inactiveSession, fs))
+    }
+
+    @Test
+    fun `An AVF filesystem keeps its execution type on selection when AVF is supported`() {
+        val fs = Filesystem(id = -1, distributionType = assetType, executionType = ExecutionType.AVF)
+        val fsm = fsmForFilesystem(fs, vmSupported = true)
+        fsm.setState(WaitingForSessionSelection)
+        fsm.getState().observeForever(mockStateObserver)
+        activeSessionLiveData.postValue(listOf())
+
+        runBlocking { fsm.submitEvent(SessionSelected(inactiveSession), this) }
+
+        assertEquals(ExecutionType.AVF, fs.executionType)
+        verify(mockFilesystemDao, never()).updateFilesystem(any())
+    }
+
     // --- AVF (VM) filesystems skip the legacy per-release asset pipeline entirely ---
 
     private val avfFilesystem = Filesystem(id = -1, distributionType = assetType, executionType = ExecutionType.AVF)

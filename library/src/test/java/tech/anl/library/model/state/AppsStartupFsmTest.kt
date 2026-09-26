@@ -359,6 +359,31 @@ class AppsStartupFsmTest {
     }
 
     @Test
+    fun `CheckFilesystemFlavor auto-selects PROOT for a distribution when no VM backend is supported`() {
+        whenever(mockAnlFiles.filesDir).thenReturn(tempFolder.root)
+        val flavorsFile = File(tempFolder.root, "apps/${app.name}/flavors.txt")
+        flavorsFile.parentFile!!.mkdirs()
+        flavorsFile.writeText("Release Name, Display Name, isPaid\nxfce, XFCE, false\n")
+
+        val noVmFsm = AppsStartupFsm(
+            mockAnlDatabase,
+            mockFilesystemManager,
+            mockAnlFiles,
+            executionTypeSupported = { !it.isVm },
+            logger = mockLogger
+        )
+        noVmFsm.setState(DatabaseEntriesFetched(appsFilesystem, appSession))
+        noVmFsm.getState().observeForever(mockStateObserver)
+
+        val filesystemWithoutFlavor = appsFilesystem.copy(flavor = "")
+        runBlocking { noVmFsm.submitEvent(CheckFilesystemFlavor(app, filesystemWithoutFlavor), this) }
+
+        assertEquals(ExecutionType.PROOT, filesystemWithoutFlavor.executionType)
+        verify(mockFilesystemDao).updateFilesystem(filesystemWithoutFlavor)
+        verify(mockStateObserver).onChanged(FilesystemFlavorSet)
+    }
+
+    @Test
     fun `SubmitFilesystemFlavor updates the filesystem and posts FilesystemFlavorSet`() {
         appsFsm.setState(FilesystemFlavorRequired(appsFilesystem, listOf(), listOf()))
         appsFsm.getState().observeForever(mockStateObserver)

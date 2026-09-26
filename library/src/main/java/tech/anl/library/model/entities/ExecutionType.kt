@@ -1,5 +1,6 @@
 package tech.anl.library.model.entities
 
+import android.content.Context
 import android.os.Build
 import androidx.room.TypeConverter
 
@@ -21,7 +22,20 @@ enum class ExecutionType(val minSupportedSdk: Int) {
 
     fun isSupportedOnThisDevice(): Boolean = Build.VERSION.SDK_INT >= minSupportedSdk
 
+    /**
+     * Like [isSupportedOnThisDevice], but also checks what the API level doesn't guarantee: many
+     * Android 14+ devices (e.g. Qualcomm phones running Gunyah instead of pKVM) ship without AVF,
+     * and QEMU's native code is arm64-only.
+     */
+    fun isSupportedOnThisDevice(context: Context): Boolean = isSupportedOnThisDevice() && when (this) {
+        PROOT -> true
+        AVF -> context.packageManager.hasSystemFeature(AVF_FEATURE)
+        QEMU -> Build.SUPPORTED_ABIS.contains("arm64-v8a")
+    }
+
     companion object {
+        private const val AVF_FEATURE = "android.software.virtualization_framework"
+
         fun fromString(value: String?): ExecutionType =
             values().firstOrNull { it.name.equals(value, ignoreCase = true) } ?: PROOT
     }
