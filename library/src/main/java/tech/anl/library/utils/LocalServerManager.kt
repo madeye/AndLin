@@ -80,6 +80,8 @@ class LocalServerManager(
         val command = "/support/common/${AndlinScripts.START_SSH_SERVER}"
         val env = HashMap<String, String>()
         env["INITIAL_USERNAME"] = session.username
+        // Only used to create the user if the filesystem lacks it (see startSSHServer.sh).
+        env["INITIAL_PASSWORD"] = session.password
         env["ANDLIN_SSH_ADDRESS"] = if (sharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)) "0.0.0.0" else "127.0.0.1"
         val authorizedKeys = sharedPreferences.getString("pref_ssh_authorized_keys", "").orEmpty().trim()
         if (authorizedKeys.isNotEmpty()) env["ANDLIN_AUTHORIZED_KEYS"] = authorizedKeys
