@@ -150,6 +150,9 @@ class BusyboxWrapper(private val anlFiles: AnlFiles) {
 
     fun getBusyboxEnv(): HashMap<String, String> {
         return hashMapOf(
+                // support/busybox is dynamically linked against support/libbusybox.so.*; without
+                // this it can't start, and every script run outside PRoot exits 1.
+                "LD_LIBRARY_PATH" to anlFiles.supportDir.absolutePath,
                 "LIB_PATH" to anlFiles.supportDir.absolutePath,
                 "ROOT_PATH" to anlFiles.filesDir.absolutePath
         )
@@ -184,7 +187,10 @@ class BusyboxWrapper(private val anlFiles: AnlFiles) {
                 "PROOT_DEBUG_LEVEL" to prootDebugLevel,
                 "EXTRA_BINDINGS" to bindings,
                 // The kill report path is opened by PRoot itself, untranslated, so it is a host path.
-                "PROOT_ARGS" to "--droid_files --kill-report=${killReportFile(filesystemDir).absolutePath}",
+                // -0 fakes root, so setup scripts can useradd/chpasswd/chown and the SSH server can
+                // log users in; --link2symlink emulates hard links, which Android forbids in app
+                // storage (useradd locks /etc/passwd with one).
+                "PROOT_ARGS" to "-0 --link2symlink --droid_files --kill-report=${killReportFile(filesystemDir).absolutePath}",
                 "OS_VERSION" to System.getProperty("os.version")!!
         )
     }

@@ -115,7 +115,7 @@ class LocalServerManagerTest {
     fun `Starting an SSH server passes the username and a localhost address by default`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
         val command = "/support/common/andlin_startSSHServer.sh"
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "ANDLIN_SSH_ADDRESS" to "127.0.0.1")
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "ANDLIN_SSH_ADDRESS" to "127.0.0.1")
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -138,7 +138,7 @@ class LocalServerManagerTest {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
         val command = "/support/common/andlin_startSSHServer.sh"
         whenever(mockSharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)).thenReturn(true)
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "ANDLIN_SSH_ADDRESS" to "0.0.0.0")
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "ANDLIN_SSH_ADDRESS" to "0.0.0.0")
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -163,6 +163,7 @@ class LocalServerManagerTest {
         whenever(mockSharedPreferences.getString("pref_ssh_authorized_keys", "")).thenReturn("ssh-ed25519 AAAA...")
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
+                "INITIAL_PASSWORD" to "",
                 "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
                 "ANDLIN_AUTHORIZED_KEYS" to "ssh-ed25519 AAAA..."
         )
@@ -190,6 +191,7 @@ class LocalServerManagerTest {
         whenever(mockSharedPreferences.getBoolean("pref_ssh_disable_password", false)).thenReturn(true)
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
+                "INITIAL_PASSWORD" to "",
                 "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
                 "ANDLIN_SSH_KEYS_ONLY" to "1"
         )
