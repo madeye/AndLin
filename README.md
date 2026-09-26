@@ -59,7 +59,7 @@ JAVA_HOME=/path/to/jdk-17 ./gradlew :app:assembleServerBoxDebug
 ```
 
 The distribution images are built in [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images)
-and published to `ghcr.io/madeye/andlin-<distro>`.
+and published to `ghcr.io/madeye/serverbox-<distro>`.
 
 ## Credits
 
