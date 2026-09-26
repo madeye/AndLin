@@ -59,7 +59,7 @@ class AdbClient private constructor(context: Context) {
         object : AbsAdbConnectionManager() {
             override fun getPrivateKey(): PrivateKey = this@AdbClient.privateKey
             override fun getCertificate(): Certificate = this@AdbClient.certificate
-            override fun getDeviceName(): String = "AndLin"
+            override fun getDeviceName(): String = "ServerBox"
         }.apply {
             setApi(Build.VERSION.SDK_INT)
             setTimeout(15, java.util.concurrent.TimeUnit.SECONDS)

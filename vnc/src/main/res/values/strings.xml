@@ -29,5 +29,5 @@
 
     <string name="vnc_channel_name">VNC viewer</string>
     <string name="vnc_notification_text">Tap to return to the desktop</string>
-    <string name="vnc_default_title">AndLin desktop</string>
+    <string name="vnc_default_title">ServerBox desktop</string>
 </resources>

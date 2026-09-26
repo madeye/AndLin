@@ -24,11 +24,11 @@
     <string name="companion_wizard_title_update">Update %1$s</string>
     <string name="companion_wizard_title_phantom">Stop Android from killing sessions</string>
     <string name="companion_wizard_step">Step %1$d of %2$d</string>
-    <string name="companion_wizard_consent_install">To run Linux in a virtual machine, AndLin needs a companion app, %1$s.\n\nIf you continue, AndLin will:\n\n• download %1$s (%2$s) from AndLin\'s GitHub releases;\n• ask you to turn on Wireless debugging in Developer options and pair AndLin with your own device, so it can act like a computer connected over ADB;\n• install %1$s and grant it the permissions it needs: running virtual machines, all files access (only used when you choose to share your device\'s storage with a session), and notifications.\n\nNothing leaves your device other than the download. You can turn Wireless debugging off again when this is done, and uninstall %1$s any time.</string>
-    <string name="companion_wizard_consent_update">A newer version of %1$s is available.\n\nIf you continue, AndLin will download it and install it over the installed one through Wireless debugging, the same way it was first installed, and grant any permissions the new version needs. Your virtual machines are kept.</string>
-    <string name="companion_wizard_consent_update_required">This version of AndLin needs a newer %1$s before virtual machine sessions can start.\n\nIf you continue, AndLin will download it and install it over the installed one through Wireless debugging, the same way it was first installed. Your virtual machines are kept.</string>
-    <string name="companion_wizard_consent_phantom">Android 12 and later stop background processes they consider \"phantom\" — which includes the Linux programs a session runs. That makes sessions close suddenly, often in the middle of installing something.\n\nAndLin can switch this off for you, once. It needs Wireless debugging for that: you will turn it on in Developer options and pair AndLin with your own device. AndLin then runs three settings commands:\n\n• device_config set_sync_disabled_for_tests persistent\n• device_config put activity_manager max_phantom_processes 2147483647\n• settings put global settings_enable_monitor_phantom_procs false\n\nYou can turn Wireless debugging off again afterwards.</string>
-    <string name="companion_wizard_legacy_install">This Android version doesn\'t have Wireless debugging, so %1$s will be installed with the system installer. Allow AndLin to install apps if asked.</string>
+    <string name="companion_wizard_consent_install">To run Linux in a virtual machine, ServerBox needs a companion app, %1$s.\n\nIf you continue, ServerBox will:\n\n• download %1$s (%2$s) from ServerBox\'s GitHub releases;\n• ask you to turn on Wireless debugging in Developer options and pair ServerBox with your own device, so it can act like a computer connected over ADB;\n• install %1$s and grant it the permissions it needs: running virtual machines, all files access (only used when you choose to share your device\'s storage with a session), and notifications.\n\nNothing leaves your device other than the download. You can turn Wireless debugging off again when this is done, and uninstall %1$s any time.</string>
+    <string name="companion_wizard_consent_update">A newer version of %1$s is available.\n\nIf you continue, ServerBox will download it and install it over the installed one through Wireless debugging, the same way it was first installed, and grant any permissions the new version needs. Your virtual machines are kept.</string>
+    <string name="companion_wizard_consent_update_required">This version of ServerBox needs a newer %1$s before virtual machine sessions can start.\n\nIf you continue, ServerBox will download it and install it over the installed one through Wireless debugging, the same way it was first installed. Your virtual machines are kept.</string>
+    <string name="companion_wizard_consent_phantom">Android 12 and later stop background processes they consider \"phantom\" — which includes the Linux programs a session runs. That makes sessions close suddenly, often in the middle of installing something.\n\nServerBox can switch this off for you, once. It needs Wireless debugging for that: you will turn it on in Developer options and pair ServerBox with your own device. ServerBox then runs three settings commands:\n\n• device_config set_sync_disabled_for_tests persistent\n• device_config put activity_manager max_phantom_processes 2147483647\n• settings put global settings_enable_monitor_phantom_procs false\n\nYou can turn Wireless debugging off again afterwards.</string>
+    <string name="companion_wizard_legacy_install">This Android version doesn\'t have Wireless debugging, so %1$s will be installed with the system installer. Allow ServerBox to install apps if asked.</string>
     <string name="companion_wizard_continue">Continue</string>
     <string name="companion_wizard_cancel">Cancel</string>
     <string name="companion_wizard_close">Close</string>
@@ -36,7 +36,7 @@
     <string name="companion_wizard_downloading">Downloading %1$s…</string>
     <string name="companion_wizard_downloading_progress">Downloading %1$s: %2$d%%</string>
     <string name="companion_wizard_download_failed">Could not download %1$s: %2$s</string>
-    <string name="companion_wizard_pair_instructions">1. Open Developer options (if you don\'t have them, go to Settings › About phone and tap Build number seven times).\n2. Turn on Wireless debugging. Your device must be on Wi-Fi.\n3. Tap Wireless debugging, then \"Pair device with pairing code\".\n4. Type the six-digit code into the notification from AndLin — or come back here and type it below.</string>
+    <string name="companion_wizard_pair_instructions">1. Open Developer options (if you don\'t have them, go to Settings › About phone and tap Build number seven times).\n2. Turn on Wireless debugging. Your device must be on Wi-Fi.\n3. Tap Wireless debugging, then \"Pair device with pairing code\".\n4. Type the six-digit code into the notification from ServerBox — or come back here and type it below.</string>
     <string name="companion_wizard_open_developer_options">Open Developer options</string>
     <string name="companion_wizard_state_need_wireless">Waiting for Wireless debugging to be turned on…</string>
     <string name="companion_wizard_state_waiting_dialog">Waiting for \"Pair device with pairing code\" to be opened…</string>
@@ -60,7 +60,7 @@
     <!-- ADB pairing notification -->
     <string name="companion_adb_channel_name">Setup with Wireless debugging</string>
     <string name="companion_adb_channel_description">Lets you type the Wireless debugging pairing code while Settings is open.</string>
-    <string name="companion_adb_notif_title">AndLin setup</string>
+    <string name="companion_adb_notif_title">ServerBox setup</string>
     <string name="companion_adb_notif_enable_wireless">Turn on Wireless debugging in Developer options.</string>
     <string name="companion_adb_notif_open_pairing">In Wireless debugging, tap \"Pair device with pairing code\", then enter the code here.</string>
     <string name="companion_adb_notif_enter_code">Enter the pairing code shown in Settings.</string>
@@ -76,7 +76,7 @@
     <string name="companion_phantom_ask_no">No</string>
     <string name="companion_phantom_ask_never">Don\'t ask again</string>
     <string name="companion_phantom_explain_title">Android may be stopping your sessions</string>
-    <string name="companion_phantom_explain_message">Android 12 and later stop programs running in the background after a while, which is a common reason for sessions closing on their own. AndLin can switch this off for you once, using Wireless debugging.</string>
+    <string name="companion_phantom_explain_message">Android 12 and later stop programs running in the background after a while, which is a common reason for sessions closing on their own. ServerBox can switch this off for you once, using Wireless debugging.</string>
     <string name="companion_phantom_fix_now">Fix it</string>
     <string name="companion_phantom_not_now">Not now</string>
     <string name="companion_phantom_not_needed">This device doesn\'t stop background sessions, so there is nothing to fix.</string>
