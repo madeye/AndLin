@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'tech.ula.customlibrary'
+    namespace 'tech.anl.customlibrary'
 
     compileSdkVersion 35
 
@@ -166,7 +166,7 @@ android {
             buildConfigField 'boolean', 'ENABLE_QEMU_BACKEND', 'false'
 
             //Need unique provider authorities
-            buildConfigField 'String', 'PROVIDER_AUTHORITY', "\"tech.ula.provider.fileprovider\""
+            buildConfigField 'String', 'PROVIDER_AUTHORITY', "\"tech.anl.provider.fileprovider\""
         }
     }
     buildFeatures.buildConfig true

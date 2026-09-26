@@ -18,10 +18,10 @@
         android:supportsRtl="true">
 
         <receiver
-            android:name="tech.ula.library.ui.InstallPairingReceiver"
+            android:name="tech.anl.library.ui.InstallPairingReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="tech.ula.library.INSTALL_PAIR" />
+                <action android:name="tech.anl.library.INSTALL_PAIR" />
             </intent-filter>
         </receiver>
 
@@ -32,7 +32,7 @@
              targets it by explicit component from its own process. No permission gate is used
              here deliberately; see the doc comment for why that's an accepted tradeoff. -->
         <receiver
-            android:name="tech.ula.library.ui.CompanionNotificationActionReceiver"
+            android:name="tech.anl.library.ui.CompanionNotificationActionReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="tech.ula.STOP_SESSION" />
@@ -40,7 +40,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name="tech.ula.library.MainActivity" android:launchMode="singleTask" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|density|screenLayout" android:exported="true">
+        <activity android:name="tech.anl.library.MainActivity" android:launchMode="singleTask" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|density|screenLayout" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
