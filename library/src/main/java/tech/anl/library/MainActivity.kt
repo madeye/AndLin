@@ -45,6 +45,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.withContext
 import tech.anl.library.companion.CompanionApp
 import tech.anl.library.companion.VmLaunchOptions
+import tech.anl.library.ui.BackgroundRunPrompt
 import tech.anl.library.ui.InstallWizardFragment
 import tech.anl.library.ui.PhantomProcessKillerPrompt
 import tech.anl.library.ui.VmLaunchOptionsDialog
@@ -468,6 +469,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             billingManager.queryInAppPurchases()
         }
         viewModel.handleOnResume()
+        BackgroundRunPrompt.maybeOffer(this)
     }
 
     override fun onDestroy() {

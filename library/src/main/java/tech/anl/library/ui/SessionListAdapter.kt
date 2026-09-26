@@ -12,6 +12,9 @@ import tech.anl.library.R
 import tech.anl.library.model.entities.Filesystem
 import tech.anl.library.model.entities.Session
 import tech.anl.library.utils.AppDetails
+import tech.anl.library.utils.NetworkAddresses
+import tech.anl.library.utils.SshServerInfo
+import tech.anl.library.utils.defaultSharedPreferences
 
 class SessionListAdapter(
     private var activity: Activity,
@@ -25,7 +28,10 @@ class SessionListAdapter(
         var textViewFilesystemName: TextView? = row.findViewById(R.id.text_list_item_filesystem_name)
         var imageViewFilesystemIcon: ImageView? = row.findViewById(R.id.image_list_item_filesystem_icon)
         var separatorText: TextView? = row.findViewById(R.id.list_item_separator_text)
+        var serverInfo: TextView? = row.findViewById(R.id.text_list_item_server_info)
     }
+
+    private val lanAddress: String? by lazy { NetworkAddresses.lanAddress() }
 
     private val ITEM_VIEW_TYPE_SESSION = 0
     private val ITEM_VIEW_TYPE_SEPARATOR = 1
@@ -101,10 +107,33 @@ class SessionListAdapter(
                 viewHolder.textViewSessionName?.text = session.name
                 viewHolder.textViewFilesystemName?.text = session.filesystemName
                 viewHolder.imageViewFilesystemIcon?.setImageURI(appDetailer.findIconUri(filesystem.distributionType))
+                bindServerInfo(viewHolder.serverInfo, session)
             }
         }
 
         return view as View
+    }
+
+    private fun bindServerInfo(view: TextView?, session: Session) {
+        view ?: return
+        val info = SshServerInfo.forSession(session, activity.defaultSharedPreferences, lanAddress)
+        if (info == null) {
+            view.visibility = View.GONE
+            return
+        }
+        val credentials = if (info.keysOnly) {
+            activity.getString(R.string.session_ssh_user_keys_only, info.username)
+        } else {
+            val password = info.password.ifEmpty { activity.getString(R.string.session_ssh_no_password) }
+            activity.getString(R.string.session_ssh_user_password, info.username, password)
+        }
+        val lines = mutableListOf(info.command, credentials)
+        if (!info.reachableFromNetwork) {
+            val listening = activity.defaultSharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)
+            lines += activity.getString(if (listening) R.string.session_ssh_no_network else R.string.session_ssh_local_only)
+        }
+        view.text = lines.joinToString("\n")
+        view.visibility = View.VISIBLE
     }
 
     override fun getItem(position: Int): SessionListItem {
