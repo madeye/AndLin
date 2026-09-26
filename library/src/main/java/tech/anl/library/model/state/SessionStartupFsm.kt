@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import tech.anl.customlibrary.BuildConfig
 import tech.anl.library.model.entities.Asset
+import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.model.entities.Filesystem
 import tech.anl.library.model.entities.Session
 import tech.anl.library.model.repositories.AssetRepository
@@ -23,6 +24,7 @@ class SessionStartupFsm(
     private val assetDownloader: AssetDownloader,
     private val storageCalculator: StorageCalculator,
     private val ociFilesystemSetup: OciFilesystemSetup? = null,
+    private val executionTypeSupported: (ExecutionType) -> Boolean = { true },
     private val logger: Logger = LogcatLogger()
 ) {
 
@@ -122,7 +124,7 @@ class SessionStartupFsm(
         return filesystems.find { filesystem -> filesystem.id == session.filesystemId }!!
     }
 
-    private fun handleSessionSelected(session: Session) {
+    private suspend fun handleSessionSelected(session: Session) {
         if (activeSessions.isNotEmpty()) {
             if (activeSessions.contains(session)) {
                 state.postValue(SessionIsRestartable(session))
@@ -134,7 +136,23 @@ class SessionStartupFsm(
         }
 
         val filesystem = findFilesystemForSession(session)
+        fallBackToProotIfVmUnsupported(filesystem)
         state.postValue(SessionIsReadyForPreparation(session, filesystem))
+    }
+
+    /**
+     * A VM filesystem whose backend this device can't run (no AVF, e.g. one set up before the
+     * feature check existed or restored from another device) runs under PRoot instead. The VM
+     * image lives in the companion app, never in this app's filesystem directory, so nothing
+     * local is lost: the normal PRoot setup downloads and extracts the rootfs.
+     */
+    private suspend fun fallBackToProotIfVmUnsupported(filesystem: Filesystem) {
+        val type = filesystem.executionType
+        if (!type.isVm || executionTypeSupported(type)) return
+        logger.addBreadcrumb(AnlBreadcrumb(className, BreadcrumbType.RuntimeError,
+            "Filesystem ${filesystem.id}: $type unsupported on this device, falling back to PROOT"))
+        filesystem.executionType = ExecutionType.PROOT
+        withContext(Dispatchers.IO) { filesystemDao.updateFilesystem(filesystem) }
     }
 
     /**

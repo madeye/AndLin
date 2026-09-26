@@ -16,6 +16,7 @@ class AppsStartupFsm(
     private val filesystemManager: FilesystemManager,
     private val anlFiles: AnlFiles,
     private val desktopEnabledProvider: () -> Boolean = { false },
+    private val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice() },
     private val logger: Logger = LogcatLogger()
 ) {
 
@@ -110,8 +111,8 @@ class AppsStartupFsm(
     private fun availableExecutionTypes(isDistribution: Boolean): List<ExecutionType> {
         val types = mutableListOf(ExecutionType.PROOT)
         if (!isDistribution) return types
-        if (BuildConfig.ENABLE_AVF_BACKEND && ExecutionType.AVF.isSupportedOnThisDevice()) types.add(ExecutionType.AVF)
-        if (BuildConfig.ENABLE_QEMU_BACKEND && ExecutionType.QEMU.isSupportedOnThisDevice()) types.add(ExecutionType.QEMU)
+        if (BuildConfig.ENABLE_AVF_BACKEND && executionTypeSupported(ExecutionType.AVF)) types.add(ExecutionType.AVF)
+        if (BuildConfig.ENABLE_QEMU_BACKEND && executionTypeSupported(ExecutionType.QEMU)) types.add(ExecutionType.QEMU)
         return types
     }
 

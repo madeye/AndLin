@@ -2,8 +2,6 @@ package tech.anl.library.companion
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
-import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.utils.defaultSharedPreferences
 
 enum class CompanionState {
@@ -115,11 +113,7 @@ class CompanionInstaller(context: Context, private val downloader: CompanionDown
          * Whether [app] can run on this device at all: the VM needs API 34 and the virtualization
          * framework feature; QEMU ships arm64-only native code and needs API 28.
          */
-        fun isSupportedOnThisDevice(context: Context, app: CompanionApp): Boolean = when (app) {
-            CompanionApp.VM -> Build.VERSION.SDK_INT >= ExecutionType.AVF.minSupportedSdk &&
-                context.packageManager.hasSystemFeature("android.software.virtualization_framework")
-            CompanionApp.QEMU -> Build.VERSION.SDK_INT >= ExecutionType.QEMU.minSupportedSdk &&
-                Build.SUPPORTED_ABIS.contains("arm64-v8a")
-        }
+        fun isSupportedOnThisDevice(context: Context, app: CompanionApp): Boolean =
+            app.executionType.isSupportedOnThisDevice(context)
     }
 }

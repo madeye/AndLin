@@ -188,14 +188,17 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val downloadManagerWrapper = DownloadManagerWrapper(downloadManager)
         val assetDownloader = AssetDownloader(assetPreferences, downloadManagerWrapper, anlFiles)
 
-        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles, { DesktopSupport.isEnabled(this) })
+        val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice(this) }
+        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles,
+            { DesktopSupport.isEnabled(this) }, executionTypeSupported)
         val sessionStartupFsm = SessionStartupFsm(
             anlDatabase,
             assetRepository,
             filesystemManager,
             assetDownloader,
             storageCalculator,
-            OciFilesystemSetup(this, anlFiles)
+            OciFilesystemSetup(this, anlFiles),
+            executionTypeSupported
         )
         ViewModelProvider(this, MainActivityViewModelFactory(appsStartupFsm, sessionStartupFsm))                .get(MainActivityViewModel::class.java)
     }
@@ -530,6 +533,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             viewModel.waitForPermissions(appToContinue = app)
             return
         }
+        // Only once storage is settled: a second request while one is in flight is dropped.
+        PermissionHandler.requestOptionalPermissions(this)
         viewModel.submitAppSelection(app, autoStart)
     }
 
@@ -541,6 +546,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             viewModel.waitForPermissions(sessionToContinue = session)
             return
         }
+        PermissionHandler.requestOptionalPermissions(this)
         viewModel.submitSessionSelection(session)
     }
 
@@ -808,8 +814,11 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (PermissionHandler.permissionsWereGranted(requestCode, grantResults)) {
+        // The optional notification/microphone request never gates anything.
+        if (!PermissionHandler.isStoragePermissionRequest(requestCode)) return
+        if (PermissionHandler.permissionsWereGranted(this, requestCode)) {
             viewModel.permissionsHaveBeenGranted()
+            PermissionHandler.requestOptionalPermissions(this)
         } else {
             PermissionHandler.showPermissionsNecessaryDialog(this)
         }

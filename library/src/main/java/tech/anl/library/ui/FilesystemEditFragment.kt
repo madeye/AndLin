@@ -24,7 +24,6 @@ import tech.anl.library.databinding.FragFilesystemEditBinding
 import tech.anl.library.MainActivity
 import tech.anl.library.R
 import tech.anl.library.model.repositories.AnlDatabase
-import tech.anl.library.utils.PermissionHandler
 import tech.anl.library.utils.CredentialValidator
 import tech.anl.library.utils.DefaultCredentials
 import tech.anl.library.utils.AnlFiles
@@ -193,10 +192,6 @@ class FilesystemEditFragment : Fragment() {
             val filePickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             filePickerIntent.addCategory(Intent.CATEGORY_OPENABLE)
             filePickerIntent.type = "application/*"
-            if (!PermissionHandler.permissionsAreGranted(activityContext)) {
-                PermissionHandler.showPermissionsNecessaryDialog(activityContext)
-                return@setOnClickListener
-            }
 
             try {
                 filesystem.isCreatedFromBackup = true
