@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Companion app names (the companions keep their own names). -->
+    <string name="companion_name_vm" translatable="false">UserLAnd VM</string>
+    <string name="companion_name_qemu" translatable="false">UserLAnd QEMU</string>
+
+    <!-- VM session progress and errors -->
+    <string name="companion_progress_preparing">Preparing virtual machine…</string>
+    <string name="companion_progress_booting">Booting virtual machine, please wait…</string>
+    <string name="companion_progress_stopping_previous">Stopping the previous session…</string>
+    <string name="companion_progress_retrying_wedged">The virtual machine stopped responding. Restarting it…</string>
+    <string name="companion_progress_retrying_registry">Download failed. Retrying from the main image registry…</string>
+    <string name="companion_error_setup_failed">Setting up the virtual machine failed.</string>
+    <string name="companion_error_start_failed">Starting the virtual machine failed.</string>
+    <string name="companion_error_not_set_up">The virtual machine image has not been set up yet.</string>
+    <string name="companion_error_corrupt">The virtual machine\'s disk is corrupted and needs to be repaired.</string>
+    <string name="companion_error_died">The companion app stopped unexpectedly.</string>
+    <string name="companion_error_unreachable">Could not reach the companion app. Make sure it is installed, then try again.</string>
+    <string name="companion_error_port_in_use">Another virtual machine session is still using the network ports. Stop it, then try again.</string>
+    <string name="companion_error_service_type">Virtual machine sessions support only SSH and VNC.</string>
+
+    <!-- Install wizard -->
+    <string name="companion_wizard_title_install">Install %1$s</string>
+    <string name="companion_wizard_title_update">Update %1$s</string>
+    <string name="companion_wizard_title_phantom">Stop Android from killing sessions</string>
+    <string name="companion_wizard_step">Step %1$d of %2$d</string>
+    <string name="companion_wizard_consent_install">To run Linux in a virtual machine, AndLin needs a companion app, %1$s.\n\nIf you continue, AndLin will:\n\n• download %1$s (%2$s) from AndLin\'s GitHub releases;\n• ask you to turn on Wireless debugging in Developer options and pair AndLin with your own device, so it can act like a computer connected over ADB;\n• install %1$s and grant it the permissions it needs: running virtual machines, all files access (only used when you choose to share your device\'s storage with a session), and notifications.\n\nNothing leaves your device other than the download. You can turn Wireless debugging off again when this is done, and uninstall %1$s any time.</string>
+    <string name="companion_wizard_consent_update">A newer version of %1$s is available.\n\nIf you continue, AndLin will download it and install it over the installed one through Wireless debugging, the same way it was first installed, and grant any permissions the new version needs. Your virtual machines are kept.</string>
+    <string name="companion_wizard_consent_update_required">This version of AndLin needs a newer %1$s before virtual machine sessions can start.\n\nIf you continue, AndLin will download it and install it over the installed one through Wireless debugging, the same way it was first installed. Your virtual machines are kept.</string>
+    <string name="companion_wizard_consent_phantom">Android 12 and later stop background processes they consider \"phantom\" — which includes the Linux programs a session runs. That makes sessions close suddenly, often in the middle of installing something.\n\nAndLin can switch this off for you, once. It needs Wireless debugging for that: you will turn it on in Developer options and pair AndLin with your own device. AndLin then runs three settings commands:\n\n• device_config set_sync_disabled_for_tests persistent\n• device_config put activity_manager max_phantom_processes 2147483647\n• settings put global settings_enable_monitor_phantom_procs false\n\nYou can turn Wireless debugging off again afterwards.</string>
+    <string name="companion_wizard_legacy_install">This Android version doesn\'t have Wireless debugging, so %1$s will be installed with the system installer. Allow AndLin to install apps if asked.</string>
+    <string name="companion_wizard_continue">Continue</string>
+    <string name="companion_wizard_cancel">Cancel</string>
+    <string name="companion_wizard_close">Close</string>
+    <string name="companion_wizard_retry">Try again</string>
+    <string name="companion_wizard_downloading">Downloading %1$s…</string>
+    <string name="companion_wizard_downloading_progress">Downloading %1$s: %2$d%%</string>
+    <string name="companion_wizard_download_failed">Could not download %1$s: %2$s</string>
+    <string name="companion_wizard_pair_instructions">1. Open Developer options (if you don\'t have them, go to Settings › About phone and tap Build number seven times).\n2. Turn on Wireless debugging. Your device must be on Wi-Fi.\n3. Tap Wireless debugging, then \"Pair device with pairing code\".\n4. Type the six-digit code into the notification from AndLin — or come back here and type it below.</string>
+    <string name="companion_wizard_open_developer_options">Open Developer options</string>
+    <string name="companion_wizard_state_need_wireless">Waiting for Wireless debugging to be turned on…</string>
+    <string name="companion_wizard_state_waiting_dialog">Waiting for \"Pair device with pairing code\" to be opened…</string>
+    <string name="companion_wizard_state_waiting_code">Enter the six-digit pairing code.</string>
+    <string name="companion_wizard_state_wrong_code">That code didn\'t work. Check the code shown in Settings and try again.</string>
+    <string name="companion_wizard_state_pairing">Pairing…</string>
+    <string name="companion_wizard_state_connecting">Connecting…</string>
+    <string name="companion_wizard_code_hint">Pairing code</string>
+    <string name="companion_wizard_pair">Pair</string>
+    <string name="companion_wizard_installing">Installing %1$s…</string>
+    <string name="companion_wizard_granting">Granting permissions…</string>
+    <string name="companion_wizard_applying_fix">Applying the setting…</string>
+    <string name="companion_wizard_done_install">%1$s is installed and ready. You can turn Wireless debugging off again.</string>
+    <string name="companion_wizard_done_install_with_problems">%1$s is installed, but some permissions could not be granted:\n\n%2$s\n\nVirtual machine sessions may not work until they are.</string>
+    <string name="companion_wizard_done_phantom">Done. Android will no longer stop your sessions\' processes. You can turn Wireless debugging off again.</string>
+    <string name="companion_wizard_failed">Something went wrong: %1$s</string>
+    <string name="companion_wizard_unsupported_vm">This device can\'t run %1$s: it needs Android 14 or later with the Android Virtualization Framework.</string>
+    <string name="companion_wizard_unsupported_qemu">This device can\'t run %1$s: it needs a 64-bit ARM device with Android 9 or later.</string>
+    <string name="companion_wizard_no_wireless_debugging">Wireless debugging needs Android 11 or later.</string>
+
+    <!-- ADB pairing notification -->
+    <string name="companion_adb_channel_name">Setup with Wireless debugging</string>
+    <string name="companion_adb_channel_description">Lets you type the Wireless debugging pairing code while Settings is open.</string>
+    <string name="companion_adb_notif_title">AndLin setup</string>
+    <string name="companion_adb_notif_enable_wireless">Turn on Wireless debugging in Developer options.</string>
+    <string name="companion_adb_notif_open_pairing">In Wireless debugging, tap \"Pair device with pairing code\", then enter the code here.</string>
+    <string name="companion_adb_notif_enter_code">Enter the pairing code shown in Settings.</string>
+    <string name="companion_adb_notif_wrong_code">That code didn\'t work. Enter the code shown in Settings.</string>
+    <string name="companion_adb_notif_pairing">Pairing…</string>
+    <string name="companion_adb_enter_code">Enter pairing code</string>
+    <string name="companion_adb_code_hint">Six-digit code</string>
+
+    <!-- Phantom process killer prompt -->
+    <string name="companion_phantom_ask_title">Did your last session crash?</string>
+    <string name="companion_phantom_ask_message">Your last session ended unexpectedly. Did it close on its own, while you were using it?</string>
+    <string name="companion_phantom_ask_yes">Yes, it crashed</string>
+    <string name="companion_phantom_ask_no">No</string>
+    <string name="companion_phantom_ask_never">Don\'t ask again</string>
+    <string name="companion_phantom_explain_title">Android may be stopping your sessions</string>
+    <string name="companion_phantom_explain_message">Android 12 and later stop programs running in the background after a while, which is a common reason for sessions closing on their own. AndLin can switch this off for you once, using Wireless debugging.</string>
+    <string name="companion_phantom_fix_now">Fix it</string>
+    <string name="companion_phantom_not_now">Not now</string>
+    <string name="companion_phantom_not_needed">This device doesn\'t stop background sessions, so there is nothing to fix.</string>
+
+    <!-- Update nudge -->
+    <string name="companion_update_available_title">Update available</string>
+    <string name="companion_update_available_message">A newer version of %1$s is available. Update now?</string>
+    <string name="companion_update_now">Update</string>
+    <string name="companion_update_later">Later</string>
+
+    <!-- Per-launch VM options -->
+    <string name="companion_vm_options_title">Start virtual machine</string>
+    <string name="companion_vm_options_share_storage">Share this device\'s storage with the session</string>
+    <string name="companion_vm_options_share_storage_hint">Your files appear inside Linux. Programs in the session can read and change them.</string>
+    <string name="companion_vm_options_memory">Memory</string>
+    <string name="companion_vm_options_memory_value">%1$d GB</string>
+    <string name="companion_vm_options_memory_limited">Limited to about 60%% of this device\'s memory (%1$s).</string>
+    <string name="companion_vm_options_cpu">Processors</string>
+    <string name="companion_vm_options_cpu_all">All cores</string>
+    <string name="companion_vm_options_cpu_half">One core (saves battery)</string>
+    <string name="companion_vm_options_qemu_note">UserLAnd QEMU always uses 1 GB and one emulated processor.</string>
+    <string name="companion_vm_options_start">Start</string>
+    <string name="companion_vm_options_remember">Remember and don\'t ask again</string>
+
+    <!-- Notification action receiver -->
+    <string name="companion_stop_session_failed">Could not stop the session.</string>
+</resources>

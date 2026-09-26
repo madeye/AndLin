@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_activity_label">Terminal</string>
+    <string name="terminal_channel_name">Terminal sessions</string>
+    <string name="terminal_notification_title">Terminal</string>
+    <plurals name="terminal_sessions_running">
+        <item quantity="one">%d terminal session running</item>
+        <item quantity="other">%d terminal sessions running</item>
+    </plurals>
+    <string name="terminal_action_open">Open</string>
+    <string name="terminal_action_exit">Exit</string>
+
+    <string name="terminal_menu_copy">Copy</string>
+    <string name="terminal_menu_paste">Paste</string>
+    <string name="terminal_menu_copy_all">Copy all</string>
+    <string name="terminal_menu_keyboard">Toggle keyboard</string>
+    <string name="terminal_menu_font_larger">Larger font</string>
+    <string name="terminal_menu_font_smaller">Smaller font</string>
+    <string name="terminal_menu_close">Close session</string>
+
+    <string name="terminal_hint">Tip: long-press the terminal to select text and open the menu. Pinch to change the font size.</string>
+    <string name="terminal_copied">Copied to clipboard</string>
+    <string name="terminal_clip_label">Terminal text</string>
+</resources>

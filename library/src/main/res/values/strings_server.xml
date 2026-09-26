@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_server_category">Server</string>
+    <string name="pref_keep_sessions_running_title">Keep sessions running</string>
+    <string name="pref_keep_sessions_running_summary">Hold a wake lock and Wi-Fi lock while a session is running, so servers keep answering with the screen off.</string>
+    <string name="pref_start_on_boot_title">Start on boot</string>
+    <string name="pref_start_on_boot_summary">Restart the sessions that were running when the device shut down.</string>
+    <string name="pref_ssh_listen_on_lan_title">Allow SSH from the network</string>
+    <string name="pref_ssh_listen_on_lan_summary">Listen on port 2022 on every interface instead of only this device. Use with SSH keys.</string>
+    <string name="pref_ssh_authorized_keys_title">SSH authorized keys</string>
+    <string name="pref_ssh_authorized_keys_summary">Public keys allowed to log in, one per line.</string>
+    <string name="pref_ssh_authorized_keys_dialog">Paste public keys (ssh-ed25519 …, ssh-rsa …), one per line. They are added to the default user\'s ~/.ssh/authorized_keys each time a session starts.</string>
+    <string name="pref_ssh_disable_password_title">Keys only</string>
+    <string name="pref_ssh_disable_password_summary">Refuse password logins over SSH.</string>
+    <string name="pref_ssh_connection_info_title">Connect with</string>
+    <string name="pref_ssh_connection_info_local">ssh -p 2022 &lt;user&gt;@127.0.0.1 (this device only)</string>
+    <string name="pref_ssh_connection_info_lan">ssh -p 2022 &lt;user&gt;@%1$s</string>
+    <string name="pref_desktop_category">Desktop (VNC)</string>
+    <string name="pref_enable_desktop_title">Enable desktop sessions</string>
+    <string name="pref_enable_desktop_summary">Offer graphical desktops (XFCE, LXDE) over VNC and show GUI-only apps. Off by default: AndLin sessions are SSH terminals.</string>
+    <string name="desktop_unavailable">Desktop sessions are turned off. Enable them under Settings → Desktop (VNC).</string>
+    <string name="flavor_server">Server (headless)</string>
+    <string name="vm_backend_unavailable">This filesystem runs in a virtual machine, which this device or build doesn\'t support.</string>
+    <string name="vm_stop_failed">The virtual machine didn\'t confirm it stopped.</string>
+    <string name="vm_terminal_banner">Booting virtual machine, please wait…</string>
+    <string name="pref_battery_optimization_title">Ignore battery optimization</string>
+    <string name="pref_battery_optimization_summary">Let Android keep AndLin running in the background. Needed on many devices for servers to stay up.</string>
+    <string name="pref_battery_optimization_done">AndLin is already exempt from battery optimization.</string>
+    <string name="pref_phantom_process_fix_title">Stop Android killing session processes</string>
+    <string name="pref_phantom_process_fix_summary">Turn off Android 12+\'s phantom process killer through Wireless debugging.</string>
+</resources>

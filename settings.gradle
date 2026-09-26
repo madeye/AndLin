@@ -1,16 +1,13 @@
 rootProject.name = "AndLin"
-include ':app', ':UserLAndLibrary'
-project(':UserLAndLibrary').projectDir = new File('UserLAndLibrary/app')
+include ':app', ':library'
 
 include ':CustomLibrary'
 project(':CustomLibrary').projectDir = new File('CustomLibrary')
 
-// Replacement for the termux-app terminal; see UserLAndLibrary/terminal.
+// Replacement for the termux-app terminal.
 include ':terminal'
-project(':terminal').projectDir = new File('UserLAndLibrary/terminal')
 
 // The VNC desktop viewer; left out of builds made with -PandlinVnc=false.
 if ((providers.gradleProperty('andlinVnc').getOrElse('true')).toBoolean()) {
     include ':vnc'
-    project(':vnc').projectDir = new File('UserLAndLibrary/vnc')
 }

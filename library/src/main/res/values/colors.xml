@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#607D8B</color> <!-- Blue Gray 500 -->
+    <color name="colorPrimaryDark">#455A64</color> <!-- Blue Gray 700 -->
+    <color name="colorAccent">#90A4AE</color> <!-- Blue Gray 300 -->
+
+    <color name="InactiveBottomNavIconColor">#9E9E9E</color> <!-- Gray 500 -->
+
+    <!-- A light Holo shade of blue -->
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <!-- A light Holo shade of green -->
+    <color name="holo_green_light">#ff99cc00</color>
+    <!-- A light Holo shade of red -->
+    <color name="holo_red_light">#ffff4444</color>
+    <!-- A light Holo shade of orange -->
+    <color name="holo_orange_light">#ffffbb33</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="dark">#9A000000</color>
+    <color name="home_page_mode_item_subtitle">#CCFFFFFF</color>
+    <color name="reticle_ripple">#9AFFFFFF</color>
+    <color name="barcode_reticle_background">#99000000</color>
+    <color name="barcode_reticle_stroke">#40000000</color>
+    <color name="barcode_field_value">#797979</color>
+    <color name="barcode_field_box_stroke">#757575</color>
+</resources>
