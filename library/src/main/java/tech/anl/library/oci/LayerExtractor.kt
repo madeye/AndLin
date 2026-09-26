@@ -81,6 +81,26 @@ class LayerExtractor(
         private const val BUFFER_SIZE = 64 * 1024
         private const val STDERR_TAIL = 4096
         private const val OWNER_RWX = 0x1c0 // 0700
+        private const val MAX_TAR_ERROR_LINES = 5
+        private val HARDLINK_ERROR = Regex("""^tar: can't link .*""")
+
+        /**
+         * Condenses tar's stderr tail for a warning once every entry turned out to be in place:
+         * the (often hundreds of) hard links Android refused, which were then copied, become one
+         * note; a line cut off by the tail buffer is dropped; other errors are kept, up to
+         * [MAX_TAR_ERROR_LINES].
+         */
+        internal fun summarizeTarErrors(tarErrors: String): String {
+            val lines = tarErrors.lines().map { it.trim() }.filter { it.isNotEmpty() }
+                .dropWhile { !it.startsWith("tar:") } // the tail may start mid-line
+            val (hardlinks, others) = lines.partition { HARDLINK_ERROR.matches(it) }
+            val parts = ArrayList<String>()
+            // Not a count: the tail usually holds only the last few of them.
+            if (hardlinks.isNotEmpty()) parts += "hard links replaced with copies (Android doesn't allow them here)"
+            parts += others.take(MAX_TAR_ERROR_LINES)
+            if (others.size > MAX_TAR_ERROR_LINES) parts += "…and ${others.size - MAX_TAR_ERROR_LINES} more"
+            return parts.joinToString("; ")
+        }
     }
 
     private val excludedDirs = excludes.filter { it.endsWith("/") }
@@ -318,7 +338,10 @@ class LayerExtractor(
             }
             // Anything else tar complained about (ownership, timestamps, the links we just
             // replaced with copies) doesn't affect the result.
-            if (exitCode != 0) warn("tar exited with $exitCode, but every entry is in place: $tarErrors")
+            if (exitCode != 0) {
+                val summary = summarizeTarErrors(tarErrors)
+                warn("tar exited with $exitCode, but every entry is in place" + if (summary.isEmpty()) "" else ": $summary")
+            }
 
             applyWhiteouts()
             RootfsFiles.makeOwnerWritable(root.resolve("support"))

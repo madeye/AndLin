@@ -282,4 +282,23 @@ class LayerExtractorTest {
         assertEquals("rwxr-x---", mode("orig"))
         assertEquals("/etc/passwd", Files.readSymbolicLink(path("abs")).toString())
     }
+
+    @Test
+    fun `tar errors are condensed for the warning`() {
+        val stderr = """
+            ury': Permission denied
+            tar: can't link 'usr/share/zoneinfo/Pacific/Majuro' -> 'usr/share/zoneinfo/Pacific/Funafuti': Permission denied
+            tar: can't link 'usr/share/zoneinfo/Pacific/Wake' -> 'usr/share/zoneinfo/Pacific/Funafuti': Permission denied
+            tar: usr/bin/sudo: Cannot change ownership to uid 0, gid 0: Operation not permitted
+        """.trimIndent()
+
+        assertEquals(
+            "hard links replaced with copies (Android doesn't allow them here); " +
+                "tar: usr/bin/sudo: Cannot change ownership to uid 0, gid 0: Operation not permitted",
+            LayerExtractor.summarizeTarErrors(stderr)
+        )
+        assertEquals("", LayerExtractor.summarizeTarErrors(""))
+        val many = (1..7).joinToString("\n") { "tar: error $it" }
+        assertEquals("tar: error 1; tar: error 2; tar: error 3; tar: error 4; tar: error 5; …and 2 more", LayerExtractor.summarizeTarErrors(many))
+    }
 }

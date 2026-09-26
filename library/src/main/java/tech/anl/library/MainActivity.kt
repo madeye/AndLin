@@ -911,7 +911,9 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         // Follow the output only while the user hasn't scrolled up to read something.
         val atBottom = !scroll.canScrollVertically(1)
         log.text = setupLog.text()
-        if (atBottom) scroll.post { scroll.fullScroll(View.FOCUS_DOWN) }
+        // Not fullScroll(FOCUS_DOWN): that focuses the (selectable) log, which scrolls it back to
+        // its top. The post runs after the layout pass the new text triggers.
+        if (atBottom) scroll.post { scroll.scrollTo(0, log.bottom) }
     }
 
     private fun killProgressBar(keepLog: Boolean = false) {
