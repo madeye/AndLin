@@ -80,6 +80,7 @@ class LocalServerManager(
         val command = "/support/common/${ServerBoxScripts.START_SSH_SERVER}"
         val env = HashMap<String, String>()
         env["INITIAL_USERNAME"] = session.username
+        env.putAll(guestNetworkEnv())
         // Only used to create the user if the filesystem lacks it (see startSSHServer.sh).
         env["INITIAL_PASSWORD"] = session.password
         env["SERVERBOX_SSH_ADDRESS"] = if (sharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)) "0.0.0.0" else "127.0.0.1"
@@ -113,31 +114,7 @@ class LocalServerManager(
         env["DIMENSIONS"] = session.geometry
         env["VERSION_CODE"] = BuildConfig.VERSION_CODE
         env["VERSION_NAME"] = BuildConfig.VERSION_NAME
-        if (sharedPreferences.getBoolean("pref_custom_hostname_enabled",false)) {
-            env["HOSTNAME"] = sharedPreferences.getString("pref_hostname", BuildConfig.DEFAULT_HOSTNAME)!!
-        } else {
-            if (sharedPreferences.contains("unique_id"))
-                env["HOSTNAME"] = sharedPreferences.getString("unique_id", "localhost")!!
-            else
-                env["HOSTNAME"] = BuildConfig.DEFAULT_HOSTNAME
-        }
-        env["HOSTS"] = "127.0.0.1 localhost\n127.0.0.1 ${env["HOSTNAME"]}"
-        if (sharedPreferences.getBoolean("pref_custom_dns_enabled",false)) {
-            env["RESOLV"] = sharedPreferences.getString("pref_dns", BuildConfig.DEFAULT_DNS_DOMAINS + "\n" + BuildConfig.DEFAULT_DNS_NAMESERVERS)!!
-        } else {
-            env["RESOLV"] = ""
-            if (sharedPreferences.contains("search_domains")) {
-                env["RESOLV"] += "search " + sharedPreferences.getString("search_domains", "Home")
-            } else
-                env["RESOLV"] += BuildConfig.DEFAULT_DNS_DOMAINS
-
-            if (sharedPreferences.contains("current_dns0")) {
-                env["RESOLV"] += "\nnameserver " + sharedPreferences.getString("current_dns0", "8.8.8.8")!!.removePrefix("/")
-                if (sharedPreferences.contains("current_dns1"))
-                    env["RESOLV"] += "\nnameserver " + sharedPreferences.getString("current_dns1", "8.8.4.4")!!.removePrefix("/")
-            } else
-                env["RESOLV"] += "\n" + BuildConfig.DEFAULT_DNS_NAMESERVERS
-        }
+        env.putAll(guestNetworkEnv())
 
         val result = busyboxExecutor.executeProotCommand(
                 command,
@@ -188,6 +165,40 @@ class LocalServerManager(
             ServiceType.Xsdl -> "/tmp/xsdl.pidfile"
             else -> "error"
         }
+    }
+
+    /**
+     * HOSTNAME, HOSTS and RESOLV for the guest's /etc/hostname, /etc/hosts and /etc/resolv.conf,
+     * which the server launch scripts write: Android has no resolv.conf to bind, and without one
+     * nothing in the guest can resolve names.
+     */
+    private fun guestNetworkEnv(): Map<String, String> {
+        val hostname = when {
+            sharedPreferences.getBoolean("pref_custom_hostname_enabled", false) ->
+                sharedPreferences.getString("pref_hostname", BuildConfig.DEFAULT_HOSTNAME)!!
+            else -> sharedPreferences.getString("unique_id", null)
+                // "android-" + the MAC address, which Android 10+ hides: "android-" alone is no name.
+                ?.takeUnless { it.isBlank() || it.endsWith("-") }
+                ?: BuildConfig.DEFAULT_HOSTNAME
+        }
+        val resolv = if (sharedPreferences.getBoolean("pref_custom_dns_enabled", false)) {
+            sharedPreferences.getString("pref_dns", BuildConfig.DEFAULT_DNS_DOMAINS + "\n" + BuildConfig.DEFAULT_DNS_NAMESERVERS)!!
+        } else {
+            // All the network's servers when known, else the two older builds recorded.
+            val servers = sharedPreferences.getString("current_dns_all", null)?.split(' ')
+                ?: listOfNotNull(sharedPreferences.getString("current_dns0", null), sharedPreferences.getString("current_dns1", null))
+            ResolvConf.build(
+                servers,
+                sharedPreferences.getString("search_domains", null)
+                    ?: BuildConfig.DEFAULT_DNS_DOMAINS.removePrefix("search "),
+                ResolvConf.nameserversIn(BuildConfig.DEFAULT_DNS_NAMESERVERS),
+            )
+        }
+        return mapOf(
+            "HOSTNAME" to hostname,
+            "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 $hostname",
+            "RESOLV" to resolv,
+        )
     }
 
     private fun Session.pidFilePath(): String {

@@ -53,7 +53,9 @@ class CommandTarProcessFactory(private val command: List<String>) : TarProcessFa
  *  - remove OCI whiteout markers (`.wh.<name>`, `.wh..wh..opq`) from the stream and apply them
  *    ourselves afterwards, so they only delete lower-layer content;
  *  - make every directory owner-writable so tar can fill read-only directories (toybox chmods a
- *    directory as soon as it creates it), and drop setuid/setgid bits;
+ *    directory as soon as it creates it). setuid/setgid bits are kept: on Android they grant
+ *    nothing (the files belong to the app), but PRoot's fake root honours them, which is what
+ *    lets sudo and su work inside the guest;
  *  - know every hard link, so links that Android's SELinux policy refused (link(2) on app data)
  *    are replaced by copies — otherwise e.g. /usr/bin/perl silently vanishes on Debian.
  *
@@ -78,7 +80,6 @@ class LayerExtractor(
         private const val OPAQUE_MARKER = ".wh..wh..opq"
         private const val BUFFER_SIZE = 64 * 1024
         private const val STDERR_TAIL = 4096
-        private const val SETID_BITS = 0xc00 // 06000
         private const val OWNER_RWX = 0x1c0 // 0700
     }
 
@@ -241,9 +242,9 @@ class LayerExtractor(
             replaceConflictingLowerEntry(path, entry.type)
             record(path, entry.type)
 
-            // Drop setuid/setgid (04000/02000), keep the sticky bit. Directories get u+rwx so tar
-            // (and later layers) can write inside them even if the image made them read-only.
-            var mode = entry.mode and SETID_BITS.inv() and 0xfff
+            // Directories get u+rwx so tar (and later layers) can write inside them even if the
+            // image made them read-only.
+            var mode = entry.mode and 0xfff
             if (entry.type == TarEntryType.DIRECTORY) mode = mode or OWNER_RWX
             return entry.copy(path = path, linkTarget = linkTarget, mode = mode)
         }

@@ -2,11 +2,13 @@
 # ServerBox's SSH server launcher, run as root inside the guest by LocalServerManager.
 #
 # Environment (all optional):
-#   INITIAL_USERNAME        user whose ~/.ssh/authorized_keys receives SERVERBOX_AUTHORIZED_KEYS
+#   INITIAL_USERNAME           user whose ~/.ssh/authorized_keys receives SERVERBOX_AUTHORIZED_KEYS
 #   SERVERBOX_SSH_ADDRESS      address to listen on; 127.0.0.1 (default) keeps SSH on this device
 #   SERVERBOX_SSH_PORT         port to listen on (default 2022)
 #   SERVERBOX_AUTHORIZED_KEYS  newline-separated public keys to add
 #   SERVERBOX_SSH_KEYS_ONLY    1 to refuse password logins
+#   RESOLV, HOSTS, HOSTNAME    contents of /etc/resolv.conf, /etc/hosts and /etc/hostname
+#   INITIAL_PASSWORD           password for INITIAL_USERNAME if the user has to be created
 #
 # Before starting dropbear it runs every executable in /etc/serverbox/autostart.d, in name order,
 # in the background with output in /var/log/serverbox-autostart.log. That is the place for
@@ -14,6 +16,11 @@
 
 unset LD_LIBRARY_PATH
 unset LD_PRELOAD
+
+# Android has no resolv.conf for PRoot to bind; the app passes the network's DNS servers.
+[ -n "$RESOLV" ] && printf '%s\n' "$RESOLV" > /etc/resolv.conf
+[ -n "$HOSTS" ] && printf '%s\n' "$HOSTS" > /etc/hosts
+[ -n "$HOSTNAME" ] && printf '%s\n' "$HOSTNAME" > /etc/hostname
 
 address="${SERVERBOX_SSH_ADDRESS:-127.0.0.1}"
 port="${SERVERBOX_SSH_PORT:-2022}"
@@ -33,6 +40,21 @@ if [ ! -f /support/serverbox_client_key ]; then
     dropbearkey -t ed25519 -f /support/serverbox_client_key >/dev/null 2>&1
 fi
 client_pubkey="$(dropbearkey -y -f /support/serverbox_client_key 2>/dev/null | grep '^ssh-')"
+
+# Filesystems installed before the extractor kept setuid bits lost them, and PRoot's fake root
+# only lets sudo/su become root through that bit. Put it back (this script runs as fake root).
+# Follow links: Ubuntu reaches sudo through /etc/alternatives (sudo.ws or sudo-rs). Never busybox
+# itself, which would make every applet root; Alpine's su goes through bbsuid (below).
+for suid in /usr/bin/sudo /usr/bin/su /bin/su /bin/bbsuid; do
+    target="$(readlink -f "$suid" 2>/dev/null)" || continue
+    case "$target" in ""|*/busybox) continue ;; esac
+    [ -f "$target" ] && [ ! -u "$target" ] && chmod u+s "$target" 2>/dev/null
+done
+# Alpine's busybox-suid routes su, passwd, crontab... through the setuid /bin/bbsuid, but the
+# image links them straight to busybox, where su says "must be suid". Re-link them once.
+if [ -u /bin/bbsuid ] && [ "$(readlink /bin/su 2>/dev/null)" = "/bin/busybox" ]; then
+    /bin/bbsuid --install >/dev/null 2>&1
+fi
 
 user="${INITIAL_USERNAME:-user}"
 # Filesystems set up before PRoot faked root never got their user (useradd/chpasswd failed);

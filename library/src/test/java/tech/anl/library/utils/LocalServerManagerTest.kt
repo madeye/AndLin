@@ -36,6 +36,14 @@ class LocalServerManagerTest {
     private val filesystemDirName = "0"
     private val fakePid = 100L
 
+    // What the SSH and VNC launchers get for the guest's hostname, hosts and resolv.conf with
+    // default preferences: the defaults' "search Home" and nameservers, one per line.
+    private val guestNetworkEnv = mapOf(
+        "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
+        "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
+        "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}\n",
+    )
+
     private lateinit var localServerManager: LocalServerManager
 
     private fun createSshPidFile() {
@@ -115,7 +123,7 @@ class LocalServerManagerTest {
     fun `Starting an SSH server passes the username and a localhost address by default`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
         val command = "/support/common/serverbox_startSSHServer.sh"
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "127.0.0.1")
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "127.0.0.1").apply { putAll(guestNetworkEnv) }
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -138,7 +146,7 @@ class LocalServerManagerTest {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
         val command = "/support/common/serverbox_startSSHServer.sh"
         whenever(mockSharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)).thenReturn(true)
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "0.0.0.0")
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "0.0.0.0").apply { putAll(guestNetworkEnv) }
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -166,7 +174,7 @@ class LocalServerManagerTest {
                 "INITIAL_PASSWORD" to "",
                 "SERVERBOX_SSH_ADDRESS" to "127.0.0.1",
                 "SERVERBOX_AUTHORIZED_KEYS" to "ssh-ed25519 AAAA..."
-        )
+        ).apply { putAll(guestNetworkEnv) }
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -194,7 +202,7 @@ class LocalServerManagerTest {
                 "INITIAL_PASSWORD" to "",
                 "SERVERBOX_SSH_ADDRESS" to "127.0.0.1",
                 "SERVERBOX_SSH_KEYS_ONLY" to "1"
-        )
+        ).apply { putAll(guestNetworkEnv) }
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -222,7 +230,7 @@ class LocalServerManagerTest {
                 "DIMENSIONS" to "10x10",
                 "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
                 "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
-                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}",
+                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}\n",
                 "HAS_CAMERA" to "0",
                 "HAS_MICROPHONE" to "0",
                 "VNC_DISPLAY" to BuildConfig.VNC_DISPLAY,
@@ -259,7 +267,7 @@ class LocalServerManagerTest {
                 "DIMENSIONS" to "10x10",
                 "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
                 "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
-                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}",
+                "RESOLV" to "${BuildConfig.DEFAULT_DNS_DOMAINS}\n${BuildConfig.DEFAULT_DNS_NAMESERVERS}\n",
                 "HAS_CAMERA" to "0",
                 "HAS_MICROPHONE" to "0",
                 "VNC_DISPLAY" to BuildConfig.VNC_DISPLAY,

@@ -418,6 +418,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                                 putString("current_dns0", dnsServers[0].toString())
                             if (dnsServers.size > 1)
                                 putString("current_dns1", dnsServers[1].toString())
+                            // All of them: the first two may be unusable in the guest (see ResolvConf).
+                            putString("current_dns_all", dnsServers.joinToString(" ") { it.hostAddress ?: "" })
                             if (searchDomains != null && !searchDomains.trim().isEmpty())
                                 putString("search_domains", searchDomains.replace(",", " "))
                             apply()
