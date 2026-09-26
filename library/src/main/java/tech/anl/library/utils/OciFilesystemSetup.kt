@@ -49,6 +49,7 @@ class OciFilesystemSetup(context: Context, private val anlFiles: AnlFiles) {
         is OciInstallProgress.Resolving -> "Resolving ${progress.reference}"
         is OciInstallProgress.Downloading -> "Downloading layer ${progress.layer}/${progress.layerCount} (${progress.percent}%)"
         is OciInstallProgress.Extracting -> "Extracting layer ${progress.layer}/${progress.layerCount} (${progress.percent}%)"
+        is OciInstallProgress.Notice -> progress.message
         OciInstallProgress.Finalizing -> "Finalizing"
     }
 

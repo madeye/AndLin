@@ -28,11 +28,11 @@ abstract class CompanionVmSessionManager internal constructor(
     private fun fsId(filesystemId: Long) = filesystemId.toString()
 
     /**
-     * The preferred registry first (the China mirror in Chinese time zones), then the original ref
-     * as a fallback. Only backends that honour a new ref for an existing fsId use the fallback.
+     * The ref on every candidate registry, preferred first (the China mirrors in Chinese time
+     * zones). Only backends that honour a new ref for an existing fsId use the fallbacks.
      */
     protected fun imageRefCandidates(imageRef: String): List<String> =
-        listOf(RegistryMirror.preferredImageRef(imageRef), imageRef).distinct()
+        RegistryMirror.imageRefCandidates(imageRef)
 
     override suspend fun setupFilesystem(filesystem: Filesystem, imageRef: String, onProgress: (String) -> Unit): VmResult =
         driver.setup(fsId(filesystem.id), imageRefCandidates(imageRef), repair = false, onProgress = onProgress)

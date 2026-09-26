@@ -9,6 +9,7 @@ import okio.Buffer
 import java.security.MessageDigest
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -31,6 +32,8 @@ class FakeRegistry(
     @Volatile var failEverythingWith: Int? = null
     /** When set, blob requests answer with this status. */
     @Volatile var failBlobsWith: Int? = null
+    /** When set, blob bodies trickle out at (bytes, per milliseconds): a slow mirror. */
+    @Volatile var throttleBlobs: Pair<Long, Long>? = null
     /** When set, blob requests redirect to this base URL (a "CDN"). */
     @Volatile var redirectBlobsTo: String? = null
 
@@ -131,7 +134,9 @@ class FakeRegistry(
             return MockResponse().setBody(Buffer().write(body))
                 .setSocketPolicy(SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY)
         }
-        return blobResponse(body, range)
+        val response = blobResponse(body, range)
+        throttleBlobs?.let { (bytes, millis) -> response.throttleBody(bytes, millis, TimeUnit.MILLISECONDS) }
+        return response
     }
 
     companion object {

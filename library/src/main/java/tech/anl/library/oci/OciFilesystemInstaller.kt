@@ -77,7 +77,7 @@ class OciFilesystemInstaller(
                                     lastPercent = percent
                                     onProgress(OciInstallProgress.Downloading(index + 1, layerCount, percent))
                                 }
-                            }, registries = image.registries)
+                            }, registries = image.registries, onNotice = { onProgress(OciInstallProgress.Notice(it)) })
                             Result.success(index to file)
                         } catch (e: IOException) {
                             Result.failure(e)
