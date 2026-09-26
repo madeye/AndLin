@@ -136,7 +136,6 @@
     <string name="progress_copying_downloads">نسخ الملفات التي تم تنزيلها إلى التخزين المحلي &#8230;</string>
     <string name="progress_verifying_sufficient_storage">التحقق من مساحة تخزين كافية متاحة &#8230;</string>
     <string name="progress_setting_up_filesystem">إعداد نظام الملفات &#8230;</string>
-    <string name="progress_extraction_details">الاستخراج: %1$s</string>
     <string name="progress_verifying_assets">التحقق من الأصول &#8230;</string>
     <string name="progress_starting">بدء الخدمة &#8230;</string>
     <string name="progress_clearing_support_files">مسح جميع ملفات الدعم &#8230;</string>

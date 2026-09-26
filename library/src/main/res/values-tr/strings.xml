@@ -140,7 +140,6 @@
     <string name="progress_copying_downloads">İndirilen dosyalar yerel depolamaya kopyalanıyor&#8230;</string>
     <string name="progress_verifying_sufficient_storage">Yeterli alan olup olmadığı doğrulanıyor&#8230;</string>
     <string name="progress_setting_up_filesystem">Dosya sistemi kontrol ediliyor&#8230;</string>
-    <string name="progress_extraction_details">Çıkartılıyor: %1$s</string>
     <string name="progress_verifying_assets">Dosyalar doğrulanıyor&#8230;</string>
     <string name="progress_starting">Servis başlatılıyor&#8230;</string>
     <string name="progress_clearing_support_files">Tüm destek dosyaları siliniyor&#8230;</string>

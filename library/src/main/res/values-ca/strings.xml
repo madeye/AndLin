@@ -124,7 +124,6 @@
     <string name="progress_downloading_out_of">%1$d de %2$d completats</string>
     <string name="progress_copying_downloads">Copiant arxius descarregats a l\'emmagatzematge local&#8230;</string>
     <string name="progress_setting_up_filesystem">Preparant el sistema d\'arxius&#8230;</string>
-    <string name="progress_extraction_details">Extraient: %1$s</string>
     <string name="progress_verifying_assets">Verificant recursos&#8230;</string>
     <string name="progress_starting">Iniciant servei&#8230;</string>
     <string name="progress_clearing_support_files">Borrant tots els arxius de suport&#8230;</string>

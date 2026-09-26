@@ -14,7 +14,15 @@ import java.util.concurrent.TimeUnit
 
 /** Builds a PRoot filesystem's root from its OCI image; see [FilesystemImages]. */
 class OciFilesystemSetup(context: Context, private val anlFiles: AnlFiles) {
-    private val extractor by lazy { LayerExtractor(CommandTarProcessFactory.toybox(), warn = { Log.w(TAG, it) }) }
+    // Where extractor warnings go besides logcat: the running operation's progress log.
+    @Volatile private var progressLog: ((String) -> Unit)? = null
+
+    private val extractor by lazy {
+        LayerExtractor(CommandTarProcessFactory.toybox(), warn = {
+            Log.w(TAG, it)
+            progressLog?.invoke("warning: $it")
+        })
+    }
 
     private val installer: OciFilesystemInstaller by lazy {
         val http = OkHttpClient.Builder()
@@ -30,7 +38,9 @@ class OciFilesystemSetup(context: Context, private val anlFiles: AnlFiles) {
         // The canonical ghcr.io reference: the client picks mirrors itself and can fall back.
         val imageRef = FilesystemImages.imageRef(filesystem.distributionType, filesystem.flavor)
         val rootfs = File(anlFiles.filesDir, "${filesystem.id}")
-        installer.install(imageRef, anlFiles.getAbi(), rootfs) { progress -> onProgress(describe(progress)) }
+        withProgressLog(onProgress) {
+            installer.install(imageRef, anlFiles.getAbi(), rootfs) { progress -> onProgress(describe(progress)) }
+        }
     }
 
     /**
@@ -41,8 +51,19 @@ class OciFilesystemSetup(context: Context, private val anlFiles: AnlFiles) {
         val rootfs = File(anlFiles.filesDir, "${filesystem.id}")
         val tarball = File(rootfs, "support/rootfs.tar.gz")
         if (!tarball.exists()) return false
-        extractor.extract(tarball, rootfs) { percent -> onProgress("Extracting filesystem ($percent%)") }
+        withProgressLog(onProgress) {
+            extractor.extract(tarball, rootfs) { percent -> onProgress("Extracting filesystem ($percent%)") }
+        }
         return true
+    }
+
+    private inline fun <T> withProgressLog(noinline onProgress: (String) -> Unit, block: () -> T): T {
+        progressLog = onProgress
+        try {
+            return block()
+        } finally {
+            progressLog = null
+        }
     }
 
     private fun describe(progress: OciInstallProgress): String = when (progress) {

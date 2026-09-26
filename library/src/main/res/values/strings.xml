@@ -141,7 +141,6 @@
     <string name="progress_copying_downloads">Copying downloaded files to local storage&#8230;</string>
     <string name="progress_verifying_sufficient_storage">Verifying sufficient storage available&#8230;</string>
     <string name="progress_setting_up_filesystem">Setting up filesystem&#8230;</string>
-    <string name="progress_extraction_details">Extracting: %1$s</string>
     <string name="progress_verifying_assets">Verifying assets&#8230;</string>
     <string name="progress_starting">Starting service&#8230;</string>
     <string name="progress_clearing_support_files">Clearing all support files&#8230;</string>
