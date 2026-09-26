@@ -34,6 +34,12 @@ if [ ! -f /support/serverbox_client_key ]; then
 fi
 client_pubkey="$(dropbearkey -y -f /support/serverbox_client_key 2>/dev/null | grep '^ssh-')"
 
+# Filesystems installed before the extractor kept setuid bits lost them, and PRoot's fake root
+# only lets sudo/su become root through that bit. Put it back (this script runs as fake root).
+for suid in /usr/bin/sudo /bin/bbsuid /usr/bin/su /bin/su; do
+    [ -f "$suid" ] && [ ! -L "$suid" ] && [ ! -u "$suid" ] && chmod u+s "$suid" 2>/dev/null
+done
+
 user="${INITIAL_USERNAME:-user}"
 # Filesystems set up before PRoot faked root never got their user (useradd/chpasswd failed);
 # create it now. addNonRootUser.sh reads INITIAL_USERNAME/INITIAL_PASSWORD.

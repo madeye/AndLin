@@ -49,7 +49,9 @@ class LayerExtractorTest {
 
         assertEquals("hello", File(rootfs, "usr/hello").readText())
         assertEquals("rwxr-xr-x", mode("usr/hello"))
-        assertEquals("setuid is dropped", "rwxr-xr-x", mode("usr/su"))
+        assertEquals("rwxr-xr-x", mode("usr/su"))
+        // PRoot's fake root needs the setuid bit (sudo, su), so it reaches tar untouched.
+        assertEquals("4755".toInt(8), fakeTar.received.single { it.path == "usr/su" }.mode and 0xfff)
         assertEquals("rwxr-xr-x", mode("usr")) // u+w added
         assertEquals("/usr/lib", Files.readSymbolicLink(path("lib")).toString())
         assertTrue(exists("abs/path"))
