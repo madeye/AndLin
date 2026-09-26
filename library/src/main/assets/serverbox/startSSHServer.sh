@@ -46,6 +46,11 @@ client_pubkey="$(dropbearkey -y -f /support/serverbox_client_key 2>/dev/null | g
 for suid in /usr/bin/sudo /bin/bbsuid /usr/bin/su /bin/su; do
     [ -f "$suid" ] && [ ! -L "$suid" ] && [ ! -u "$suid" ] && chmod u+s "$suid" 2>/dev/null
 done
+# Alpine's busybox-suid routes su, passwd, crontab... through the setuid /bin/bbsuid, but the
+# image links them straight to busybox, where su says "must be suid". Re-link them once.
+if [ -u /bin/bbsuid ] && [ "$(readlink /bin/su 2>/dev/null)" = "/bin/busybox" ]; then
+    /bin/bbsuid --install >/dev/null 2>&1
+fi
 
 user="${INITIAL_USERNAME:-user}"
 # Filesystems set up before PRoot faked root never got their user (useradd/chpasswd failed);
