@@ -52,7 +52,6 @@
     <string name="progress_copying_downloads">正在将已下载文件复制到本地储存&#8230;</string>
     <string name="progress_starting">开始服务&#8230;</string>
     <string name="progress_setting_up_filesystem">设置文件系统中&#8230;</string>
-    <string name="progress_extraction_details">提取: %1$s</string>
     <string name="illegal_state_title">&appname;发生了一些错误</string>
     <string name="illegal_state_transition">这些错误有: %1$s</string>
     <string name="progress_verifying_assets">正在验证下载的资源&#8230;\n很快就会完成。</string>

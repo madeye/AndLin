@@ -95,7 +95,6 @@
     <string name="progress_downloading_out_of">%1$d из %2$d завершено</string>
     <string name="progress_copying_downloads">Копирование скачанных файлов в локальное хранилище&#8230;</string>
     <string name="progress_setting_up_filesystem">Настройка файловой системы&#8230;</string>
-    <string name="progress_extraction_details">Извлечение: %1$s</string>
     <string name="progress_verifying_assets">Проверка файлов&#8230;</string>
     <string name="progress_starting">Запуск службы&#8230;</string>
     <string name="progress_clearing_support_files">Очистка всех служебных файлов&#8230;</string>

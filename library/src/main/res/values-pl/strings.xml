@@ -140,7 +140,6 @@
     <string name="progress_copying_downloads">Kopiowanie pobranych plików do pamięci lokalnej&#8230;</string>
     <string name="progress_verifying_sufficient_storage">Weryfikacja wystarczającej ilości dostępnego miejsca&#8230;</string>
     <string name="progress_setting_up_filesystem">Konfigurowanie systemu plików&#8230;</string>
-    <string name="progress_extraction_details">Wypakowywanie: %1$s</string>
     <string name="progress_verifying_assets">Weryfikacja zasobów&#8230;</string>
     <string name="progress_starting">Uruchamianie usługi&#8230;</string>
     <string name="progress_clearing_support_files">Czyszczenie wszystkich plików pomocniczych&#8230;</string>

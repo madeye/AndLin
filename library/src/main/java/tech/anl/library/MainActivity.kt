@@ -76,6 +76,9 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     val className = "MainActivity"
 
     private var progressBarIsVisible = false
+    private val setupLog = SetupLog()
+    // Set when an operation finishes, so the next one starts with an empty log.
+    private var setupLogIsStale = false
     private var currentFragmentDisplaysProgressDialog = false
     private var autoStarted = false
 
@@ -292,7 +295,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                     destination.label == getString(R.string.sessions) ||
                             destination.label == getString(R.string.apps) ||
                             destination.label == getString(R.string.filesystems)
-            if (!currentFragmentDisplaysProgressDialog) killProgressBar()
+            // Only hidden while on another tab: the operation (and its log) carries on.
+            if (!currentFragmentDisplaysProgressDialog) killProgressBar(keepLog = true)
             else if (progressBarIsVisible) displayProgressBar()
         }
     }
@@ -847,12 +851,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                 updateProgressBar(step, "")
             }
             is FilesystemExtractionStep -> {
-                val step = getString(R.string.progress_setting_up_filesystem)
-                val details = getString(
-                    R.string.progress_extraction_details,
-                    state.extractionTarget
-                )
-                updateProgressBar(step, details)
+                // The raw line: the setup terminal shows it under the step's own header.
+                updateProgressBar(getString(R.string.progress_setting_up_filesystem), state.extractionTarget)
             }
             is ClearingSupportFiles -> {
                 val step = getString(R.string.progress_clearing_support_files)
@@ -898,9 +898,26 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
         activityMainBinding.textSessionListProgressStep.text = step
         activityMainBinding.textSessionListProgressDetails.text = details
+        if (setupLogIsStale) {
+            setupLog.clear()
+            setupLogIsStale = false
+        }
+        if (setupLog.append(step, details)) showSetupLog()
     }
 
-    private fun killProgressBar() {
+    private fun showSetupLog() {
+        val scroll = activityMainBinding.scrollSetupLog
+        val log = activityMainBinding.textSetupLog
+        // Follow the output only while the user hasn't scrolled up to read something.
+        val atBottom = !scroll.canScrollVertically(1)
+        log.text = setupLog.text()
+        // Not fullScroll(FOCUS_DOWN): that focuses the (selectable) log, which scrolls it back to
+        // its top. The post runs after the layout pass the new text triggers.
+        if (atBottom) scroll.post { scroll.scrollTo(0, log.bottom) }
+    }
+
+    private fun killProgressBar(keepLog: Boolean = false) {
+        if (!keepLog) setupLogIsStale = true
         val outAnimation = AlphaAnimation(1f, 0f)
         outAnimation.duration = 200
         activityMainBinding.layoutProgress.animation = outAnimation

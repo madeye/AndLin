@@ -103,7 +103,6 @@
     <string name="progress_downloading_out_of">%1$d de %2$d completados</string>
     <string name="progress_copying_downloads">Copiando archivos descargados al almacenamiento local&#8230;</string>
     <string name="progress_setting_up_filesystem">Preparando el sistema de archivos&#8230;</string>
-    <string name="progress_extraction_details">Extrayendo: %1$s</string>
     <string name="progress_verifying_assets">Verificando recursos&#8230;</string>
     <string name="progress_starting">Iniciando servicio&#8230;</string>
     <string name="progress_clearing_support_files">Borrando todos los archivos de soporte&#8230;</string>

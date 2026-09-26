@@ -112,7 +112,6 @@
     <string name="progress_downloading_out_of">%1$d 中的 %2$d 完成</string>
     <string name="progress_copying_downloads">正在複製下載的檔案到本機儲存空間&#8230;</string>
     <string name="progress_setting_up_filesystem">正在設定檔案系統&#8230;</string>
-    <string name="progress_extraction_details">正在解壓縮：%1$s</string>
     <string name="progress_verifying_assets">正在驗證資源&#8230;</string>
     <string name="progress_starting">正在開始服務&#8230;</string>
     <string name="progress_clearing_support_files">正在清除所有支援檔案&#8230;</string>

@@ -115,7 +115,6 @@
     <string name="progress_copying_downloads">Copiando arquivos baixados para armazenamento local&#8230;</string>
     <string name="progress_verifying_sufficient_storage">Verificando o armazenamento insuficiente disponível&#8230;</string>
     <string name="progress_setting_up_filesystem">Configurando o sistema de arquivos&#8230;</string>
-    <string name="progress_extraction_details">Extraindo: %1$s</string>
     <string name="progress_verifying_assets">Verificando recursos&#8230;</string>
     <string name="progress_starting">Começando serviço&#8230;</string>
     <string name="progress_clearing_support_files">Limpar todos os arquivos de suporte&#8230;</string>

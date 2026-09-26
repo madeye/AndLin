@@ -140,7 +140,6 @@
     <string name="progress_copying_downloads">Heruntergeladene Dateien werden in den lokalen Speicher kopiert&#8230;</string>
     <string name="progress_verifying_sufficient_storage">Überprüfen, ob genügend Speicher verfügbar ist &#8230;</string>
     <string name="progress_setting_up_filesystem">Dateisystem wird eingerichtet&#8230;</string>
-    <string name="progress_extraction_details">Entpacken: %1$s</string>
     <string name="progress_verifying_assets">Dateien werden geprüft&#8230;</string>
     <string name="progress_starting">Dienst wird gestartet&#8230;</string>
     <string name="progress_clearing_support_files">Alle Support-Dateien werden gelöscht&#8230;</string>
