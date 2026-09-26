@@ -74,6 +74,8 @@ sealed class OciInstallProgress {
     data class Resolving(val reference: String) : OciInstallProgress()
     data class Downloading(val layer: Int, val layerCount: Int, val percent: Int) : OciInstallProgress()
     data class Extracting(val layer: Int, val layerCount: Int, val percent: Int) : OciInstallProgress()
+    /** A one-off message worth showing, e.g. switching registries away from a slow mirror. */
+    data class Notice(val message: String) : OciInstallProgress()
     object Finalizing : OciInstallProgress() {
         override fun toString() = "Finalizing"
     }

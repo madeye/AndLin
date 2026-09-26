@@ -232,6 +232,100 @@ class OciRegistryClientTest {
         assertEquals(1, mirror.blobRequests(layer.digest))
     }
 
+    // --- slow registries ------------------------------------------------------------------------
+
+    /** Treats anything under 1 MB/s over 200 ms as slow, so a throttled FakeRegistry trips it quickly. */
+    private fun speedCheckingClient(candidates: (String) -> List<String>) = OciRegistryClient(
+        OkHttpClient(),
+        registryCandidates = candidates,
+        baseUrlFor = { "http://$it" },
+        retryDelayMillis = 1,
+        minBytesPerSecond = 1024 * 1024,
+        slowWindowMillis = 200,
+    )
+
+    /** 1 KB every 50 ms: about 20 KB/s. */
+    private fun FakeRegistry.crawl() { throttleBlobs = 1024L to 50L }
+
+    @Test
+    fun `switches away from a slow registry and resumes from the partial download`() = runBlocking {
+        val slow = registry().apply { crawl() }
+        val fast = registry(requireToken = false)
+        val content = Random(2).nextBytes(256 * 1024)
+        val blob = slow.addBlob(content)
+        fast.addBlob(content)
+        val client = speedCheckingClient { listOf(slow.registry, fast.registry) }
+        val notices = Collections.synchronizedList(ArrayList<String>())
+        val dest = File(temp.root, "switched")
+
+        client.downloadBlob(slow.reference, blob, dest, {}, onNotice = { notices += it })
+
+        assertArrayEquals(content, dest.readBytes())
+        assertEquals("the slow registry is not retried", 1, slow.blobRequests(blob.digest))
+        val resumedAt = Regex("""bytes=(\d+)-""").find(fast.requests.last().getHeader("Range")!!)!!.groupValues[1].toLong()
+        assertTrue("resumed at $resumedAt", resumedAt > 0)
+        assertTrue(notices.single(), notices.single().startsWith("${slow.registry} is slow") && notices.single().endsWith("switching to ${fast.registry}"))
+
+        // Later blobs go to the fast registry first.
+        val next = slow.addBlob("second".toByteArray())
+        fast.addBlob("second".toByteArray())
+        client.downloadBlob(slow.reference, next, File(temp.root, "second"), {})
+        assertEquals(0, slow.blobRequests(next.digest))
+    }
+
+    @Test
+    fun `never switches to a registry already measured as slower`() = runBlocking {
+        val slow = registry().apply { crawl() } // ~20 KB/s
+        val slower = registry(requireToken = false).apply { throttleBlobs = 256L to 50L } // ~5 KB/s
+        val content = Random(5).nextBytes(16 * 1024)
+        val blob = slow.addBlob(content)
+        slower.addBlob(content)
+        val client = speedCheckingClient { listOf(slow.registry, slower.registry) }
+        val notices = Collections.synchronizedList(ArrayList<String>())
+
+        client.downloadBlob(slow.reference, blob, File(temp.root, "first"), {}, onNotice = { notices += it })
+
+        // Probes the untried registry once, finds it slower and comes back to stay.
+        assertEquals(listOf("switching to ${slower.registry}", "switching to ${slow.registry}"), notices.map { it.substringAfter("; ") })
+        assertEquals(1, slower.blobRequests(blob.digest))
+
+        // The next blob starts on the faster of the two and doesn't probe the other again.
+        val next = slow.addBlob(content.reversedArray())
+        slower.addBlob(content.reversedArray())
+        notices.clear()
+        client.downloadBlob(slow.reference, next, File(temp.root, "next"), {}, onNotice = { notices += it })
+        assertTrue(notices.toString(), notices.isEmpty())
+        assertEquals(0, slower.blobRequests(next.digest))
+    }
+
+    @Test
+    fun `falls back to a slow registry when the fast one fails`() = runBlocking {
+        val slow = registry().apply { crawl() }
+        val broken = registry(requireToken = false).apply { failBlobsWith = 500 }
+        val content = Random(3).nextBytes(16 * 1024)
+        val blob = slow.addBlob(content)
+        val dest = File(temp.root, "slow-but-works")
+
+        speedCheckingClient { listOf(slow.registry, broken.registry) }
+            .downloadBlob(slow.reference, blob, dest, {})
+
+        assertArrayEquals(content, dest.readBytes())
+        assertEquals("slow, then retried last without the speed check", 2, slow.blobRequests(blob.digest))
+    }
+
+    @Test
+    fun `the only registry is never dropped for being slow`() = runBlocking {
+        val slow = registry().apply { crawl() }
+        val content = Random(4).nextBytes(16 * 1024)
+        val blob = slow.addBlob(content)
+        val dest = File(temp.root, "only")
+
+        speedCheckingClient { listOf(it) }.downloadBlob(slow.reference, blob, dest, {})
+
+        assertArrayEquals(content, dest.readBytes())
+        assertEquals(1, slow.blobRequests(blob.digest))
+    }
+
     @Test
     fun `a 404 on every registry is reported as such`() = runBlocking {
         val registry = registry()

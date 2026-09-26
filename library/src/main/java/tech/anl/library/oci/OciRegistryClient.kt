@@ -23,7 +23,9 @@ import java.util.concurrent.ConcurrentHashMap
  * Mirrors: [registryCandidates] maps an image's registry to the registries to try, preferred
  * first (e.g. `{ RegistryMirror.candidates(it) }` to prefer a GHCR mirror in China). The manifest
  * comes from the first registry that serves it; each blob falls back through the remaining
- * registries if one keeps failing. Mirrors are safe because content is addressed by digest.
+ * registries if one keeps failing, or stays slower than [minBytesPerSecond] while another registry
+ * might do better (a mirror can be reachable yet crawl). Measured speeds are remembered: later blobs
+ * try the fastest registry first. Mirrors are safe because content is addressed by digest.
  *
  * Authentication follows whatever `WWW-Authenticate: Bearer` challenge a registry sends (GHCR
  * wants an anonymous token; some mirrors need none). Blob downloads may redirect to a CDN; OkHttp
@@ -37,6 +39,10 @@ class OciRegistryClient(
     private val maxAttempts: Int = 4,
     /** First retry delay; doubled for each further attempt. */
     private val retryDelayMillis: Long = 1_000,
+    /** A blob download slower than this over a [slowWindowMillis] window moves to the next registry. */
+    private val minBytesPerSecond: Long = 32 * 1024,
+    private val slowWindowMillis: Long = 15_000,
+    private val clockMillis: () -> Long = { System.nanoTime() / 1_000_000 },
 ) {
     companion object {
         const val OCI_INDEX = "application/vnd.oci.image.index.v1+json"
@@ -85,6 +91,8 @@ class OciRegistryClient(
 
     private val jsonAdapter = Moshi.Builder().build().adapter(Any::class.java)
     private val tokens = ConcurrentHashMap<String, String>()
+    /** Last measured blob throughput per registry, in bytes/s; 0 for one that failed. */
+    private val measuredRates = ConcurrentHashMap<String, Long>()
 
     /** The registries to try for [ref], preferred first (never empty). */
     fun candidatesFor(ref: OciImageReference): List<String> =
@@ -131,8 +139,11 @@ class OciRegistryClient(
      * [onBytes] receives the number of bytes of the blob present so far.
      *
      * Data goes to `<dest>.partial` first. Failed attempts are retried with exponential backoff,
-     * resuming with an HTTP Range request; once a registry has used up [maxAttempts], the next of
-     * [registries] continues from the same partial file. An existing, valid [dest] is reused.
+     * resuming with an HTTP Range request; once a registry has used up [maxAttempts], or is too
+     * slow while another of [registries] is untried or known to be much faster, that one continues
+     * from the same partial file. A registry dropped for being slow is tried again last, so a slow
+     * registry still beats none. Registries are tried fastest-known first, untried ones before
+     * known-slow ones. [onNotice] reports each switch. An existing, valid [dest] is reused.
      * Cancellation deletes the partial file.
      */
     suspend fun downloadBlob(
@@ -141,6 +152,7 @@ class OciRegistryClient(
         dest: File,
         onBytes: (Long) -> Unit,
         registries: List<String> = candidatesFor(ref),
+        onNotice: (String) -> Unit = {},
     ) {
         val expectedHex = descriptor.digest.removePrefix("sha256:")
         if (!descriptor.digest.startsWith("sha256:") || expectedHex.length != 64) {
@@ -155,16 +167,30 @@ class OciRegistryClient(
 
         try {
             val failures = ArrayList<IOException>()
-            for (registry in registries) {
+            // Untried registries (MAX_VALUE) keep their preference order ahead of measured ones.
+            val queue = ArrayDeque(registries.distinct().sortedByDescending { measuredRates[it] ?: Long.MAX_VALUE })
+            var switches = 0
+            while (queue.isNotEmpty()) {
+                val registry = queue.removeFirst()
                 try {
+                    // Bounded, so fluctuating speeds can't bounce between registries forever.
+                    val alternatives = if (switches < 2 * registries.size) queue.toList() else emptyList()
                     withRetries(maxAttempts) {
-                        downloadAttempt(ref.withRegistry(registry), descriptor, expectedHex, partial, onBytes)
+                        downloadAttempt(ref.withRegistry(registry), descriptor, expectedHex, partial, onBytes, alternatives)
                     }
                     dest.delete()
                     if (!partial.renameTo(dest)) throw OciException("Could not move ${partial.name} to ${dest.name}")
                     return
+                } catch (e: SlowRegistryException) {
+                    switches++
+                    queue.remove(e.alternative)
+                    queue.addFirst(e.alternative)
+                    queue.addLast(registry)
+                    onNotice("${e.message}; switching to ${e.alternative}")
                 } catch (e: IOException) {
+                    measuredRates[registry] = 0
                     failures += e
+                    queue.firstOrNull()?.let { next -> onNotice("$registry failed (${e.message}); trying $next") }
                 }
             }
             throw OciException(
@@ -181,6 +207,34 @@ class OciRegistryClient(
     // --- manifests ---------------------------------------------------------------------------
 
     private class ImageManifest(val config: OciDescriptor, val layers: List<OciDescriptor>)
+
+    /** A registry serving a blob too slowly while [alternative] may do better; not retried there. */
+    private class SlowRegistryException(registry: String, bytesPerSecond: Long, val alternative: String) :
+        OciException("$registry is slow (${bytesPerSecond / 1024} KB/s)", retryable = false)
+
+    /**
+     * Records the throughput of each [slowWindowMillis] window. When a window averages less than
+     * [minBytesPerSecond] and one of [alternatives] is untried or measured at least twice as fast,
+     * throws [SlowRegistryException] naming it; otherwise carries on with a new window.
+     */
+    private inner class SpeedCheck(private val registry: String, private val alternatives: List<String>) {
+        private var windowStart = clockMillis()
+        private var windowBytes = 0L
+
+        fun onRead(bytes: Int) {
+            windowBytes += bytes
+            val now = clockMillis()
+            val elapsed = now - windowStart
+            if (elapsed < slowWindowMillis) return
+            val rate = windowBytes * 1000 / elapsed
+            measuredRates[registry] = rate
+            windowStart = now
+            windowBytes = 0
+            if (rate >= minBytesPerSecond) return
+            val better = alternatives.firstOrNull { alt -> measuredRates[alt]?.let { it >= 2 * rate.coerceAtLeast(1) } ?: true }
+            if (better != null) throw SlowRegistryException(registry, rate, better)
+        }
+    }
 
     /** The image is unusable no matter which registry serves it; don't try mirrors. */
     private class ImageContentException(message: String) : OciException(message)
@@ -279,6 +333,7 @@ class OciRegistryClient(
         expectedHex: String,
         partial: File,
         onBytes: (Long) -> Unit,
+        alternatives: List<String>,
     ) {
         var offset = if (partial.isFile) partial.length() else 0L
         if (offset > descriptor.size) {
@@ -312,6 +367,7 @@ class OciRegistryClient(
                             val buffer = ByteArray(BUFFER_SIZE)
                             var total = offset
                             onBytes(total)
+                            val speed = SpeedCheck(ref.registry, alternatives)
                             while (true) {
                                 ensureActive()
                                 val n = input.read(buffer)
@@ -323,6 +379,7 @@ class OciRegistryClient(
                                 out.write(buffer, 0, n)
                                 total += n
                                 onBytes(total)
+                                speed.onRead(n)
                             }
                         }
                     }
