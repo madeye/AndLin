@@ -118,7 +118,7 @@ class AdbClient private constructor(context: Context) {
      */
     suspend fun shell(cmd: String): Pair<Int, String> = withContext(Dispatchers.IO) {
         requireConnected()
-        val marker = "__ANDLIN_EXIT_${Random().nextInt(Int.MAX_VALUE)}__"
+        val marker = "__SERVERBOX_EXIT_${Random().nextInt(Int.MAX_VALUE)}__"
         val stream = manager.openStream("shell:{ $cmd ; } 2>&1; echo $marker\$?")
         val output = stream.use { readAll(it) }
         val idx = output.lastIndexOf(marker)
@@ -162,7 +162,7 @@ class AdbClient private constructor(context: Context) {
             if (result != null && result.contains("Success")) return@withContext true to result.trim()
             if (result != null && result.contains("Failure")) return@withContext false to result.trim()
             // Fallback: stage the APK, then install from the file.
-            val staged = "/data/local/tmp/andlin-companion.apk"
+            val staged = "/data/local/tmp/serverbox-companion.apk"
             val upload = manager.openStream("exec:sh -c 'head -c $size > $staged'")
             upload.use { s ->
                 val out = s.openOutputStream()
@@ -224,7 +224,7 @@ class AdbClient private constructor(context: Context) {
         val algorithm = "SHA512withRSA"
         val notBefore = Date()
         val notAfter = Date(notBefore.time + 30L * 365 * 24 * 60 * 60 * 1000)
-        val subject = X500Name("CN=AndLin")
+        val subject = X500Name("CN=ServerBox")
         val extensions = CertificateExtensions().apply {
             set("SubjectKeyIdentifier", SubjectKeyIdentifierExtension(KeyIdentifier(pair.public).identifier))
         }

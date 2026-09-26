@@ -41,10 +41,8 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        AndLin {
+        ServerBox {
             dimension "app"
-
-            buildConfigField "String", "REPO_NAME", "\"AndLin\""
 
             buildConfigField 'String', 'VERSION_CODE', '\"' + rootProject.ext.appVersionCode + '\"'
             buildConfigField 'String', 'VERSION_NAME', '\"' + rootProject.ext.appVersionName + '\"'
@@ -59,7 +57,7 @@ android {
             buildConfigField "String", "DEFAULT_SSH_PASSWORD", "\"sshpass\""
             buildConfigField 'boolean', 'USE_RANDOM_VNC_PASSWORD', 'true'
             buildConfigField "String", "DEFAULT_VNC_PASSWORD", "\"vncpass\""
-            buildConfigField "String", "DEFAULT_USERNAME", "\"userland\""
+            buildConfigField "String", "DEFAULT_USERNAME", "\"serverbox\""
 
             //controls whether to ask for session type or not
             buildConfigField 'boolean', 'USE_DEFAULT_SERVICE_TYPE', 'false'
@@ -128,7 +126,7 @@ android {
             resValue "string", "clear_support_files_enabled", "true"
 
             //this is used to hide many of the preferences from the user
-            buildConfigField 'boolean', 'HIDE_USERLAND_PREFS', 'false'
+            buildConfigField 'boolean', 'HIDE_APP_PREFS', 'false'
 
             //this should be set to true if the assets are embedded in the filesystem
             buildConfigField 'boolean', 'FILESYSTEM_ONLY_ASSET', 'false'

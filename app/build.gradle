@@ -36,7 +36,7 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        AndLin {
+        ServerBox {
             dimension "app"
             applicationId "tech.anl"
         }
@@ -95,10 +95,10 @@ android {
         }
     }
 
-    // Every variant's APK is named andlin.apk (debug and release land in separate output dirs).
+    // Every variant's APK is named serverbox.apk (debug and release land in separate output dirs).
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "andlin.apk"
+            outputFileName = "serverbox.apk"
         }
     }
 

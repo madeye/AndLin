@@ -34,7 +34,7 @@ import tech.anl.library.ui.InstallPairingReceiver
  */
 object AdbSetupFlow {
     private const val TAG = "AdbSetupFlow"
-    const val CHANNEL_ID = "andlin_adb_setup"
+    const val CHANNEL_ID = "serverbox_adb_setup"
     const val NOTIFICATION_ID = 4711
     const val ACTION_INSTALL_PAIR = "tech.anl.library.INSTALL_PAIR"
     const val KEY_PAIRING_CODE = "pairing_code"

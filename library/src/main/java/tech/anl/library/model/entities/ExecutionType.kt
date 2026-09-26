@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.room.TypeConverter
 
 /**
- * Where a filesystem's Linux userland actually runs.
+ * Where a filesystem's Linux userspace actually runs.
  *
  * PROOT runs in this app's own process tree. AVF and QEMU run inside a full VM hosted by a
  * separately installed companion app (UserLAnd VM / UserLAnd QEMU), which this app drives over a

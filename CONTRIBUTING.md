@@ -7,7 +7,7 @@ All contributions must follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 Talk with us through an issue or a pull request.
 
 ## Architecture
-ServerBox follows UserLAnd's MVVM-C architecture. UI lives in XML and is inflated only by
+ServerBox follows the MVVM-C architecture. UI lives in XML and is inflated only by
 view controllers (activities and fragments). Business logic should be decoupled from the Android
 framework as much as possible and live in the `model` or `utils` packages. Application-layer logic
 belongs in the view models.
@@ -23,7 +23,7 @@ The modules are:
 2. Branch from `master`.
 3. Write your code and tests for it.
 4. Run the tests and lint:
-   `./gradlew :library:testAndLinDebugUnitTest :app:lintAndLinDebug`
+   `./gradlew :library:testServerBoxDebugUnitTest :app:lintServerBoxDebug`
    (Android builds need JDK 17.)
 5. Open a pull request against `master`.
 

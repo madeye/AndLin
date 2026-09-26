@@ -22,12 +22,12 @@ class HelpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         fragHelpBinding.githubLogo.setOnClickListener {
-            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://github.com/CypherpunkArmory/UserLAnd/issues"))
+            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://github.com/madeye/AndLin/issues"))
             startActivity(intent)
         }
 
-        fragHelpBinding.userlandLogo.setOnClickListener {
-            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://userland.tech"))
+        fragHelpBinding.websiteLogo.setOnClickListener {
+            val intent = Intent("android.intent.action.VIEW", Uri.parse("https://github.com/madeye/AndLin"))
             startActivity(intent)
         }
     }

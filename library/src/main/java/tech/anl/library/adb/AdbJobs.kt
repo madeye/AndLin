@@ -5,7 +5,7 @@ import android.util.Log
 import tech.anl.library.companion.CompanionApp
 import java.io.File
 
-/** The one-off ADB jobs AndLin runs through [AdbSetupFlow]. Each returns a user-facing error or null. */
+/** The one-off ADB jobs ServerBox runs through [AdbSetupFlow]. Each returns a user-facing error or null. */
 object AdbJobs {
     private const val TAG = "AdbJobs"
 
