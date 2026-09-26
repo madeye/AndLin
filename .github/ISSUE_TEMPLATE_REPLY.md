@@ -2,7 +2,7 @@ It looks like you've posted an issue that requires more details for our team to 
 working on it.
 
 We have created some issue templates to assist you in this process. These issue templates can be
-found [here](https://github.com/CypherpunkArmory/UserLAnd/tree/master/.github/ISSUE_TEMPLATE).
+found [here](https://github.com/madeye/AndLin/tree/master/.github/ISSUE_TEMPLATE).
 
 To correctly follow the template, all of the headers from the template must be present in your
 new issue. The headers for each template are the lines that begin with a '#'. Include the
@@ -17,4 +17,4 @@ first place, it will marked low priority.
 
 If your issue is not updated to follow a template, we will likely close it within the week.
 
-Thanks for using UserLAnd and for helping us improve it!
+Thanks for using ServerBox and for helping us improve it!

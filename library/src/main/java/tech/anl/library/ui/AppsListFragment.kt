@@ -71,7 +71,7 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
             val desktopEnabled = DesktopSupport.isEnabled(activityContext)
             appsAdapter.updateApps(list.filter { app -> desktopEnabled || app.supportsCli })
             fragAppListBinding.listApps.scrollToPosition(0)
-            if (list.isEmpty() || userlandIsNewVersion()) {
+            if (list.isEmpty() || appIsNewVersion()) {
                 doRefresh()
             }
         }
@@ -154,7 +154,7 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
 
     private fun doRefresh() {
         viewModel.refreshAppsList()
-        setLatestUpdateUserlandVersion()
+        setLatestUpdateAppVersion()
     }
 
     private fun showAppDetails(app: App): Boolean {
@@ -182,21 +182,21 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
                 .create().show()
     }
 
-    private fun userlandIsNewVersion(): Boolean {
-        val version = getUserlandVersion()
+    private fun appIsNewVersion(): Boolean {
+        val version = getAppVersion()
         val lastUpdatedVersion = activityContext.defaultSharedPreferences.getString("lastAppsUpdate", "")
         return version != lastUpdatedVersion
     }
 
-    private fun setLatestUpdateUserlandVersion() {
-        val version = getUserlandVersion()
+    private fun setLatestUpdateAppVersion() {
+        val version = getAppVersion()
         with(activityContext.defaultSharedPreferences.edit()) {
             putString("lastAppsUpdate", version)
             apply()
         }
     }
 
-    private fun getUserlandVersion(): String {
+    private fun getAppVersion(): String {
         val info = activityContext.packageManager.getPackageInfo(activityContext.packageName, 0)
         return info.versionName ?: ""
     }

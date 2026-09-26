@@ -2,7 +2,7 @@ package tech.anl.library.desktop
 
 import android.content.Context
 
-/** Stand-in for builds made with -PandlinVnc=false, which leave the VNC viewer out entirely. */
+/** Stand-in for builds made with -PserverboxVnc=false, which leave the VNC viewer out entirely. */
 object DesktopViewer {
     const val isAvailable = false
 

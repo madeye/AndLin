@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException
 
 sealed class AssetDownloadState
 object CacheSyncAttemptedWhileCacheIsEmpty : AssetDownloadState()
-object NonUserlandDownloadFound : AssetDownloadState()
+object ForeignDownloadFound : AssetDownloadState()
 object AllDownloadsCompletedSuccessfully : AssetDownloadState()
 data class CompletedDownloadsUpdate(val numCompleted: Int, val numTotal: Int) : AssetDownloadState()
 data class AssetDownloadFailure(val reason: DownloadFailureLocalizationData) : AssetDownloadState()
@@ -78,7 +78,7 @@ class AssetDownloader(
     fun handleDownloadComplete(downloadId: Long): AssetDownloadState {
         var md5Mismatch = false
 
-        if (!downloadIsForUserland(downloadId)) return NonUserlandDownloadFound
+        if (!downloadIsOurs(downloadId)) return ForeignDownloadFound
 
         if (downloadManagerWrapper.downloadHasFailed(downloadId)) {
             val reason = downloadManagerWrapper.getDownloadFailureReason(downloadId)
@@ -181,7 +181,7 @@ class AssetDownloader(
         }
     }
 
-    fun downloadIsForUserland(id: Long): Boolean {
+    fun downloadIsOurs(id: Long): Boolean {
         return enqueuedDownloadIds.contains(id)
     }
 

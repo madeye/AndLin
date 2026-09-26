@@ -73,7 +73,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             updateSshConnectionInfo(newValue as Boolean)
             true
         }
-        if (BuildConfig.HIDE_USERLAND_PREFS) hidePrefs()
+        if (BuildConfig.HIDE_APP_PREFS) hidePrefs()
     }
 
     private fun updateSshConnectionInfo(

@@ -144,10 +144,10 @@ class SessionStartupFsmTest {
             for (state in possibleStates) {
                 if (state is WaitingForSessionSelection) {
                     // Test the branch for receiving downloads not enqueued by us
-                    whenever(mockAssetDownloader.downloadIsForUserland(0L))
+                    whenever(mockAssetDownloader.downloadIsOurs(0L))
                             .thenReturn(false)
                 } else {
-                    whenever(mockAssetDownloader.downloadIsForUserland(0L))
+                    whenever(mockAssetDownloader.downloadIsOurs(0L))
                             .thenReturn(true)
                 }
                 sessionFsm.setState(state)
@@ -173,13 +173,13 @@ class SessionStartupFsmTest {
     }
 
     @Test
-    fun `AssetDownloadComplete events can be submitted at any time if they are not userland downloads`() {
+    fun `AssetDownloadComplete events can be submitted at any time if they are not our downloads`() {
         val downloadId = 0L
         sessionFsm.setState(WaitingForSessionSelection)
         sessionFsm.getState().observeForever(mockStateObserver)
 
         whenever(mockAssetDownloader.handleDownloadComplete(downloadId))
-                .thenReturn(NonUserlandDownloadFound)
+                .thenReturn(ForeignDownloadFound)
 
         runBlocking { sessionFsm.submitEvent(AssetDownloadComplete(downloadId), this) }
 
@@ -433,7 +433,7 @@ class SessionStartupFsmTest {
         sessionFsm.getState().observeForever(mockStateObserver)
 
         whenever(mockAssetDownloader.handleDownloadComplete(0))
-                .thenReturn(NonUserlandDownloadFound)
+                .thenReturn(ForeignDownloadFound)
 
         runBlocking {
             sessionFsm.submitEvent(AssetDownloadComplete(0), this)

@@ -80,7 +80,7 @@ class SessionStartupFsm(
             is AssetDownloadComplete -> {
                 // If we are currently downloading assets, we can handle completed downloads that
                 // don't belong to us. Otherwise, we still don't want to post an illegal transition.
-                currentState is DownloadingAssets || !assetDownloader.downloadIsForUserland(event.downloadAssetId)
+                currentState is DownloadingAssets || !assetDownloader.downloadIsOurs(event.downloadAssetId)
             }
             is SyncDownloadState -> {
 //                currentState is WaitingForSessionSelection || currentState is (DownloadingAssets)
@@ -208,7 +208,7 @@ class SessionStartupFsm(
         return when (assetDownloadState) {
             // We don't care if some other app has downloaded something, though we may intercept the
             // broadcast from the Download Manager.
-            is NonUserlandDownloadFound -> {}
+            is ForeignDownloadFound -> {}
             is CacheSyncAttemptedWhileCacheIsEmpty -> state.postValue(AttemptedCacheAccessWhileEmpty)
             is AllDownloadsCompletedSuccessfully -> state.postValue(DownloadsHaveSucceeded)
             is CompletedDownloadsUpdate -> {

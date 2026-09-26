@@ -77,16 +77,16 @@ class LocalServerManager(
     private fun startSSHServer(session: Session): Long {
         val filesystemDirName = session.filesystemId.toString()
         deletePidFile(session)
-        val command = "/support/common/${AndlinScripts.START_SSH_SERVER}"
+        val command = "/support/common/${ServerBoxScripts.START_SSH_SERVER}"
         val env = HashMap<String, String>()
         env["INITIAL_USERNAME"] = session.username
         // Only used to create the user if the filesystem lacks it (see startSSHServer.sh).
         env["INITIAL_PASSWORD"] = session.password
-        env["ANDLIN_SSH_ADDRESS"] = if (sharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)) "0.0.0.0" else "127.0.0.1"
+        env["SERVERBOX_SSH_ADDRESS"] = if (sharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)) "0.0.0.0" else "127.0.0.1"
         val authorizedKeys = sharedPreferences.getString("pref_ssh_authorized_keys", "").orEmpty().trim()
-        if (authorizedKeys.isNotEmpty()) env["ANDLIN_AUTHORIZED_KEYS"] = authorizedKeys
+        if (authorizedKeys.isNotEmpty()) env["SERVERBOX_AUTHORIZED_KEYS"] = authorizedKeys
         // The app's terminal authenticates with its own generated key, so this can't lock it out.
-        if (sharedPreferences.getBoolean("pref_ssh_disable_password", false)) env["ANDLIN_SSH_KEYS_ONLY"] = "1"
+        if (sharedPreferences.getBoolean("pref_ssh_disable_password", false)) env["SERVERBOX_SSH_KEYS_ONLY"] = "1"
         val result = busyboxExecutor.executeProotCommand(command, filesystemDirName, false, env = env)
         return when (result) {
             is OngoingExecution -> result.process.pid()

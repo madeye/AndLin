@@ -8,10 +8,10 @@ import java.io.File
  * filesystem images. They are copied into filesDir/support, which every PRoot session binds at
  * /support/common.
  */
-object AndlinScripts {
-    const val START_SSH_SERVER = "andlin_startSSHServer.sh"
+object ServerBoxScripts {
+    const val START_SSH_SERVER = "serverbox_startSSHServer.sh"
 
-    private val scripts = mapOf("andlin/startSSHServer.sh" to START_SSH_SERVER)
+    private val scripts = mapOf("serverbox/startSSHServer.sh" to START_SSH_SERVER)
 
     fun install(context: Context, supportDir: File) {
         supportDir.mkdirs()
