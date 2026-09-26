@@ -19,7 +19,7 @@ object FilesystemImages {
         val distro = distribution.lowercase(Locale.ENGLISH)
         val tag = tagFor(ociTag, distro)
         return when (flavor.lowercase(Locale.ENGLISH)) {
-            FilesystemFlavor.SERVER, "" -> "$SERVER_IMAGE_NAMESPACE/andlin-$distro:$tag"
+            FilesystemFlavor.SERVER, "" -> "$SERVER_IMAGE_NAMESPACE/serverbox-$distro:$tag"
             FilesystemFlavor.DEFAULT -> "$DESKTOP_IMAGE_NAMESPACE/userland-$distro:$tag"
             else -> "$DESKTOP_IMAGE_NAMESPACE/userland-${distro}_${flavor.lowercase(Locale.ENGLISH)}:$tag"
         }
