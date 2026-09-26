@@ -17,10 +17,10 @@ import tech.anl.library.utils.defaultSharedPreferences
 /**
  * Servers have to keep answering with the screen off, which Android's battery optimization (and
  * vendor power managers on top of it, like HyperOS's) get in the way of. Asks once, the first time
- * the app is open while a session is running and AndLin isn't exempt yet.
+ * the app is open while a session is running and ServerBox isn't exempt yet.
  */
 object BackgroundRunPrompt {
-    private const val ASKED_KEY = "andlin_background_prompt_asked"
+    private const val ASKED_KEY = "serverbox_background_prompt_asked"
 
     fun maybeOffer(activity: FragmentActivity) {
         if (activity.isFinishing || activity.isDestroyed) return

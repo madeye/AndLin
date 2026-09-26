@@ -16,8 +16,8 @@ class NotificationConstructor(val context: Context) {
 
     companion object {
         const val serviceNotificationId = 1000
-        const val GROUP_KEY_USERLAND = "tech.anl.userland"
-        const val serviceNotificationChannelId = "UserLAnd"
+        const val GROUP_KEY_SESSIONS = "tech.anl.sessions"
+        const val serviceNotificationChannelId = "ServerBox"
     }
 
     private val serviceNotificationTitle = context.getString(R.string.service_notification_title)
@@ -59,7 +59,7 @@ class NotificationConstructor(val context: Context) {
                 .setContentTitle(serviceNotificationTitle)
                 .setContentText(serviceNotificationDescription)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setGroup(GROUP_KEY_USERLAND)
+                .setGroup(GROUP_KEY_SESSIONS)
                 .setGroupSummary(true)
                 .setAutoCancel(false)
                 .setContentIntent(pendingSessionListIntent)

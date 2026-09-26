@@ -6,7 +6,7 @@ import tech.anl.library.model.entities.Session
 
 /**
  * How to reach a session's SSH server: shown on the Sessions tab and copied from it. PRoot
- * sessions always listen on [PORT] (see andlin/startSSHServer.sh); "Allow SSH from the network"
+ * sessions always listen on [PORT] (see serverbox/startSSHServer.sh); "Allow SSH from the network"
  * decides whether that is on every interface or only 127.0.0.1.
  */
 data class SshServerInfo(

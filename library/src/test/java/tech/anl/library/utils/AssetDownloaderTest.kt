@@ -198,12 +198,12 @@ class AssetDownloaderTest {
     }
 
     @Test
-    fun `Returns NonUserLandDownloadFound if a a download we did not start is found`() {
+    fun `Returns ForeignDownloadFound if a a download we did not start is found`() {
         setupDownloadState()
 
         val result = assetDownloader.handleDownloadComplete(-1)
 
-        assertTrue(result is NonUserlandDownloadFound)
+        assertTrue(result is ForeignDownloadFound)
     }
 
     @Test
@@ -244,7 +244,7 @@ class AssetDownloaderTest {
     }
 
     @Test
-    fun `Clears download directory of userland files`() {
+    fun `Clears download directory of our files`() {
         val asset1DownloadsFile = File("${downloadDirectory.path}/${downloadMetadata1.downloadTitle}")
         val asset2DownloadsFile = File("${downloadDirectory.path}/${downloadMetadata2.downloadTitle}")
         asset1DownloadsFile.createNewFile()

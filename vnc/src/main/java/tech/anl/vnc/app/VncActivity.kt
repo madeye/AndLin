@@ -52,7 +52,7 @@ import java.lang.ref.WeakReference
 import kotlin.math.hypot
 
 /**
- * Full-screen VNC viewer for a UserLAnd desktop session.
+ * Full-screen VNC viewer for a ServerBox desktop session.
  *
  * Started with [createIntent]; the data URI is `vnc://host:port/?password=...`.
  */

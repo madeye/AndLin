@@ -66,7 +66,7 @@ class LocalServerManagerTest {
     @Test
     fun `Calling startServer with an SSH session should use the appropriate command`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh)
-        val command = "/support/common/andlin_startSSHServer.sh"
+        val command = "/support/common/serverbox_startSSHServer.sh"
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -88,7 +88,7 @@ class LocalServerManagerTest {
     @Test
     fun `If starting an ssh server fails, an error is logged and -1 is returned`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh)
-        val command = "/support/common/andlin_startSSHServer.sh"
+        val command = "/support/common/serverbox_startSSHServer.sh"
 
         val reason = "reason"
         whenever(mockBusyboxExecutor.executeProotCommand(
@@ -114,8 +114,8 @@ class LocalServerManagerTest {
     @Test
     fun `Starting an SSH server passes the username and a localhost address by default`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
-        val command = "/support/common/andlin_startSSHServer.sh"
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "ANDLIN_SSH_ADDRESS" to "127.0.0.1")
+        val command = "/support/common/serverbox_startSSHServer.sh"
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "127.0.0.1")
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -136,9 +136,9 @@ class LocalServerManagerTest {
     @Test
     fun `Starting an SSH server listens on LAN when the preference is set`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
-        val command = "/support/common/andlin_startSSHServer.sh"
+        val command = "/support/common/serverbox_startSSHServer.sh"
         whenever(mockSharedPreferences.getBoolean("pref_ssh_listen_on_lan", false)).thenReturn(true)
-        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "ANDLIN_SSH_ADDRESS" to "0.0.0.0")
+        val env = hashMapOf("INITIAL_USERNAME" to "user", "INITIAL_PASSWORD" to "", "SERVERBOX_SSH_ADDRESS" to "0.0.0.0")
 
         whenever(mockBusyboxExecutor.executeProotCommand(
                 eq(command),
@@ -159,13 +159,13 @@ class LocalServerManagerTest {
     @Test
     fun `Starting an SSH server includes authorized keys when the preference is set`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
-        val command = "/support/common/andlin_startSSHServer.sh"
+        val command = "/support/common/serverbox_startSSHServer.sh"
         whenever(mockSharedPreferences.getString("pref_ssh_authorized_keys", "")).thenReturn("ssh-ed25519 AAAA...")
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
                 "INITIAL_PASSWORD" to "",
-                "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
-                "ANDLIN_AUTHORIZED_KEYS" to "ssh-ed25519 AAAA..."
+                "SERVERBOX_SSH_ADDRESS" to "127.0.0.1",
+                "SERVERBOX_AUTHORIZED_KEYS" to "ssh-ed25519 AAAA..."
         )
 
         whenever(mockBusyboxExecutor.executeProotCommand(
@@ -187,13 +187,13 @@ class LocalServerManagerTest {
     @Test
     fun `Starting an SSH server restricts to key-only auth when the preference is set`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Ssh, username = "user")
-        val command = "/support/common/andlin_startSSHServer.sh"
+        val command = "/support/common/serverbox_startSSHServer.sh"
         whenever(mockSharedPreferences.getBoolean("pref_ssh_disable_password", false)).thenReturn(true)
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
                 "INITIAL_PASSWORD" to "",
-                "ANDLIN_SSH_ADDRESS" to "127.0.0.1",
-                "ANDLIN_SSH_KEYS_ONLY" to "1"
+                "SERVERBOX_SSH_ADDRESS" to "127.0.0.1",
+                "SERVERBOX_SSH_KEYS_ONLY" to "1"
         )
 
         whenever(mockBusyboxExecutor.executeProotCommand(
@@ -214,11 +214,11 @@ class LocalServerManagerTest {
 
     @Test
     fun `Calling startServer with a VNC session should use the appropriate command`() {
-        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "userland", geometry = "10x10")
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "vncpass", geometry = "10x10")
         val command = "/support/startVNCServer.sh"
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
-                "INITIAL_VNC_PASSWORD" to "userland",
+                "INITIAL_VNC_PASSWORD" to "vncpass",
                 "DIMENSIONS" to "10x10",
                 "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
                 "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",
@@ -251,11 +251,11 @@ class LocalServerManagerTest {
 
     @Test
     fun `If starting a vnc server fails, an error is logged and -1 is returned`() {
-        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "userland", geometry = "10x10")
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "vncpass", geometry = "10x10")
         val command = "/support/startVNCServer.sh"
         val env = hashMapOf(
                 "INITIAL_USERNAME" to "user",
-                "INITIAL_VNC_PASSWORD" to "userland",
+                "INITIAL_VNC_PASSWORD" to "vncpass",
                 "DIMENSIONS" to "10x10",
                 "HOSTNAME" to BuildConfig.DEFAULT_HOSTNAME,
                 "HOSTS" to "127.0.0.1 localhost\n127.0.0.1 ${BuildConfig.DEFAULT_HOSTNAME}",

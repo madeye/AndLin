@@ -18,8 +18,8 @@ it like any other box on your network: host services, run scripts and cron jobs,
 - **Stays up.** Servers keep running with the screen off and after the app is closed: ServerBox
   holds a wake lock and a Wi-Fi lock, restarts a server that dies unexpectedly, and can restart
   your sessions after a reboot (**Start on boot**).
-- **Your services start with it.** Executables in `/etc/andlin/autostart.d` inside the
-  distribution run each time its server starts (logs in `/var/log/andlin-autostart.log`), which is
+- **Your services start with it.** Executables in `/etc/serverbox/autostart.d` inside the
+  distribution run each time its server starts (logs in `/var/log/serverbox-autostart.log`), which is
   the place for databases, web servers and other daemons in guests without a working init.
 - **Phone storage.** Shared storage is available at `/sdcard` inside the distribution; ServerBox
   asks for access to a folder the first time a program uses it.
@@ -54,8 +54,8 @@ address stays the same.
 ## Building
 
 ```sh
-JAVA_HOME=/path/to/jdk-17 ./gradlew :app:assembleAndLinDebug
-./gradlew :library:testAndLinDebugUnitTest :app:lintAndLinDebug
+JAVA_HOME=/path/to/jdk-17 ./gradlew :app:assembleServerBoxDebug
+./gradlew :library:testServerBoxDebugUnitTest :app:lintServerBoxDebug
 ```
 
 The distribution images are built in [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images)

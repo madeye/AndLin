@@ -5,7 +5,7 @@ import org.junit.Test
 
 class FilesystemImagesTest {
     @Test
-    fun `server flavor uses AndLin's headless images`() {
+    fun `server flavor uses ServerBox's headless images`() {
         assertEquals("ghcr.io/madeye/andlin-ubuntu:latest", FilesystemImages.imageRef("ubuntu", "server", "latest"))
     }
 
