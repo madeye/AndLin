@@ -10,8 +10,8 @@ import androidx.test.espresso.Root
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.schibsted.spain.barista.internal.failurehandler.BaristaException
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.internal.failurehandler.BaristaException
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeMatcher
 import androidx.test.uiautomator.UiDevice

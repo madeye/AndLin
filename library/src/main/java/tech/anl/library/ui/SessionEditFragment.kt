@@ -107,7 +107,7 @@ class SessionEditFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityContext = activity!!
+        activityContext = requireActivity()
         sessionEditViewModel.getAllFilesystems().observe(viewLifecycleOwner, filesystemChangeObserver)
     }
 

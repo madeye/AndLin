@@ -107,7 +107,7 @@ class FilesystemListViewModel(
         coroutineScope: CoroutineScope = this
     ) = coroutineScope.launch {
         when {
-            activeSessions.value!!.isNotEmpty() -> {
+            (activeSessions.value ?: emptyList()).isNotEmpty() -> {
                 viewState.postValue(FilesystemExportState.Failure(R.string.deactivate_sessions))
                 return@launch
             }

@@ -323,15 +323,39 @@ class DroidFilesServer(
         }
         val pfd = backend.openFile(relative, plan.mode)
         if (plan.appendViaFcntl) {
-            try {
-                val fd = pfd.fileDescriptor
-                val current = Os.fcntlInt(fd, OsConstants.F_GETFL, 0)
-                Os.fcntlInt(fd, OsConstants.F_SETFL, current or OsConstants.O_APPEND)
-            } catch (e: ErrnoException) {
-                Log.w(TAG, "cannot set O_APPEND on $relative", e)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                try {
+                    val fd = pfd.fileDescriptor
+                    val current = Os.fcntlInt(fd, OsConstants.F_GETFL, 0)
+                    Os.fcntlInt(fd, OsConstants.F_SETFL, current or OsConstants.O_APPEND)
+                } catch (e: ErrnoException) {
+                    Log.w(TAG, "cannot set O_APPEND on $relative", e)
+                }
+            } else {
+                return FdResult.Ok(reopenForAppend(pfd, relative))
             }
         }
         return FdResult.Ok(pfd)
+    }
+
+    /**
+     * Os.fcntlInt() is API 30+, so below that O_APPEND is added by reopening the fd through its
+     * /proc/self/fd magic link. If that fails, the original fd is handed out (non-atomic append).
+     */
+    private fun reopenForAppend(pfd: ParcelFileDescriptor, relative: String): ParcelFileDescriptor {
+        try {
+            val reopened = Os.open("/proc/self/fd/${pfd.fd}", OsConstants.O_RDWR or OsConstants.O_APPEND, 0)
+            try {
+                return ParcelFileDescriptor.dup(reopened).also { pfd.close() }
+            } finally {
+                Os.close(reopened)
+            }
+        } catch (e: ErrnoException) {
+            Log.w(TAG, "cannot set O_APPEND on $relative", e)
+        } catch (e: IOException) {
+            Log.w(TAG, "cannot set O_APPEND on $relative", e)
+        }
+        return pfd
     }
 
     private fun statFd(backend: DroidFilesBackend, relative: String): FdResult =

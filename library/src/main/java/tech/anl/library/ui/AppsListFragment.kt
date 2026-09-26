@@ -135,7 +135,7 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityContext = activity!! as MainActivity
+        activityContext = requireActivity() as MainActivity
         viewModel.getAppsList().observe(viewLifecycleOwner, appsObserver)
         viewModel.getActiveApps().observe(viewLifecycleOwner, activeAppsObserver)
         viewModel.getRefreshStatus().observe(viewLifecycleOwner, refreshStatusObserver)

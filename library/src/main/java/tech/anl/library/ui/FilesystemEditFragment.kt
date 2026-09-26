@@ -84,7 +84,7 @@ class FilesystemEditFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityContext = activity!! as MainActivity
+        activityContext = requireActivity() as MainActivity
         filesystemEditViewModel.getImportStatusLiveData().observe(viewLifecycleOwner, filesystemImportStatusObserver)
 
         if (distributionList.isNotEmpty()) {
