@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "tech.ula"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 35
 
         versionCode rootProject.ext.appVersionCode
@@ -36,54 +36,6 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        AiCLI {
-            dimension "app"
-            applicationId "tech.ula.aicli"
-        }
-        Andacious {
-            dimension "app"
-            applicationId "tech.ula.andacious"
-        }
-        BirdBox {
-            dimension "app"
-            applicationId "tech.ula.birdbox"
-        }
-        FoxBox {
-            dimension "app"
-            applicationId "tech.ula.foxbox_pro"
-        }
-        GIMP {
-            dimension "app"
-            applicationId "tech.ula.gimp"
-        }
-        IDLE {
-            dimension "app"
-            applicationId "tech.ula.idle"
-        }
-        Inky {
-            dimension "app"
-            applicationId "tech.ula.inkscape"
-        }
-        LibreDocs {
-            dimension "app"
-            applicationId "tech.ula.libredocs"
-        }
-        Octave {
-            dimension "app"
-            applicationId "tech.ula.octave"
-        }
-        R {
-            dimension "app"
-            applicationId "tech.ula.r"
-        }
-        deVStudio {
-            dimension "app"
-            applicationId "tech.ula.devstudio"
-        }
-        gnuplot {
-            dimension "app"
-            applicationId "tech.ula.gnuplot"
-        }
         UserLAnd {
             dimension "app"
             applicationId "tech.ula"

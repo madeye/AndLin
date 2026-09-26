@@ -1,11 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- adbndk (the embedded ADB client used by the companion-app install wizard) requires
-         minSdk 28; suppress the merge error since it's only actually invoked once a user opts
-         into the AVF or QEMU backend, both of which are hidden below their own API floors;
-         see FilesystemEditFragment's setupExecutionTypeSelector() SDK_INT gating. -->
-    <uses-sdk tools:overrideLibrary="tech.userland.adbndk"/>
-
-</manifest>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" />

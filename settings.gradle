@@ -9,9 +9,8 @@ project(':CustomLibrary').projectDir = new File('CustomLibrary')
 include ':terminal'
 project(':terminal').projectDir = new File('UserLAndLibrary/terminal')
 
-include ':adbndk'
-project(':adbndk').projectDir = new File('../../adb-ndk/android')
-
-// Replacement for the bVNC client; see UserLAndLibrary/vnc.
-include ':vnc'
-project(':vnc').projectDir = new File('UserLAndLibrary/vnc')
+// The VNC desktop viewer; left out of builds made with -PandlinVnc=false.
+if ((providers.gradleProperty('andlinVnc').getOrElse('true')).toBoolean()) {
+    include ':vnc'
+    project(':vnc').projectDir = new File('UserLAndLibrary/vnc')
+}

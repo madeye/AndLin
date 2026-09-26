@@ -20,4 +20,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Debian in UserLAnd!"
+echo "Welcome to Debian in AndLin!"

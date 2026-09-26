@@ -20,4 +20,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Ubuntu in UserLAnd!"
+echo "Welcome to Ubuntu in AndLin!"

@@ -20,4 +20,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Alpine Linux in UserLAnd!"
+echo "Welcome to Alpine Linux in AndLin!"

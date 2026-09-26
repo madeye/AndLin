@@ -1,1 +1,0 @@
-The Gemini CLI is an open-source AI agent developed by Google that brings the power of Gemini directly into your terminal.

@@ -20,4 +20,4 @@ if [ -d /storage ]; then
   fi
 fi
 
-echo "Welcome to Arch Linux in UserLAnd!"
+echo "Welcome to Arch Linux in AndLin!"
