@@ -43,8 +43,12 @@ client_pubkey="$(dropbearkey -y -f /support/serverbox_client_key 2>/dev/null | g
 
 # Filesystems installed before the extractor kept setuid bits lost them, and PRoot's fake root
 # only lets sudo/su become root through that bit. Put it back (this script runs as fake root).
-for suid in /usr/bin/sudo /bin/bbsuid /usr/bin/su /bin/su; do
-    [ -f "$suid" ] && [ ! -L "$suid" ] && [ ! -u "$suid" ] && chmod u+s "$suid" 2>/dev/null
+# Follow links: Ubuntu reaches sudo through /etc/alternatives (sudo.ws or sudo-rs). Never busybox
+# itself, which would make every applet root; Alpine's su goes through bbsuid (below).
+for suid in /usr/bin/sudo /usr/bin/su /bin/su /bin/bbsuid; do
+    target="$(readlink -f "$suid" 2>/dev/null)" || continue
+    case "$target" in ""|*/busybox) continue ;; esac
+    [ -f "$target" ] && [ ! -u "$target" ] && chmod u+s "$target" 2>/dev/null
 done
 # Alpine's busybox-suid routes su, passwd, crontab... through the setuid /bin/bbsuid, but the
 # image links them straight to busybox, where su says "must be suid". Re-link them once.
