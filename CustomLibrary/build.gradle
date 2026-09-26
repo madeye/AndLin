@@ -41,10 +41,10 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        UserLAnd {
+        AndLin {
             dimension "app"
 
-            buildConfigField "String", "REPO_NAME", "\"UserLAnd\""
+            buildConfigField "String", "REPO_NAME", "\"AndLin\""
 
             buildConfigField 'String', 'VERSION_CODE', '\"' + rootProject.ext.appVersionCode + '\"'
             buildConfigField 'String', 'VERSION_NAME', '\"' + rootProject.ext.appVersionName + '\"'

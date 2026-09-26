@@ -36,7 +36,7 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        UserLAnd {
+        AndLin {
             dimension "app"
             applicationId "tech.anl"
         }
@@ -92,6 +92,13 @@ android {
             // assets and self-extracted to filesDir at startup) -- not attempted here.
             useLegacyPackaging true
             excludes += ['lib/armeabi/libsqlcipher.so', 'lib/mips64/libsqlcipher.so', 'lib/mips/libsqlcipher.so']
+        }
+    }
+
+    // Every variant's APK is named andlin.apk (debug and release land in separate output dirs).
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "andlin.apk"
         }
     }
 
