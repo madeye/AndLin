@@ -63,3 +63,4 @@ library/src/main/jniLibs/*
 
 # Native build intermediates
 .cxx/
+__pycache__/
