@@ -1,2 +1,0 @@
-App Name, Category, Filesystem Type Required, Supports CLI, Supports GUI, isPaidApp, Version
-Inkscape, Distribution, inkscape, false, true, false, false, 1

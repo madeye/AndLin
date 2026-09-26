@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application>
+        <!-- Lives in its own task so the notification can bring the desktop back to the front. -->
+        <activity
+            android:name="tech.anl.vnc.app.VncActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VncViewer"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.vnc"
+            android:label="@string/vnc_channel_name"
+            android:resizeableActivity="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|density|navigation|uiMode"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <receiver
+            android:name="tech.anl.vnc.app.VncCloseReceiver"
+            android:exported="false" />
+    </application>
+</manifest>

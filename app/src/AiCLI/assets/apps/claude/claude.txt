@@ -1,1 +1,0 @@
-Claude Code is an agentic AI coding tool by Anthropic that operates directly inside your terminal or code editor.

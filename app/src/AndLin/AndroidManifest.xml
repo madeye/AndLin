@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Lint misreads this removal as a camera requirement. -->
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_main_launcher"
+        android:roundIcon="@mipmap/ic_main_launcher_round"
+        android:supportsRtl="true">
+
+        <!-- The companion-app receivers and package queries come from the library manifest. -->
+        <activity android:name="tech.anl.library.MainActivity" android:launchMode="singleTask" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|density|screenLayout" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

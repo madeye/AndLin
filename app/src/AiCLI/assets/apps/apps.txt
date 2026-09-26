@@ -1,2 +1,0 @@
-App Name, Category, Filesystem Type Required, Supports CLI, Supports GUI, Supports Standalone, isPaidApp, Version
-AICLI, Distribution, aicli, true, false, false, false, 1

@@ -1,0 +1,36 @@
+package tech.anl.library.model.entities
+
+import android.os.Build
+import androidx.room.TypeConverter
+
+/**
+ * Where a filesystem's Linux userland actually runs.
+ *
+ * PROOT runs in this app's own process tree. AVF and QEMU run inside a full VM hosted by a
+ * separately installed companion app (UserLAnd VM / UserLAnd QEMU), which this app drives over a
+ * local control socket; see tech.anl.library.companion.
+ */
+enum class ExecutionType(val minSupportedSdk: Int) {
+    PROOT(Build.VERSION_CODES.LOLLIPOP),
+    // The Android Virtualization Framework's app-facing API arrived in Android 14.
+    AVF(Build.VERSION_CODES.UPSIDE_DOWN_CAKE),
+    // The companion's embedded ADB installer and QEMU build both need API 28's bionic.
+    QEMU(Build.VERSION_CODES.P);
+
+    val isVm: Boolean get() = this != PROOT
+
+    fun isSupportedOnThisDevice(): Boolean = Build.VERSION.SDK_INT >= minSupportedSdk
+
+    companion object {
+        fun fromString(value: String?): ExecutionType =
+            values().firstOrNull { it.name.equals(value, ignoreCase = true) } ?: PROOT
+    }
+}
+
+class ExecutionTypeConverter {
+    @TypeConverter
+    fun fromString(value: String?): ExecutionType = ExecutionType.fromString(value)
+
+    @TypeConverter
+    fun toString(value: ExecutionType): String = value.name
+}

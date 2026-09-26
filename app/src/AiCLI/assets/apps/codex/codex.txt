@@ -1,1 +1,0 @@
-Codex CLI is an open-source, terminal-based AI coding agent developed by OpenAI.

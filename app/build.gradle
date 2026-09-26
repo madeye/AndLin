@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'tech.ula'
+    namespace 'tech.anl'
 
     compileSdkVersion 35
 
     defaultConfig {
-        applicationId "tech.ula"
-        minSdkVersion 24
+        applicationId "tech.anl"
+        minSdkVersion 26
         targetSdkVersion 35
 
         versionCode rootProject.ext.appVersionCode
@@ -36,57 +36,9 @@ android {
 
     flavorDimensions "app"
     productFlavors {
-        AiCLI {
+        AndLin {
             dimension "app"
-            applicationId "tech.ula.aicli"
-        }
-        Andacious {
-            dimension "app"
-            applicationId "tech.ula.andacious"
-        }
-        BirdBox {
-            dimension "app"
-            applicationId "tech.ula.birdbox"
-        }
-        FoxBox {
-            dimension "app"
-            applicationId "tech.ula.foxbox_pro"
-        }
-        GIMP {
-            dimension "app"
-            applicationId "tech.ula.gimp"
-        }
-        IDLE {
-            dimension "app"
-            applicationId "tech.ula.idle"
-        }
-        Inky {
-            dimension "app"
-            applicationId "tech.ula.inkscape"
-        }
-        LibreDocs {
-            dimension "app"
-            applicationId "tech.ula.libredocs"
-        }
-        Octave {
-            dimension "app"
-            applicationId "tech.ula.octave"
-        }
-        R {
-            dimension "app"
-            applicationId "tech.ula.r"
-        }
-        deVStudio {
-            dimension "app"
-            applicationId "tech.ula.devstudio"
-        }
-        gnuplot {
-            dimension "app"
-            applicationId "tech.ula.gnuplot"
-        }
-        UserLAnd {
-            dimension "app"
-            applicationId "tech.ula"
+            applicationId "tech.anl"
         }
     }
 
@@ -131,7 +83,7 @@ android {
             // REVERTED to true (see git history for the failed attempt at false). Confirmed
             // live: with useLegacyPackaging=false, this device's PackageManager extracted
             // *nothing* to legacyNativeLibraryDir at all -- android:extractNativeLibs="true"
-            // in UserLAndLibrary's manifest did not force extraction the way it's documented
+            // in the library module's manifest did not force extraction the way it's documented
             // to. Since busybox/proot/pulseaudio/etc. are "fake .so" executables that only
             // work by actually landing on disk (not by being mmap'd as real shared
             // libraries), useLegacyPackaging=false breaks every session outright. Getting
@@ -143,12 +95,19 @@ android {
         }
     }
 
+    // Every variant's APK is named andlin.apk (debug and release land in separate output dirs).
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "andlin.apk"
+        }
+    }
+
 }
 
 // UserLAnd VM/QEMU are no longer bundled with this app in any form (neither as a raw asset nor
 // as a Play Asset Delivery pack) -- InstallWizardFragment downloads the companion APK directly
 // from a GitHub release at wizard-run time instead (see InstallTarget.downloadUrl in
-// UserLAndLibrary's InstallWizardFragment.kt). Nothing here needs to know about UserLAnd-VM/
+// the library module's InstallWizardFragment.kt). Nothing here needs to know about UserLAnd-VM/
 // UserLAnd-QEMU's local checkouts anymore.
 
 dependencies {
@@ -159,5 +118,5 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 
-    implementation project(':UserLAndLibrary')
+    implementation project(':library')
 }

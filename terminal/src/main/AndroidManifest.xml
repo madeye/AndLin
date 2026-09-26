@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application>
+        <activity
+            android:name="tech.anl.terminal.TerminalActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|density|keyboard|keyboardHidden|navigation|uiMode"
+            android:exported="false"
+            android:label="@string/terminal_activity_label"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.terminal"
+            android:theme="@style/Theme.AnlTerminal"
+            android:windowSoftInputMode="adjustResize" />
+
+        <service
+            android:name="tech.anl.terminal.TerminalService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps interactive terminal (SSH) sessions into the user's local Linux environment running while the terminal is in the background." />
+        </service>
+    </application>
+</manifest>

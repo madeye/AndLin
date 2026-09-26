@@ -59,4 +59,7 @@ google-services.json
 app/src/main/resources/sentry.properties
 
 # Lib resources should be left out of source tree
-app/src/main/jniLibs/*
+library/src/main/jniLibs/*
+
+# Native build intermediates
+.cxx/
