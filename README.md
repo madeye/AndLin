@@ -58,6 +58,16 @@ JAVA_HOME=/path/to/jdk-17 ./gradlew :app:assembleServerBoxDebug
 ./gradlew :library:testServerBoxDebugUnitTest :app:lintServerBoxDebug
 ```
 
+`./gradlew :app:assembleServerBoxRelease` signs the release APK when a keystore is configured in
+`local.properties` (or the same names as environment variables); without one it builds unsigned:
+
+```properties
+KEYSTORE_PATH=/path/to/keystore
+KEYSTORE_PASSWORD=...
+KEY_ALIAS=...
+KEY_PASSWORD=...
+```
+
 The distribution images are built in [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images)
 and published to `ghcr.io/madeye/serverbox-<distro>`.
 

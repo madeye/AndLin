@@ -3,6 +3,12 @@ plugins {
     id 'kotlin-android'
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) localPropertiesFile.withInputStream { localProperties.load(it) }
+
+def signingProp = { String key -> localProperties.getProperty(key) ?: System.getenv(key) }
+
 android {
     namespace 'tech.anl'
 
@@ -19,18 +25,17 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        beta {
-            storeFile project.file('../keystore.jks')
-            keyAlias System.getenv('ANDROID_KEY_ALIAS')
-            storePassword System.getenv('ANDROID_STORE_PASSWORD')
-            keyPassword System.getenv('ANDROID_KEY_PASSWORD')
-        }
-        release {
-            storeFile project.file('../keystore.jks')
-            keyAlias System.getenv('ANDROID_KEY_ALIAS')
-            storePassword System.getenv('ANDROID_STORE_PASSWORD')
-            keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+    // Release signing: KEYSTORE_PATH, KEYSTORE_PASSWORD, KEY_ALIAS and KEY_PASSWORD come from
+    // local.properties or the environment. Without a keystore, release builds stay unsigned.
+    def keystoreFile = signingProp('KEYSTORE_PATH')?.with { file(it) }
+    if (keystoreFile?.exists()) {
+        signingConfigs {
+            release {
+                storeFile keystoreFile
+                storePassword signingProp('KEYSTORE_PASSWORD')
+                keyAlias signingProp('KEY_ALIAS')
+                keyPassword signingProp('KEY_PASSWORD')
+            }
         }
     }
 
@@ -52,6 +57,7 @@ android {
         release {
             debuggable false
             minifyEnabled false
+            if (keystoreFile?.exists()) signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
