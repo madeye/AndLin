@@ -469,7 +469,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         if (item.itemId == R.id.terms_and_conditions) {
             val intent = Intent(
                 "android.intent.action.VIEW",
-                Uri.parse("https://github.com/madeye/AndLin/blob/master/LICENSE")
+                Uri.parse("https://github.com/madeye/ServerBox/blob/master/LICENSE")
             )
             startActivity(intent)
         }
@@ -489,7 +489,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun sendWikiIntent() {
         val intent = Intent(
             "android.intent.action.VIEW",
-            Uri.parse("https://github.com/madeye/AndLin#readme")
+            Uri.parse("https://github.com/madeye/ServerBox#readme")
         )
         startActivity(intent)
     }

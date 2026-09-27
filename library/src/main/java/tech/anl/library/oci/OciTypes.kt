@@ -3,7 +3,7 @@ package tech.anl.library.oci
 import java.io.IOException
 
 /**
- * A container image reference such as `ghcr.io/cypherpunkarmory/userland-ubuntu:20260921`.
+ * A container image reference such as `ghcr.io/madeye/serverbox-ubuntu:20260921`.
  *
  * [tag] holds either a tag (`latest`) or a content digest (`sha256:...`); see [isDigest].
  */
