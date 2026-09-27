@@ -36,9 +36,10 @@ If applicable, add screenshots to help explain your problem.
 
 Device: [e.g. Pixel XL 2].  
 Android Version: [e.g. Oreo, 8.0].  
-ServerBox Version [e.g. 0.1.2].  
+ServerBox Version [e.g. 1.0].  
+Distribution [e.g. Ubuntu], and whether it runs under PRoot or in a VM.  
 Whether the device is rooted.  
-Whether the device is running LineageOS 
+Whether the device is running a custom ROM such as LineageOS.
 
 
 

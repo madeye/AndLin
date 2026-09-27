@@ -13,17 +13,25 @@ framework as much as possible and live in the `model` or `utils` packages. Appli
 belongs in the view models.
 
 The modules are:
-- `app`: the application shell and per-distribution assets.
+- `app`: the application shell and per-distribution assets (the Apps list lives in
+  `app/src/ServerBox/assets/apps/apps.txt`).
+- `CustomLibrary`: the `ServerBox` build flavor's configuration (BuildConfig defaults such as the
+  default user and image tag).
 - `library`: sessions, filesystems, the PRoot and OCI setup, the SSH server and settings.
 - `terminal`: the built-in terminal (an SSH client to the session's server).
+
+The distribution images come from [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images).
+Room schema changes need a new database version, a migration, and the exported schema JSON under
+`library/schemas/`.
 
 ## Steps to follow
 1. Open an issue describing the problem your contribution solves, if there isn't one yet.
 2. Branch from `master`.
 3. Write your code and tests for it.
-4. Run the tests and lint:
-   `./gradlew :library:testServerBoxDebugUnitTest :app:lintServerBoxDebug`
-   (Android builds need JDK 17.)
+4. Run the tests and lint (Android builds need JDK 17):
+   `./gradlew testServerBoxDebugUnitTest :terminal:testDebugUnitTest lintServerBoxDebug`.
+   If you touched the database or the terminal, also run the instrumented tests on a device or
+   emulator (see the README).
 5. Open a pull request against `master`.
 
 ## Style guides

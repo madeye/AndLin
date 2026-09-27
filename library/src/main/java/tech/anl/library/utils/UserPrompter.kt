@@ -153,7 +153,7 @@ class UserFeedbackPrompter(private val activity: Activity, private val viewGroup
     }
 
     private val sendGithubIntent = {
-        val githubURI = "https://github.com/madeye/AndLin"
+        val githubURI = "https://github.com/madeye/ServerBox"
         val intent = Intent("android.intent.action.VIEW", Uri.parse(githubURI))
         activity.startActivity(intent)
     }
@@ -418,7 +418,7 @@ class ContributionPrompter(private val activity: MainActivity, private val viewG
         get() = userHasResponded
 
     private val sendGithubIntent = {
-        val githubURI = "https://github.com/madeye/AndLin#readme"
+        val githubURI = "https://github.com/madeye/ServerBox#readme"
         val intent = Intent("android.intent.action.VIEW", Uri.parse(githubURI))
         savedActivity.startActivity(intent)
     }

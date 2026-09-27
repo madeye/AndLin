@@ -26,6 +26,22 @@ it like any other box on your network: host services, run scripts and cron jobs,
 - **Virtual machines where supported.** On phones with the Android Virtualization Framework,
   distributions can also run in a real VM through a companion app.
 
+## Download
+
+Get the APK from [Releases](https://github.com/madeye/ServerBox/releases/latest). ServerBox needs
+Android 8.0 or later. Every distribution is available for 64-bit ARM (nearly all current phones)
+and x86_64; 32-bit support varies by distribution.
+
+Releases are signed with this certificate (SHA-256), which you can check with
+`apksigner verify --print-certs serverbox-<version>.apk`:
+
+```
+55:40:C1:F2:4F:5D:44:86:C5:96:EF:76:0A:8C:E9:8C:8E:68:FE:45:AF:C9:E9:54:1C:C6:3D:EF:3E:7A:76:B5
+```
+
+Builds from before 1.0 were signed with a different key, so Android can't update them to a
+release: uninstall the old build first. Uninstalling deletes its distributions and sessions.
+
 ## Getting started
 
 1. Install ServerBox and open it.
@@ -53,9 +69,18 @@ address stays the same.
 
 ## Building
 
+Builds need JDK 17.
+
 ```sh
-JAVA_HOME=/path/to/jdk-17 ./gradlew :app:assembleServerBoxDebug
-./gradlew :library:testServerBoxDebugUnitTest :app:lintServerBoxDebug
+./gradlew :app:assembleServerBoxDebug
+./gradlew testServerBoxDebugUnitTest :terminal:testDebugUnitTest lintServerBoxDebug
+```
+
+Instrumented tests (Room migrations and DAOs, the terminal's PTY) run on a connected device or
+emulator:
+
+```sh
+./gradlew :library:connectedServerBoxDebugAndroidTest :terminal:connectedDebugAndroidTest
 ```
 
 `./gradlew :app:assembleServerBoxRelease` signs the release APK when a keystore is configured in

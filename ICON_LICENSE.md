@@ -1,4 +1,5 @@
-The UserLAnd Icon is covered by the following license.
+The UserLAnd icon artwork, which ServerBox still uses as the Adventure and Zork icons in the Apps
+list, is covered by the following license. ServerBox's own app icon (`art/icon/`) is not.
 
 Attribution-ShareAlike 4.0 International
 
