@@ -56,6 +56,19 @@ class AppsDaoTest {
         assertFalse(retrieved.contains(app1))
     }
 
+    @Test
+    fun appsMissingFromTheListAreDeleted() {
+        val kept = App(name = "kept")
+        val dropped = App(name = "dropped")
+        db.appsDao().insertApp(kept)
+        db.appsDao().insertApp(dropped)
+
+        db.appsDao().deleteAppsNotIn(listOf("kept", "new"))
+
+        val retrieved = db.appsDao().getAllApps().blockingObserve()!!
+        assertEquals(listOf(kept), retrieved)
+    }
+
     companion object {
         val DEFAULT_NAME = "test"
     }

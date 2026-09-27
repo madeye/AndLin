@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
@@ -109,6 +111,7 @@ class AppsRepositoryTest {
         verifyBlocking(mockGithubAppsFetcher) { fetchAppIcon(inactiveApp) }
         verifyBlocking(mockGithubAppsFetcher) { fetchAppDescription(inactiveApp) }
         verifyBlocking(mockGithubAppsFetcher) { fetchAppScript(inactiveApp) }
+        verify(mockAppsDao).deleteAppsNotIn(listOf(inactiveAppName))
         verify(mockAppsDao).insertApp(inactiveApp)
         verify(mockAppsPreferences).setDistributionsList(setOf(inactiveAppName))
         verify(mockRefreshStatusObserver).onChanged(RefreshStatus.ACTIVE)
@@ -128,5 +131,6 @@ class AppsRepositoryTest {
 
         verify(mockRefreshStatusObserver).onChanged(RefreshStatus.ACTIVE)
         verify(mockRefreshStatusObserver).onChanged(RefreshStatus.FAILED)
+        verify(mockAppsDao, never()).deleteAppsNotIn(any())
     }
 }

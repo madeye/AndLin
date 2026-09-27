@@ -58,7 +58,10 @@ class AppsRepository(
         }
 
         try {
-            remoteAppsSource.fetchAppsList().forEach { app ->
+            val apps = remoteAppsSource.fetchAppsList()
+            // Inserts only replace rows, so apps dropped from the list would otherwise linger.
+            if (apps.isNotEmpty()) appsDao.deleteAppsNotIn(apps.map { it.name })
+            apps.forEach { app ->
                 jobs.add(scope.launch {
                     if (app.category.toLowerCase(Locale.ENGLISH) == "distribution") distributionsList.add(app.name)
                     remoteAppsSource.fetchAppIcon(app)
