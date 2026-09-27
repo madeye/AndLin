@@ -57,6 +57,8 @@ if [ -u /bin/bbsuid ] && [ "$(readlink /bin/su 2>/dev/null)" = "/bin/busybox" ];
 fi
 
 user="${INITIAL_USERNAME:-user}"
+# Filesystems from before ServerBox have the old default user "userland"; rename it to match.
+sh /support/common/serverbox_renameLegacyUser.sh "$user"
 # Filesystems set up before PRoot faked root never got their user (useradd/chpasswd failed);
 # create it now. addNonRootUser.sh reads INITIAL_USERNAME/INITIAL_PASSWORD.
 if ! getent passwd "$user" >/dev/null 2>&1 && [ -x /support/addNonRootUser.sh ]; then

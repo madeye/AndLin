@@ -258,6 +258,22 @@ class LocalServerManagerTest {
     }
 
     @Test
+    fun `Starting a VNC session first renames the legacy userland user`() {
+        val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "serverbox", vncPassword = "vncpass", geometry = "10x10")
+
+        localServerManager.startServer(session)
+
+        verify(mockBusyboxExecutor).executeProotCommand(
+                eq("/support/common/serverbox_renameLegacyUser.sh serverbox"),
+                eq(filesystemDirName),
+                eq(true),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull()
+        )
+    }
+
+    @Test
     fun `If starting a vnc server fails, an error is logged and -1 is returned`() {
         val session = Session(0, filesystemId = filesystemId, serviceType = ServiceType.Vnc, username = "user", vncPassword = "vncpass", geometry = "10x10")
         val command = "/support/startVNCServer.sh"

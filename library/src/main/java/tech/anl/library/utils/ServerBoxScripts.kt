@@ -10,8 +10,12 @@ import java.io.File
  */
 object ServerBoxScripts {
     const val START_SSH_SERVER = "serverbox_startSSHServer.sh"
+    const val RENAME_LEGACY_USER = "serverbox_renameLegacyUser.sh"
 
-    private val scripts = mapOf("serverbox/startSSHServer.sh" to START_SSH_SERVER)
+    private val scripts = mapOf(
+        "serverbox/startSSHServer.sh" to START_SSH_SERVER,
+        "serverbox/renameLegacyUser.sh" to RENAME_LEGACY_USER
+    )
 
     fun install(context: Context, supportDir: File) {
         supportDir.mkdirs()

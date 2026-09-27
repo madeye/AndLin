@@ -104,6 +104,11 @@ class LocalServerManager(
     private fun startVNCServer(session: Session): Long {
         val filesystemDirName = session.filesystemId.toString()
         deletePidFile(session)
+        // startSSHServer.sh does this itself; the VNC script comes from the support assets.
+        busyboxExecutor.executeProotCommand(
+                "/support/common/${ServerBoxScripts.RENAME_LEGACY_USER} ${session.username}",
+                filesystemDirName,
+                commandShouldTerminate = true)
         val command = "/support/startVNCServer.sh"
         val env = HashMap<String, String>()
         env["HAS_CAMERA"] = sharedPreferences.getInt("camera_supported",0).toString()
