@@ -1,0 +1,1 @@
+Turn a used Android phone into a Linux server with SSH. No root required.

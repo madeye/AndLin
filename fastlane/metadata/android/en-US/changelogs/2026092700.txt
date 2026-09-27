@@ -1,0 +1,1 @@
+The first Google Play release of ServerBox: Alpine, Arch, Debian, Kali and Ubuntu as headless Linux servers with an always-on SSH server, a built-in terminal, start on boot, autostart scripts and phone storage access. No root required.

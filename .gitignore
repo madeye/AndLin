@@ -49,7 +49,6 @@ app/versionCode.txt
 app/versionName.txt
 fastlane/README.md
 fastlane/report.xml
-fastlane/metadata/android/*/changelogs
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -64,3 +63,10 @@ library/src/main/jniLibs/*
 # Native build intermediates
 .cxx/
 __pycache__/
+
+# fastlane: Play service-account key and run artifacts
+fastlane/play-store-key.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
