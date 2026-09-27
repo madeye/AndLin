@@ -1,2 +1,11 @@
+ServerBox is a fork of UserLAnd (https://github.com/CypherpunkArmory/UserLAnd) and its library
+(UserLAndLibrary), by CypherpunkArmory / UserLAnd Technologies, LLC.
+
 UserLAnd Technologies, LLC is the copyright holder for all originally authored code in this repository.
-Changes made for ServerBox are copyright Max Lv and are released under the same license (GPLv3).
+Changes made for ServerBox are copyright Max Lv and are released under the same license.
+
+ServerBox, like UserLAnd, is released under the GNU General Public License, version 3 (GPLv3);
+the full text is in LICENSE.
+
+Contains code from `Terminal Emulator for Android` (https://github.com/jackpal/Android-Terminal-Emulator),
+which is released under the Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0).

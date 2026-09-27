@@ -53,6 +53,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 } else {
                     bottomNavView.visibility = View.VISIBLE
                 }
+                SystemBarInsets.refresh(bottomNavView)
             }
             true
         }

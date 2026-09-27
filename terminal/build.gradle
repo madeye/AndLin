@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'tech.anl.terminal'
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion project.findProperty('ndkVersion') ?: '29.0.14206865'
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {

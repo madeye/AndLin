@@ -101,6 +101,12 @@
     <string name="companion_vm_options_start">Start</string>
     <string name="companion_vm_options_remember">Remember and don\'t ask again</string>
 
+    <!-- Builds that cannot install companion apps (Google Play) -->
+    <string name="companion_not_installable_title">%1$s is not installed</string>
+    <string name="companion_not_installable_message">Virtual machine sessions run in a separate companion app, %1$s, which this version of ServerBox cannot install. Use a PRoot filesystem instead, or install %1$s yourself and try again.</string>
+    <string name="companion_too_old_title">%1$s needs an update</string>
+    <string name="companion_too_old_message">This version of ServerBox needs a newer %1$s before virtual machine sessions can start. Update %1$s the same way you installed it, then try again.</string>
+
     <!-- Notification action receiver -->
     <string name="companion_stop_session_failed">Could not stop the session.</string>
 </resources>

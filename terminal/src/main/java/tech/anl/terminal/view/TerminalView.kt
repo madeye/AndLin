@@ -85,6 +85,20 @@ class TerminalView @JvmOverloads constructor(
 
     // Selection endpoints as (line id, column); line id = buffer row + emulator.scrolledOut.
     private var selecting = false
+        set(value) {
+            if (field == value) return
+            field = value
+            onSelectionChanged?.invoke(value)
+        }
+
+    /**
+     * Called when a text selection starts or ends. With predictive back (target SDK 33+ opted in,
+     * always on from 36) KEYCODE_BACK never reaches [onKeyDown], so the host clears the selection
+     * from an OnBackPressedCallback that it enables only while this reports true.
+     */
+    var onSelectionChanged: ((Boolean) -> Unit)? = null
+
+    val isSelecting: Boolean get() = selecting
     private var selStartLine = 0L
     private var selStartCol = 0
     private var selEndLine = 0L
@@ -825,13 +839,8 @@ class TerminalView @JvmOverloads constructor(
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         val s = session ?: return super.onKeyDown(keyCode, event)
         when (keyCode) {
-            KeyEvent.KEYCODE_BACK -> {
-                if (selecting) {
-                    clearSelection()
-                    return true
-                }
-                return super.onKeyDown(keyCode, event)
-            }
+            // Back (clearing a selection included) goes through the activity's OnBackPressedDispatcher.
+            KeyEvent.KEYCODE_BACK,
             KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_MUTE,
             KeyEvent.KEYCODE_HOME, KeyEvent.KEYCODE_APP_SWITCH, KeyEvent.KEYCODE_POWER,
             -> return super.onKeyDown(keyCode, event)

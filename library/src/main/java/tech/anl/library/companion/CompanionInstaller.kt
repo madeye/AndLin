@@ -2,6 +2,8 @@ package tech.anl.library.companion
 
 import android.content.Context
 import android.content.SharedPreferences
+import tech.anl.library.model.entities.ExecutionType
+import tech.anl.library.utils.DeclaredPermissions
 import tech.anl.library.utils.defaultSharedPreferences
 
 enum class CompanionState {
@@ -115,5 +117,17 @@ class CompanionInstaller(context: Context, private val downloader: CompanionDown
          */
         fun isSupportedOnThisDevice(context: Context, app: CompanionApp): Boolean =
             app.executionType.isSupportedOnThisDevice(context)
+
+        /**
+         * Whether new filesystems may be offered [type]. A VM type needs its companion app: builds
+         * that cannot install companions (the Play build) offer it only when one is already
+         * installed, e.g. sideloaded by the user.
+         */
+        fun isOffered(context: Context, type: ExecutionType): Boolean {
+            if (!type.isSupportedOnThisDevice(context)) return false
+            val companion = CompanionApp.forExecutionType(type) ?: return true
+            return DeclaredPermissions.canInstallCompanionApps(context) ||
+                CompanionControlClient.isInstalled(context, companion)
+        }
     }
 }

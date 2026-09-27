@@ -12,12 +12,12 @@ def signingProp = { String key -> localProperties.getProperty(key) ?: System.get
 android {
     namespace 'tech.anl'
 
-    compileSdkVersion 35
+    compileSdkVersion 36
 
     defaultConfig {
-        applicationId "tech.anl"
+        applicationId "io.github.madeye.serverbox"
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         versionCode rootProject.ext.appVersionCode
         versionName rootProject.ext.appVersionName
@@ -43,7 +43,7 @@ android {
     productFlavors {
         ServerBox {
             dimension "app"
-            applicationId "tech.anl"
+            applicationId "io.github.madeye.serverbox"
         }
     }
 
@@ -59,6 +59,14 @@ android {
             minifyEnabled false
             if (keystoreFile?.exists()) signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        // Google Play build: the release build minus what Play forbids. src/playRelease's manifest
+        // strips the permissions and the library gates the matching features at run time (see
+        // DeclaredPermissions); the library modules have no playRelease and use their release.
+        playRelease {
+            initWith release
+            matchingFallbacks += 'release'
+            if (keystoreFile?.exists()) signingConfig signingConfigs.release
         }
     }
     compileOptions {

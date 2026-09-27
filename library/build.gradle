@@ -10,11 +10,11 @@ plugins {
 android {
     namespace 'tech.anl.library'
 
-    compileSdkVersion 35
+    compileSdkVersion 36
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.pro'
