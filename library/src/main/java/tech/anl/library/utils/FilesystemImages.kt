@@ -8,7 +8,7 @@ import java.util.Locale
  * Maps a distribution and flavor to the OCI image its filesystem is built from.
  *
  * New filesystems always get ServerBox's own headless server images
- * (github.com/madeye/AndLin-Images). Filesystems created before desktop support was removed may
+ * (github.com/madeye/ServerBox-Images). Filesystems created before desktop support was removed may
  * still record a desktop flavor ("default", "xfce", "lxde"); those keep resolving to the upstream
  * UserLAnd image they were built from, because the image is resolved again after creation (every
  * VM session start passes it to the companion, which re-pulls it when layers are missing, and an

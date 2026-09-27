@@ -125,7 +125,7 @@ class OciFilesystemInstaller(
     /**
      * Contents of [STATE_FILE]:
      * ```
-     * image ghcr.io/cypherpunkarmory/userland-alpine:latest
+     * image ghcr.io/madeye/serverbox-alpine:latest
      * manifest sha256:...
      * layer sha256:...   (one line per applied layer, in order)
      * ```

@@ -93,7 +93,7 @@ KEY_ALIAS=...
 KEY_PASSWORD=...
 ```
 
-The distribution images are built in [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images)
+The distribution images are built in [madeye/ServerBox-Images](https://github.com/madeye/ServerBox-Images)
 and published to `ghcr.io/madeye/serverbox-<distro>`.
 
 ## Credits

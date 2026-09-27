@@ -20,7 +20,7 @@ The modules are:
 - `library`: sessions, filesystems, the PRoot and OCI setup, the SSH server and settings.
 - `terminal`: the built-in terminal (an SSH client to the session's server).
 
-The distribution images come from [madeye/AndLin-Images](https://github.com/madeye/AndLin-Images).
+The distribution images come from [madeye/ServerBox-Images](https://github.com/madeye/ServerBox-Images).
 Room schema changes need a new database version, a migration, and the exported schema JSON under
 `library/schemas/`.
 
