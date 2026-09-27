@@ -1,9 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        def vcode = (int)(((new Date().getTime()/1000) - 1559347200) / 10)
-        appVersionCode = vcode
-        appVersionName = '26.09.05'
+        // yyyyMMddNN: the release date plus a two-digit build number for that day. It must keep
+        // increasing, and is above the time-based codes (~23,1xx,xxx) earlier builds used.
+        appVersionCode = 2026092700
+        appVersionName = '1.0'
         orientation = "unspecified"
         provider_authority = "tech.anl.provider.fileprovider"
         support_assets_version = "v1.4.23"
