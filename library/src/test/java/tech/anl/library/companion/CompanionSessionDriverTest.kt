@@ -157,13 +157,16 @@ class CompanionSessionDriverTest {
             val (_, d) = driver(fake, CompanionBackendTraits.VM, store)
             val seen = Collections.synchronizedList(mutableListOf<String>())
             val r = d.start("4", params) { seen += it }
-            assertEquals(VmResult.Success(VmEndpoints(2022, 5901)), r)
+            assertEquals(VmResult.Success(VmEndpoints(2022)), r)
             assertEquals(2, starts.v)
             assertEquals(setOf("4"), store.all())
             assertTrue(seen.contains("Booting virtual machine, please wait..."))
             assertTrue(seen.any { it.contains("stopped responding") })
             val start = fake.requests.first { it["cmd"] == "start" }
             assertEquals("ssh", start["serviceType"])
+            // Still part of the companion protocol even though SSH sessions don't use them.
+            assertEquals("vncpass", start["vncPassword"])
+            assertEquals("1280x720", start["geometry"])
             assertEquals(9.0, start["sessionId"])
             assertEquals((2L shl 30).toDouble(), start["memoryBytes"])
             assertEquals(true, start["useAllCores"])
@@ -261,6 +264,7 @@ class CompanionSessionDriverTest {
             assertTrue(d.start("1", params.copy(vncPassword = "a\nb")) {} is VmResult.Failure)
             assertTrue(d.start("1", params.copy(geometry = "1280x720; rm -rf /")) {} is VmResult.Failure)
             assertTrue(d.start("1", params.copy(serviceType = "xsdl")) {} is VmResult.Failure)
+            assertTrue(d.start("1", params.copy(serviceType = "vnc")) {} is VmResult.Failure)
             assertTrue(fake.requests.isEmpty())
         }
     }

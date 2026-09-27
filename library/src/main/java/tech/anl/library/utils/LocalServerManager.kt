@@ -15,8 +15,6 @@ class LocalServerManager(
         private val logger: Logger = LogcatLogger()
 ) {
 
-    private val vncDisplayNumber = BuildConfig.VNC_DISPLAY
-
     fun Process.pid(): Long {
         return this.toString()
                 .substringAfter("pid=")
@@ -35,9 +33,7 @@ class LocalServerManager(
     fun startServer(session: Session): Long {
         return when (session.serviceType) {
             ServiceType.Ssh -> startSSHServer(session)
-            ServiceType.Vnc -> startVNCServer(session)
-            ServiceType.Xsdl -> setDisplayNumberAndStartTwm(session)
-            else -> 0
+            ServiceType.Unselected -> 0
         }
     }
 
@@ -53,9 +49,6 @@ class LocalServerManager(
 
     fun isServerRunning(session: Session): Boolean {
         val command = "support/isServerInProcTree.sh ${session.serverPid()}"
-        // The server itself is run by a third-party, so we can consider this to always be true.
-        // The third-party app is responsible for handling errors starting their server.
-        if (session.serviceType == ServiceType.Xsdl) return true
         val result = busyboxExecutor.executeScript(command)
         return when (result) {
             is SuccessfulExecution -> true
@@ -101,74 +94,10 @@ class LocalServerManager(
         }
     }
 
-    private fun startVNCServer(session: Session): Long {
-        val filesystemDirName = session.filesystemId.toString()
-        deletePidFile(session)
-        // startSSHServer.sh does this itself; the VNC script comes from the support assets.
-        busyboxExecutor.executeProotCommand(
-                "/support/common/${ServerBoxScripts.RENAME_LEGACY_USER} ${session.username}",
-                filesystemDirName,
-                commandShouldTerminate = true)
-        val command = "/support/startVNCServer.sh"
-        val env = HashMap<String, String>()
-        env["HAS_CAMERA"] = sharedPreferences.getInt("camera_supported",0).toString()
-        env["HAS_MICROPHONE"] = sharedPreferences.getInt("microphone_supported",0).toString()
-        env["INITIAL_USERNAME"] = session.username
-        env["INITIAL_VNC_PASSWORD"] = session.vncPassword
-        env["VNC_DISPLAY"] = vncDisplayNumber
-        env["DIMENSIONS"] = session.geometry
-        env["VERSION_CODE"] = BuildConfig.VERSION_CODE
-        env["VERSION_NAME"] = BuildConfig.VERSION_NAME
-        env.putAll(guestNetworkEnv())
-
-        val result = busyboxExecutor.executeProotCommand(
-                command,
-                filesystemDirName,
-                commandShouldTerminate = false,
-                env = env)
-        return when (result) {
-            is OngoingExecution -> result.process.pid()
-            is FailedExecution -> {
-                val details = "func: startVncServer err: ${result.reason}"
-                val breadcrumb = AnlBreadcrumb("LocalServerManager", BreadcrumbType.RuntimeError, details)
-                logger.addBreadcrumb(breadcrumb)
-                -1
-            }
-            else -> -1
-        }
-    }
-
-    private fun setDisplayNumberAndStartTwm(session: Session): Long {
-        val filesystemDirName = session.filesystemId.toString()
-        deletePidFile(session)
-        val command = "/support/startXSDLServer.sh"
-        val env = HashMap<String, String>()
-        env["INITIAL_USERNAME"] = session.username
-        env["DISPLAY"] = ":4721"
-        env["PULSE_SERVER"] = "127.0.0.1:4721"
-        val result = busyboxExecutor.executeProotCommand(
-                command,
-                filesystemDirName,
-                commandShouldTerminate = false,
-                env = env)
-        return when (result) {
-            is OngoingExecution -> result.process.pid()
-            is FailedExecution -> {
-                val details = "func: setDisplayNumberAndStartTwm err: ${result.reason}"
-                val breadcrumb = AnlBreadcrumb("LocalServerManager", BreadcrumbType.RuntimeError, details)
-                logger.addBreadcrumb(breadcrumb)
-                -1
-            }
-            else -> -1
-        }
-    }
-
     private fun Session.pidRelativeFilePath(): String {
         return when (this.serviceType) {
             ServiceType.Ssh -> "/run/dropbear.pid"
-            ServiceType.Vnc -> "/home/${this.username}/.vnc/localhost:$vncDisplayNumber.pid"
-            ServiceType.Xsdl -> "/tmp/xsdl.pidfile"
-            else -> "error"
+            ServiceType.Unselected -> "error"
         }
     }
 

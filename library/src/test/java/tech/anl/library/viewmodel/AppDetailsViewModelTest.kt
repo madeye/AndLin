@@ -2,7 +2,6 @@ package tech.anl.library.viewmodel
 
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import org.mockito.kotlin.verify
@@ -62,8 +61,7 @@ class AppDetailsViewModelTest {
         val session = buildSession(inactiveApp, ServiceType.Ssh)
         whenever(mockSessionDao.findAppsSession(inactiveName)).thenReturn(listOf(session))
 
-        val buildVersion = Build.VERSION_CODES.M
-        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, buildVersion, mockSharedPreferences)
+        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, mockSharedPreferences)
         viewModel.viewState.observeForever(mockViewStateObserver)
 
         runBlocking {
@@ -74,26 +72,21 @@ class AppDetailsViewModelTest {
                 mockUri,
                 inactiveName,
                 inactiveDescription,
-                sshEnabled = true,
-                vncEnabled = true,
-                xsdlEnabled = true,
                 describeStateHintEnabled = false,
                 describeStateText = null,
-                selectedServiceTypeButton = R.id.apps_ssh_preference,
                 autoStartEnabled = false
         )
         verify(mockViewStateObserver).onChanged(expectedResult)
     }
 
     @Test
-    fun `Buttons are disabled if app is active, and hint is for stopping app`() {
+    fun `No hint is shown for an active app`() {
         stubAppDetails(activeApp)
 
         val session = buildSession(activeApp, ServiceType.Ssh)
         whenever(mockSessionDao.findAppsSession(activeName)).thenReturn(listOf(session))
 
-        val buildVersion = Build.VERSION_CODES.M
-        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, buildVersion, mockSharedPreferences)
+        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, mockSharedPreferences)
         viewModel.viewState.observeForever(mockViewStateObserver)
 
         runBlocking {
@@ -104,56 +97,21 @@ class AppDetailsViewModelTest {
                 mockUri,
                 activeName,
                 activeDescription,
-                sshEnabled = false,
-                vncEnabled = false,
-                xsdlEnabled = false,
-                describeStateHintEnabled = true,
-                describeStateText = R.string.info_stop_app,
-                selectedServiceTypeButton = R.id.apps_ssh_preference,
-                autoStartEnabled = false
-        )
-        verify(mockViewStateObserver).onChanged(expectedResult)
-    }
-
-    @Test
-    fun `Xsdl button is disabled if device is newer than O_MR1`() {
-        stubAppDetails(inactiveApp)
-
-        val session = buildSession(inactiveApp, ServiceType.Ssh)
-        whenever(mockSessionDao.findAppsSession(inactiveName)).thenReturn(listOf(session))
-
-        val buildVersion = Build.VERSION_CODES.P
-        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, buildVersion, mockSharedPreferences)
-        viewModel.viewState.observeForever(mockViewStateObserver)
-
-        runBlocking {
-            viewModel.submitEvent(AppDetailsEvent.SubmitApp(inactiveApp), this)
-        }
-
-        val expectedResult = AppDetailsViewState(
-                mockUri,
-                inactiveName,
-                inactiveDescription,
-                sshEnabled = true,
-                vncEnabled = true,
-                xsdlEnabled = false,
                 describeStateHintEnabled = false,
                 describeStateText = null,
-                selectedServiceTypeButton = R.id.apps_ssh_preference,
                 autoStartEnabled = false
         )
         verify(mockViewStateObserver).onChanged(expectedResult)
     }
 
     @Test
-    fun `Buttons are disabled if setup is incomplete, and hint says as much`() {
+    fun `Hint says to finish setup if the service type is unset`() {
         stubAppDetails(inactiveApp)
 
         val session = buildSession(inactiveApp, ServiceType.Unselected)
         whenever(mockSessionDao.findAppsSession(inactiveName)).thenReturn(listOf(session))
 
-        val buildVersion = Build.VERSION_CODES.M
-        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, buildVersion, mockSharedPreferences)
+        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, mockSharedPreferences)
         viewModel.viewState.observeForever(mockViewStateObserver)
 
         runBlocking {
@@ -164,25 +122,20 @@ class AppDetailsViewModelTest {
                 mockUri,
                 inactiveName,
                 inactiveDescription,
-                sshEnabled = false,
-                vncEnabled = false,
-                xsdlEnabled = false,
                 describeStateHintEnabled = true,
                 describeStateText = R.string.info_finish_app_setup,
-                selectedServiceTypeButton = null,
                 autoStartEnabled = false
         )
         verify(mockViewStateObserver).onChanged(expectedResult)
     }
 
     @Test
-    fun `Buttons are disabled if app session cannot be found, hint is for finishing setup`() {
+    fun `Hint is for finishing setup if app session cannot be found`() {
         stubAppDetails(inactiveApp)
 
         whenever(mockSessionDao.findAppsSession(inactiveName)).thenReturn(listOf())
 
-        val buildVersion = Build.VERSION_CODES.M
-        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, buildVersion, mockSharedPreferences)
+        viewModel = AppDetailsViewModel(mockSessionDao, mockAppDetails, mockSharedPreferences)
         viewModel.viewState.observeForever(mockViewStateObserver)
 
         runBlocking {
@@ -193,12 +146,8 @@ class AppDetailsViewModelTest {
                 mockUri,
                 inactiveName,
                 inactiveDescription,
-                sshEnabled = false,
-                vncEnabled = false,
-                xsdlEnabled = false,
                 describeStateHintEnabled = true,
                 describeStateText = R.string.info_finish_app_setup,
-                selectedServiceTypeButton = null,
                 autoStartEnabled = false
         )
         verify(mockViewStateObserver).onChanged(expectedResult)

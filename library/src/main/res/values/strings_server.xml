@@ -28,11 +28,6 @@
     <string name="background_prompt_allow">Allow</string>
     <string name="background_prompt_later">Not now</string>
     <string name="background_prompt_app_settings">App settings</string>
-    <string name="pref_desktop_category">Desktop (VNC)</string>
-    <string name="pref_enable_desktop_title">Enable desktop sessions</string>
-    <string name="pref_enable_desktop_summary">Offer graphical desktops (XFCE, LXDE) over VNC and show GUI-only apps. Off by default: ServerBox sessions are SSH terminals.</string>
-    <string name="desktop_unavailable">Desktop sessions are turned off. Enable them under Settings → Desktop (VNC).</string>
-    <string name="flavor_server">Server (headless)</string>
     <string name="vm_backend_unavailable">This filesystem runs in a virtual machine, which this device or build doesn\'t support.</string>
     <string name="vm_stop_failed">The virtual machine didn\'t confirm it stopped.</string>
     <string name="vm_terminal_banner">Booting virtual machine, please wait…</string>

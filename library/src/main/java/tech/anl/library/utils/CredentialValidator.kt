@@ -48,21 +48,6 @@ class CredentialValidator {
         }
     }
 
-    fun validateVncPassword(vncPassword: String): CredentialValidationStatus {
-        return when {
-            vncPassword.isEmpty() ->
-                CredentialValidationStatus(false, R.string.error_empty_field)
-
-            vncPassword.length > 8 || vncPassword.length < 6 ->
-                CredentialValidationStatus(false, R.string.error_vnc_password_length_incorrect)
-
-            !validatePasswordCharacters(vncPassword) ->
-                CredentialValidationStatus(false, R.string.error_vnc_password_invalid)
-
-            else -> CredentialValidationStatus(true)
-        }
-    }
-
     private fun validateFilesystemNameCharacters(filesystemName: String): Boolean {
         val filesystemNameRegex = "([a-zA-Z0-9!@#$%^&()_+=,.?<>]{0,50})"
 

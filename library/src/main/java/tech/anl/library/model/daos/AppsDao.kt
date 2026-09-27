@@ -25,4 +25,7 @@ interface AppsDao {
 
     @Query("delete from apps")
     fun deleteAllApps()
+
+    @Query("delete from apps where name not in (:names)")
+    fun deleteAppsNotIn(names: List<String>)
 }

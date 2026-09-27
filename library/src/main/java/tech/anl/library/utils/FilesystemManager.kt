@@ -56,7 +56,6 @@ class FilesystemManager(
         val env = HashMap<String, String>()
         env["INITIAL_USERNAME"] = filesystem.defaultUsername
         env["INITIAL_PASSWORD"] = filesystem.defaultPassword
-        env["INITIAL_VNC_PASSWORD"] = filesystem.defaultVncPassword
         if (BuildConfig.FILESYSTEM_ONLY_ASSET)
             env["EXCLUDE_SUPPORT"] = "--exclude support/common"
         else

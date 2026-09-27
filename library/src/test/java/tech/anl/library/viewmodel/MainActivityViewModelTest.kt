@@ -185,7 +185,7 @@ class MainActivityViewModelTest {
 
     @Test
     fun `Posts IllegalState if filesystem credentials are submitted while no filesystem is selected`() {
-        mainActivityViewModel.submitFilesystemCredentials("", "", "")
+        mainActivityViewModel.submitFilesystemCredentials("", "")
 
         verify(mockStateObserver).onChanged(NoFilesystemSelectedWhenCredentialsSubmitted)
         verify(mockLogger).sendIllegalStateLog(NoFilesystemSelectedWhenCredentialsSubmitted)
@@ -195,32 +195,12 @@ class MainActivityViewModelTest {
     fun `Submits filesystem credentials for last selected filesystem`() {
         val username = "user"
         val password = "pass"
-        val vncPassword = "vnc"
         mainActivityViewModel.lastSelectedFilesystem = selectedFilesystem
 
-        mainActivityViewModel.submitFilesystemCredentials(username, password, vncPassword)
+        mainActivityViewModel.submitFilesystemCredentials(username, password)
 
         runBlocking {
-            verify(mockAppsStartupFsm).submitEvent(SubmitAppsFilesystemCredentials(selectedFilesystem, username, password, vncPassword), mainActivityViewModel)
-        }
-    }
-
-    @Test
-    fun `Posts IllegalState if service preference submitted while no app is selected`() {
-        mainActivityViewModel.submitAppServiceType(ServiceType.Ssh)
-
-        verify(mockStateObserver).onChanged(NoAppSelectedWhenPreferenceSubmitted)
-        verify(mockLogger).sendIllegalStateLog(NoAppSelectedWhenPreferenceSubmitted)
-    }
-
-    @Test
-    fun `Submits app service preference for last selected session`() {
-        mainActivityViewModel.lastSelectedSession = selectedSession
-
-        mainActivityViewModel.submitAppServiceType(ServiceType.Ssh)
-
-        runBlocking {
-            verify(mockAppsStartupFsm).submitEvent(SubmitAppSessionServiceType(selectedSession, ServiceType.Ssh), mainActivityViewModel)
+            verify(mockAppsStartupFsm).submitEvent(SubmitAppsFilesystemCredentials(selectedFilesystem, username, password), mainActivityViewModel)
         }
     }
 
@@ -351,7 +331,7 @@ class MainActivityViewModelTest {
     fun `Posts IllegalState on incorrect app transitions`() {
         makeAppSelections()
 
-        val event = SubmitAppSessionServiceType(selectedSession, ServiceType.Ssh)
+        val event = CheckAppSessionServiceType(selectedSession)
         val state = WaitingForAppSelection
         val badTransition = IncorrectAppTransition(event, state)
         appsStartupStateLiveData.postValue(IncorrectAppTransition(event, state))
@@ -392,11 +372,10 @@ class MainActivityViewModelTest {
         makeAppSelections()
         appsStartupStateLiveData.postValue(DatabaseEntriesFetched(selectedFilesystem, selectedSession))
 
-        val flavors = listOf(FilesystemFlavor.serverFlavor)
-        val executionTypes = listOf(ExecutionType.PROOT)
-        appsStartupStateLiveData.postValue(FilesystemFlavorRequired(selectedFilesystem, flavors, executionTypes))
+        val executionTypes = listOf(ExecutionType.PROOT, ExecutionType.AVF)
+        appsStartupStateLiveData.postValue(FilesystemFlavorRequired(selectedFilesystem, executionTypes))
 
-        verify(mockStateObserver).onChanged(FilesystemFlavorSelectionRequired(flavors, executionTypes))
+        verify(mockStateObserver).onChanged(FilesystemFlavorSelectionRequired(executionTypes))
     }
 
     @Test
@@ -438,15 +417,6 @@ class MainActivityViewModelTest {
         runBlocking {
             verify(mockAppsStartupFsm).submitEvent(CopyAppScriptToFilesystem(selectedApp, selectedFilesystem), mainActivityViewModel)
         }
-    }
-
-    @Test
-    fun `Posts PreferenceRequired if equivalent event observed`() {
-        makeAppSelections()
-
-        appsStartupStateLiveData.postValue(AppRequiresServiceType)
-
-        verify(mockStateObserver).onChanged(AppServiceTypePreferenceRequired)
     }
 
     @Test

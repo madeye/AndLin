@@ -125,30 +125,4 @@ class GithubAppsFetcher(
             httpStream.toTextFile(url, file)
         }
     }
-
-    /**
-     * Fetches the optional flavors.txt listing an app's filesystem variants (minimal, XFCE, ...).
-     * Most apps don't have one, so a missing file is not an error; any stale copy is removed so
-     * the variant picker never offers flavors the source no longer lists.
-     */
-    suspend fun fetchAppFlavors(app: App) = withContext(Dispatchers.IO) {
-        val directoryAndFilename = "${app.name}/flavors.txt"
-        val file = File("$filesDirPath/apps/$directoryAndFilename")
-
-        try {
-            if (appsInAssets) {
-                file.parentFile!!.mkdirs()
-                assets.open("apps/$directoryAndFilename").use { input ->
-                    file.outputStream().use { output ->
-                        input.copyTo(output, 1024)
-                    }
-                }
-            } else {
-                val url = "${baseUrl()}/$directoryAndFilename"
-                httpStream.toTextFile(url, file)
-            }
-        } catch (err: Exception) {
-            file.delete()
-        }
-    }
 }

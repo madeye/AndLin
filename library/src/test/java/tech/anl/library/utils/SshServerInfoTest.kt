@@ -42,6 +42,6 @@ class SshServerInfoTest {
     @Test
     fun `keys-only is reported and non-SSH sessions have no info`() {
         assertTrue(SshServerInfo.forSession(sshSession, prefs(keysOnly = true), null)!!.keysOnly)
-        assertNull(SshServerInfo.forSession(sshSession.copy(serviceType = ServiceType.Vnc), prefs(), null))
+        assertNull(SshServerInfo.forSession(sshSession.copy(serviceType = ServiceType.Unselected), prefs(), null))
     }
 }

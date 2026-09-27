@@ -17,7 +17,7 @@
     <string name="companion_error_died">The companion app stopped unexpectedly.</string>
     <string name="companion_error_unreachable">Could not reach the companion app. Make sure it is installed, then try again.</string>
     <string name="companion_error_port_in_use">Another virtual machine session is still using the network ports. Stop it, then try again.</string>
-    <string name="companion_error_service_type">Virtual machine sessions support only SSH and VNC.</string>
+    <string name="companion_error_service_type">Virtual machine sessions support only SSH.</string>
 
     <!-- Install wizard -->
     <string name="companion_wizard_title_install">Install %1$s</string>

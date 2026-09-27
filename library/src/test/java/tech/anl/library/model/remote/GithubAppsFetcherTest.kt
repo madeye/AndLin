@@ -7,7 +7,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -192,27 +191,6 @@ class GithubAppsFetcherTest {
         }
     }
 
-    @Test
-    fun `fetchAppFlavors does not throw and deletes any stale file when remote fetch fails`() {
-        val directoryAndFilename = "${app.name}/flavors.txt"
-        val existingFile = File(testFilesDir.path, "apps/$directoryAndFilename")
-        existingFile.parentFile!!.mkdirs()
-        existingFile.writeText("stale")
-        runBlocking {
-            whenever(mockHttpStream.toTextFile(
-                    "$baseUrl/$directoryAndFilename",
-                    existingFile
-            )).thenThrow(IOException())
-        }
-
-        // A missing/failed flavors.txt is not an error: fetchAppFlavors swallows it.
-        runBlocking {
-            githubAppsFetcher.fetchAppFlavors(app)
-        }
-
-        assertFalse(existingFile.exists())
-    }
-
     // --- APPS_IN_ASSETS = true path (this build flavor's default) ---
 
     private fun fetcherWithAssets(): GithubAppsFetcher = GithubAppsFetcher(
@@ -237,20 +215,5 @@ class GithubAppsFetcherTest {
         val expectedFile = File(testFilesDir.path, "apps/$directoryAndFilename")
         assertEquals(true, expectedFile.exists())
         assertEquals(bytes.toList(), expectedFile.readBytes().toList())
-    }
-
-    @Test
-    fun `fetchAppFlavors deletes a stale file when the asset is missing`() {
-        val directoryAndFilename = "${app.name}/flavors.txt"
-        val existingFile = File(testFilesDir.path, "apps/$directoryAndFilename")
-        existingFile.parentFile!!.mkdirs()
-        existingFile.writeText("stale")
-        whenever(mockAssetManager.open("apps/$directoryAndFilename")).thenThrow(IOException("not found"))
-
-        runBlocking {
-            fetcherWithAssets().fetchAppFlavors(app)
-        }
-
-        assertFalse(existingFile.exists())
     }
 }

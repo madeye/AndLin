@@ -16,7 +16,6 @@ The modules are:
 - `app`: the application shell and per-distribution assets.
 - `library`: sessions, filesystems, the PRoot and OCI setup, the SSH server and settings.
 - `terminal`: the built-in terminal (an SSH client to the session's server).
-- `vnc`: the optional VNC desktop viewer.
 
 ## Steps to follow
 1. Open an issue describing the problem your contribution solves, if there isn't one yet.

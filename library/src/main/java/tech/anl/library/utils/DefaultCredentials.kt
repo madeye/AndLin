@@ -9,7 +9,7 @@ object DefaultCredentials {
     const val PASSWORD_LENGTH = 6
 
     // Lowercase letters and digits minus look-alikes (0/o, 1/l/i), so it can be read off the
-    // Sessions tab and typed on another device. 6 characters also suits VNC's 6-8 limit.
+    // Sessions tab and typed on another device.
     private const val ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"
 
     fun randomPassword(random: Random = SecureRandom()): String =

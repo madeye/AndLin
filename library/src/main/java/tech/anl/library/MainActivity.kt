@@ -14,8 +14,6 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.*
 import android.preference.PreferenceScreen
-import android.speech.SpeechRecognizer.isRecognitionAvailable
-import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.LinearLayout
@@ -51,9 +49,7 @@ import tech.anl.library.ui.PhantomProcessKillerPrompt
 import tech.anl.library.ui.VmLaunchOptionsDialog
 import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.model.entities.FilesystemFlavor
-import tech.anl.library.model.entities.ServiceType
 import tech.anl.library.model.entities.Session
-import tech.anl.library.model.entities.toServiceType
 import tech.anl.library.model.remote.GithubApiClient
 import tech.anl.library.model.repositories.AssetRepository
 import tech.anl.library.model.repositories.DownloadMetadata
@@ -189,8 +185,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val assetDownloader = AssetDownloader(assetPreferences, downloadManagerWrapper, anlFiles)
 
         val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice(this) }
-        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles,
-            { DesktopSupport.isEnabled(this) }, executionTypeSupported)
+        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles, executionTypeSupported)
         val sessionStartupFsm = SessionStartupFsm(
             anlDatabase,
             assetRepository,
@@ -354,24 +349,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         return UUID.randomUUID().toString()
     }
 
-    private fun getCameraInfo() {
-        val recognitionServiceAvailable = isRecognitionAvailable(this)
-        with(defaultSharedPreferences.edit()) {
-            putInt(
-                "camera_supported",
-                if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) 1 else 0
-            )
-            putInt(
-                "microphone_supported",
-                if (recognitionServiceAvailable && packageManager.hasSystemFeature(
-                        PackageManager.FEATURE_MICROPHONE
-                    )
-                ) 1 else 0
-            )
-            apply()
-        }
-    }
-
     private fun getNetInfo() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val re1 = "^\\d+(\\.\\d+){3}$".toRegex()
@@ -527,7 +504,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     override fun appHasBeenSelected(app: App, autoStart: Boolean) {
         getNetInfo()
-        getCameraInfo()
         if (!PermissionHandler.permissionsAreGranted(this)) {
             PermissionHandler.showPermissionsNecessaryDialog(this)
             viewModel.waitForPermissions(appToContinue = app)
@@ -540,7 +516,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     override fun sessionHasBeenSelected(session: Session) {
         getNetInfo()
-        getCameraInfo()
         if (!PermissionHandler.permissionsAreGranted(this)) {
             PermissionHandler.showPermissionsNecessaryDialog(this)
             viewModel.waitForPermissions(sessionToContinue = session)
@@ -582,37 +557,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val details = ""
         updateProgressBar(step, details)
 
-        // TODO: Alert user when defaulting to VNC
-        // TODO: Is this even possible?
-        if (session.serviceType is ServiceType.Xsdl && Build.VERSION.SDK_INT > Build.VERSION_CODES.O_MR1) {
-            session.serviceType = ServiceType.Vnc
-        }
-
-        when (session.serviceType) {
-            ServiceType.Xsdl -> {
-                viewModel.lastSelectedSession = session
-                sendXsdlIntentToSetDisplayNumberAndExpectResult()
-            }
-            ServiceType.Vnc -> {
-                setVncResolution(session)
-                startSession(session)
-            }
-            else -> startSession(session)
-        }
-    }
-
-    private fun setVncResolution(session: Session) {
-        val deviceDimensions = DeviceDimensions()
-        val windowManager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        val orientation = applicationContext.resources.configuration.orientation
-        deviceDimensions.saveDeviceDimensions(
-            windowManager,
-            DisplayMetrics(),
-            orientation,
-            defaultSharedPreferences
-        )
-        session.geometry = deviceDimensions.getScreenResolution()
+        startSession(session)
     }
 
     private fun startSession(session: Session) {
@@ -653,48 +598,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         }
     }
 
-    /*
-    XSDL has a different flow than starting SSH/VNC session.  It sends an intent to XSDL with
-        with a display value.  Then XSDL sends an intent to open ServerBox signalling
-        that it has an xserver listening.  We set the initial display number as an environment variable
-        then start a twm process to connect to XSDL's xserver.
-    */
-    private fun sendXsdlIntentToSetDisplayNumberAndExpectResult() {
-        try {
-            val xsdlIntent = Intent(Intent.ACTION_MAIN, Uri.parse("x11://give.me.display:4721"))
-            val setDisplayRequestCode = 1
-            startActivityForResult(xsdlIntent, setDisplayRequestCode)
-        } catch (e: Exception) {
-            val appPackageName = "x.org.server"
-            try {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=$appPackageName")
-                    )
-                )
-            } catch (error: android.content.ActivityNotFoundException) {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                    )
-                )
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        data?.let {
-                val session = viewModel.lastSelectedSession
-                val result = data.getStringExtra("run") ?: ""
-                if (session.serviceType == ServiceType.Xsdl && result.isNotEmpty()) {
-                    startSession(session)
-                }
-        }
-    }
-
     private fun restartRunningSession(session: Session) {
         val serviceIntent = Intent(this, ServerService::class.java)
                 .putExtra("type", "restartRunningSession")
@@ -721,23 +624,13 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                 if (BuildConfig.USE_DEFAULT_CREDS) {
                     viewModel.submitFilesystemCredentials(
                         BuildConfig.DEFAULT_USERNAME,
-                        BuildConfig.DEFAULT_SSH_PASSWORD,
-                        BuildConfig.DEFAULT_VNC_PASSWORD
+                        BuildConfig.DEFAULT_SSH_PASSWORD
                     )
                 } else
                     getCredentials()
             }
             is FilesystemFlavorSelectionRequired -> {
-                getFilesystemFlavor(state.flavors, state.executionTypes)
-            }
-            is AppServiceTypePreferenceRequired -> {
-                // ServerBox sessions are SSH terminals unless desktop sessions are switched on.
-                if (!DesktopSupport.isEnabled(this))
-                    viewModel.submitAppServiceType(ServiceType.Ssh)
-                else if (BuildConfig.USE_DEFAULT_SERVICE_TYPE)
-                    viewModel.submitAppServiceType(BuildConfig.DEFAULT_LAUNCH_TYPE.toServiceType())
-                else
-                    getServiceTypePreference()
+                getFilesystemFlavor(state.executionTypes)
             }
             is LargeDownloadRequired -> {
                 if (wifiIsEnabled()) {
@@ -777,13 +670,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                     R.string.illegal_state_unhandled_session_service_type
                 )
             }
-            "desktopUnavailable" ->
-                Toast.makeText(this, R.string.desktop_unavailable, Toast.LENGTH_LONG).show()
-            "playStoreMissingForClient" ->
-                displayGenericErrorDialog(
-                    R.string.alert_need_client_app_title,
-                    R.string.alert_need_client_app_message
-                )
         }
     }
 
@@ -979,7 +865,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val suggestedPassword = DefaultCredentials.randomPassword()
         dialogView.findViewById<TextInputEditText>(R.id.text_input_username).setText(DefaultCredentials.USERNAME)
         dialogView.findViewById<TextInputEditText>(R.id.text_input_password).setText(suggestedPassword)
-        dialogView.findViewById<TextInputEditText>(R.id.text_input_vnc_password).setText(suggestedPassword)
         dialog.setView(dialogView)
         dialog.setCancelable(true)
         dialog.setPositiveButton(R.string.button_continue, null)
@@ -989,11 +874,10 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val username = customDialog.find<TextInputEditText>(R.id.text_input_username).text.toString()
                 val password = customDialog.find<TextInputEditText>(R.id.text_input_password).text.toString()
-                val vncPassword = customDialog.find<TextInputEditText>(R.id.text_input_vnc_password).text.toString()
 
-                if (validateCredentials(username, password, vncPassword)) {
+                if (validateCredentials(username, password)) {
                     customDialog.dismiss()
-                    viewModel.submitFilesystemCredentials(username, password, vncPassword)
+                    viewModel.submitFilesystemCredentials(username, password)
                 }
             }
         }
@@ -1014,7 +898,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     // TODO refactor the names here
     // TODO could this dialog share a layout with the apps details page somehow?
-    private fun getFilesystemFlavor(flavors: List<FilesystemFlavor>, executionTypes: List<ExecutionType>) {
+    // New filesystems always use the headless server image, so only the execution type is asked.
+    private fun getFilesystemFlavor(executionTypes: List<ExecutionType>) {
         val padding = (16 * resources.displayMetrics.density).toInt()
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -1023,20 +908,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val entitled = contributionPrompter.isEntitledToProFeatures()
         fun label(text: String, paid: Boolean) =
             if (paid && !entitled) getString(R.string.pro_feature_label, text) else text
-
-        val flavorGroup = RadioGroup(this)
-        flavors.forEachIndexed { index, flavor ->
-            flavorGroup.addView(RadioButton(this).apply {
-                id = View.generateViewId()
-                tag = flavor
-                text = label(flavor.displayName, flavor.isPaid)
-                isChecked = index == 0
-            })
-        }
-        if (flavors.size > 1) {
-            content.addView(TextView(this).apply { setText(R.string.filesystem_flavor_title) })
-            content.addView(flavorGroup)
-        }
 
         val executionGroup = RadioGroup(this)
         executionTypes.forEachIndexed { index, type ->
@@ -1047,13 +918,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                 isChecked = index == 0
             })
         }
-        if (executionTypes.size > 1) {
-            content.addView(TextView(this).apply {
-                setText(R.string.execution_type_title)
-                setPadding(0, padding, 0, 0)
-            })
-            content.addView(executionGroup)
-        }
+        content.addView(TextView(this).apply { setText(R.string.execution_type_title) })
+        content.addView(executionGroup)
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.filesystem_setup_title)
@@ -1063,17 +929,15 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             .create()
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val flavor = flavorGroup.findViewById<RadioButton>(flavorGroup.checkedRadioButtonId)?.tag as? FilesystemFlavor
-                    ?: flavors.first()
                 val executionType = executionGroup.findViewById<RadioButton>(executionGroup.checkedRadioButtonId)?.tag as? ExecutionType
                     ?: ExecutionType.PROOT
-                if ((flavor.isPaid || executionType.isVm) && !entitled) {
+                if (executionType.isVm && !entitled) {
                     Toast.makeText(this, R.string.pro_feature_required, Toast.LENGTH_LONG).show()
                     contributionPrompter.showView()
                     return@setOnClickListener
                 }
                 dialog.dismiss()
-                viewModel.submitFilesystemFlavor(flavor.name, executionType)
+                viewModel.submitFilesystemFlavor(FilesystemFlavor.SERVER, executionType)
             }
         }
         dialog.setOnCancelListener { viewModel.handleUserInputCancelled() }
@@ -1086,52 +950,12 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         ExecutionType.QEMU -> R.string.execution_type_qemu
     }
 
-    private fun getServiceTypePreference() {
-        val dialog = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.dia_app_select_client, null)
-        dialog.setView(dialogView)
-        dialog.setCancelable(true)
-        dialog.setPositiveButton(R.string.button_continue, null)
-        val customDialog = dialog.create()
-
-        customDialog.setOnShowListener {
-            val sshTypePreference = customDialog.find<RadioButton>(R.id.ssh_radio_button)
-            val vncTypePreference = customDialog.find<RadioButton>(R.id.vnc_radio_button)
-            val xsdlTypePreference = customDialog.find<RadioButton>(R.id.xsdl_radio_button)
-
-            // XSDL is gone; the built-in VNC viewer is the only desktop client.
-            xsdlTypePreference.visibility = View.GONE
-            customDialog.findViewById<TextView>(R.id.text_xsdl_version_supported_description)?.visibility = View.GONE
-
-            if (!viewModel.lastSelectedApp.supportsCli) {
-                sshTypePreference.isEnabled = false
-                sshTypePreference.alpha = 0.5f
-            }
-
-            customDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                customDialog.dismiss()
-                val selectedType = when {
-                    sshTypePreference.isChecked -> ServiceType.Ssh
-                    vncTypePreference.isChecked -> ServiceType.Vnc
-                    else -> ServiceType.Unselected
-                }
-                viewModel.submitAppServiceType(selectedType)
-            }
-        }
-        customDialog.setOnCancelListener {
-            viewModel.handleUserInputCancelled()
-        }
-
-        customDialog.show()
-    }
-
-    private fun validateCredentials(username: String, password: String, vncPassword: String): Boolean {
+    private fun validateCredentials(username: String, password: String): Boolean {
         val blacklistedUsernames = this.resources.getStringArray(R.array.blacklisted_usernames)
         val validator = CredentialValidator()
 
         val usernameCredentials = validator.validateUsername(username, blacklistedUsernames)
         val passwordCredentials = validator.validatePassword(password)
-        val vncPasswordCredentials = validator.validateVncPassword(vncPassword)
 
         return when {
             !usernameCredentials.credentialIsValid -> {
@@ -1140,10 +964,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             }
             !passwordCredentials.credentialIsValid -> {
                 Toast.makeText(this, passwordCredentials.errorMessageId, Toast.LENGTH_LONG).show()
-                false
-            }
-            !vncPasswordCredentials.credentialIsValid -> {
-                Toast.makeText(this, vncPasswordCredentials.errorMessageId, Toast.LENGTH_LONG).show()
                 false
             }
             else -> true

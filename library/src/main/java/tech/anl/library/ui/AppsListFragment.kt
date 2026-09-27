@@ -19,7 +19,6 @@ import tech.anl.library.databinding.FragAppListBinding
 import tech.anl.library.BuildConfig
 import tech.anl.library.MainActivity
 import tech.anl.library.R
-import tech.anl.library.utils.DesktopSupport
 import tech.anl.library.ServerService
 import tech.anl.library.model.entities.App
 import tech.anl.library.model.remote.GithubAppsFetcher
@@ -67,9 +66,8 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
 
     private val appsObserver = Observer<List<App>> {
         it?.let { list ->
-            // GUI-only apps (no CLI) need a desktop session, which is opt-in.
-            val desktopEnabled = DesktopSupport.isEnabled(activityContext)
-            appsAdapter.updateApps(list.filter { app -> desktopEnabled || app.supportsCli })
+            // Apps run in SSH sessions, so GUI-only apps (e.g. from a custom apps list) are hidden.
+            appsAdapter.updateApps(list.filter { app -> app.supportsCli })
             fragAppListBinding.listApps.scrollToPosition(0)
             if (list.isEmpty() || appIsNewVersion()) {
                 doRefresh()

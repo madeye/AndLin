@@ -137,7 +137,7 @@ class CompanionMiscLogicTest {
     }
 
     @Test fun `start params omit a null shared path`() {
-        val p = CompanionStartParams("vnc", "u", "p", "v", "800x600", "", 1, false, null, true, 0, false)
+        val p = CompanionStartParams("ssh", "u", "p", "v", "800x600", "", 1, false, null, true, 0, false)
         assertFalse(p.toFields("1").containsValue(null) && CompanionJson.encode(p.toFields("1")).contains("sharedPath"))
         assertTrue(CompanionJson.encode(p.copy(sharedPath = "/storage/emulated/0").toFields("1")).contains("\"sharedPath\":\"/storage/emulated/0\""))
     }

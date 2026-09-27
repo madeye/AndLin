@@ -10,9 +10,7 @@ import kotlinx.coroutines.Job
 import tech.anl.library.R
 import tech.anl.library.model.entities.App
 import tech.anl.library.model.entities.ExecutionType
-import tech.anl.library.model.entities.FilesystemFlavor
 import tech.anl.library.model.entities.Filesystem
-import tech.anl.library.model.entities.ServiceType
 import tech.anl.library.model.entities.Session
 import tech.anl.library.model.repositories.DownloadMetadata
 import tech.anl.library.model.state.* // ktlint-disable no-wildcard-imports
@@ -146,12 +144,12 @@ class MainActivityViewModel(
         submitSessionStartupEvent(AssetDownloadComplete(id))
     }
 
-    fun submitFilesystemCredentials(username: String, password: String, vncPassword: String) {
+    fun submitFilesystemCredentials(username: String, password: String) {
         if (lastSelectedFilesystem == unselectedFilesystem) {
             postIllegalStateWithLog(NoFilesystemSelectedWhenCredentialsSubmitted)
             return
         }
-        submitAppsStartupEvent(SubmitAppsFilesystemCredentials(lastSelectedFilesystem, username, password, vncPassword))
+        submitAppsStartupEvent(SubmitAppsFilesystemCredentials(lastSelectedFilesystem, username, password))
     }
 
     fun submitFilesystemFlavor(flavor: String, executionType: ExecutionType) {
@@ -164,14 +162,6 @@ class MainActivityViewModel(
 
     fun lowAvailableStorageAcknowledged() {
         submitSessionStartupEvent(VerifyAvailableStorageComplete)
-    }
-
-    fun submitAppServiceType(serviceType: ServiceType) {
-        if (lastSelectedSession == unselectedSession) {
-            postIllegalStateWithLog(NoAppSelectedWhenPreferenceSubmitted)
-            return
-        }
-        submitAppsStartupEvent(SubmitAppSessionServiceType(lastSelectedSession, serviceType))
     }
 
     fun handleUserInputCancelled() {
@@ -223,7 +213,7 @@ class MainActivityViewModel(
                 submitAppsStartupEvent(CheckFilesystemFlavor(lastSelectedApp, lastSelectedFilesystem))
             }
             is FilesystemFlavorRequired -> {
-                state.postValue(FilesystemFlavorSelectionRequired(newState.flavors, newState.executionTypes))
+                state.postValue(FilesystemFlavorSelectionRequired(newState.executionTypes))
             }
             is FilesystemFlavorSet -> {
                 submitAppsStartupEvent(CheckAppsFilesystemCredentials(lastSelectedFilesystem))
@@ -239,9 +229,6 @@ class MainActivityViewModel(
             }
             is AppHasServiceTypeSet -> {
                 submitAppsStartupEvent(CopyAppScriptToFilesystem(lastSelectedApp, lastSelectedFilesystem))
-            }
-            is AppRequiresServiceType -> {
-                state.postValue(AppServiceTypePreferenceRequired)
             }
             is CopyingAppScript -> {}
             is AppScriptCopySucceeded -> {
@@ -452,7 +439,6 @@ object TooManySelectionsMadeWhenPermissionsGranted : IllegalState()
 object NoSelectionsMadeWhenPermissionsGranted : IllegalState()
 
 object NoFilesystemSelectedWhenCredentialsSubmitted : IllegalState()
-object NoAppSelectedWhenPreferenceSubmitted : IllegalState()
 object NoAppSelectedWhenTransitionNecessary : IllegalState()
 object ErrorFetchingAppDatabaseEntries : IllegalState()
 object ErrorCopyingAppScript : IllegalState()
@@ -473,8 +459,7 @@ object BusyboxMissing : IllegalState()
 sealed class UserInputRequiredState : State()
 object FilesystemCredentialsRequired : UserInputRequiredState()
 object LowStorageAcknowledgementRequired : UserInputRequiredState()
-object AppServiceTypePreferenceRequired : UserInputRequiredState()
-data class FilesystemFlavorSelectionRequired(val flavors: List<FilesystemFlavor>, val executionTypes: List<ExecutionType>) : UserInputRequiredState()
+data class FilesystemFlavorSelectionRequired(val executionTypes: List<ExecutionType>) : UserInputRequiredState()
 data class LargeDownloadRequired(val downloadRequirements: List<DownloadMetadata>) : UserInputRequiredState()
 object ActiveSessionsMustBeDeactivated : UserInputRequiredState()
 

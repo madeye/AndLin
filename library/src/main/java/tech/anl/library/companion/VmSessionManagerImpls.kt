@@ -54,8 +54,10 @@ abstract class CompanionVmSessionManager internal constructor(
             serviceType = session.serviceType.toString(),
             username = session.username,
             password = session.password,
+            // vncPassword and geometry stay in the companion protocol; SSH sessions don't use them,
+            // but the companions still expect a well-formed screen size.
             vncPassword = session.vncPassword,
-            geometry = geometry,
+            geometry = geometry.takeIf { CompanionInputValidator.isValidGeometry(it) } ?: CompanionStartParams.DEFAULT_GEOMETRY,
             appScript = decorateAppScript(appScript.orEmpty(), sound),
             sessionId = session.id,
             settingsEnabled = !CustomBuildConfig.DEFAULT_HIDE_SETTINGS,

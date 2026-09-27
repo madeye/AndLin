@@ -10,7 +10,6 @@ import android.view.View
 import androidx.preference.*
 import tech.anl.customlibrary.BuildConfig
 import tech.anl.library.R
-import tech.anl.library.utils.DesktopSupport
 import tech.anl.library.ui.PhantomProcessKillerPrompt
 import tech.anl.library.utils.NetworkAddresses
 import tech.anl.library.utils.ProotDebugLogger
@@ -57,9 +56,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             true
         }
-        if (!DesktopSupport.isBuiltIn) {
-            preferenceScreen.removePreference(findPreference<Preference>("pref_desktop_category")!!)
-        }
         updateSshConnectionInfo()
         findPreference<Preference>("pref_phantom_process_fix")!!.setOnPreferenceClickListener {
             PhantomProcessKillerPrompt.showFix(requireActivity())
@@ -103,7 +99,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             "pref_hide_distributions", "pref_custom_hostname_enabled", "pref_hostname",
             "pref_custom_apps_enabled", "pref_apps", "pref_custom_filesystem_enabled", "pref_filesystem"
         ).forEach { key -> findPreference<Preference>(key)?.let { appCategory.removePreference(it) } }
-        findPreference<Preference>("pref_desktop_category")?.let { preferenceScreen.removePreference(it) }
         preferenceScreen.removePreference(findPreference<Preference>("pref_proot_category")!!)
     }
 

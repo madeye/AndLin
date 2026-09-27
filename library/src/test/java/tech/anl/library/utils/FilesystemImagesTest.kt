@@ -10,7 +10,7 @@ class FilesystemImagesTest {
     }
 
     @Test
-    fun `desktop flavors use the UserLAnd images`() {
+    fun `legacy desktop flavors keep resolving to the UserLAnd images they were built from`() {
         assertEquals("ghcr.io/cypherpunkarmory/userland-debian:latest", FilesystemImages.imageRef("debian", "default", "latest"))
         assertEquals("ghcr.io/cypherpunkarmory/userland-kali_xfce:latest", FilesystemImages.imageRef("Kali", "XFCE", "latest"))
     }
