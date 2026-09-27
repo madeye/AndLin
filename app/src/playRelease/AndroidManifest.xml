@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google Play build (playRelease): drops the permissions Play does not allow for this app. The
+     library checks what is declared at run time (DeclaredPermissions) and leaves the matching
+     features out: no companion-app download/install, no microphone or camera requests. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Installing the VM/QEMU companion apps from GitHub: Play forbids installing apps from
+         outside Play. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove" />
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
+
+    <!-- Never used: implied by libadb-android, whose manifest has no targetSdkVersion. Play would
+         otherwise list it and it would need a disclosure. -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+</manifest>

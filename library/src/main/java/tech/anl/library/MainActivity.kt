@@ -21,6 +21,9 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import android.graphics.Color
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -42,10 +45,12 @@ import tech.anl.library.model.entities.App
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.withContext
 import tech.anl.library.companion.CompanionApp
+import tech.anl.library.companion.CompanionInstaller
 import tech.anl.library.companion.VmLaunchOptions
 import tech.anl.library.ui.BackgroundRunPrompt
 import tech.anl.library.ui.InstallWizardFragment
 import tech.anl.library.ui.PhantomProcessKillerPrompt
+import tech.anl.library.ui.SystemBarInsets
 import tech.anl.library.ui.VmLaunchOptionsDialog
 import tech.anl.library.model.entities.ExecutionType
 import tech.anl.library.model.entities.FilesystemFlavor
@@ -185,7 +190,10 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         val assetDownloader = AssetDownloader(assetPreferences, downloadManagerWrapper, anlFiles)
 
         val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice(this) }
-        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles, executionTypeSupported)
+        // New filesystems get a VM type only when its companion app can be installed by this build
+        // or already is. Existing ones keep theirs: starting them explains a missing companion.
+        val executionTypeOffered: (ExecutionType) -> Boolean = { CompanionInstaller.isOffered(this, it) }
+        val appsStartupFsm = AppsStartupFsm(anlDatabase, filesystemManager, anlFiles, executionTypeOffered)
         val sessionStartupFsm = SessionStartupFsm(
             anlDatabase,
             assetRepository,
@@ -212,7 +220,18 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Edge-to-edge is enforced from target SDK 35; opt in on older releases too so every
+        // version lays out the same way. Toolbar and bottom navigation are dark: light bar icons.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+        )
         setContentView(R.layout.activity_main)
+        SystemBarInsets.applyToMainFrame(
+            activityMainBinding.root,
+            activityMainBinding.toolbar,
+            activityMainBinding.bottomNavView
+        )
         setSupportActionBar(activityMainBinding.toolbar)
         notificationManager.createServiceNotificationChannel() // Android O requirement
 
@@ -285,6 +304,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         } else {
             bottomNavView.visibility = View.VISIBLE
         }
+        SystemBarInsets.refresh(bottomNavView)
     }
 
     private fun setProgressDialogNavListeners() {
@@ -622,10 +642,14 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             }
             is FilesystemCredentialsRequired -> {
                 if (BuildConfig.USE_DEFAULT_CREDS) {
-                    viewModel.submitFilesystemCredentials(
-                        BuildConfig.DEFAULT_USERNAME,
+                    // A fixed password would let anyone on the network in once SSH is allowed
+                    // from it; the Sessions tab shows the generated one.
+                    val password = if (BuildConfig.USE_RANDOM_SSH_PASSWORD) {
+                        DefaultCredentials.randomPassword()
+                    } else {
                         BuildConfig.DEFAULT_SSH_PASSWORD
-                    )
+                    }
+                    viewModel.submitFilesystemCredentials(BuildConfig.DEFAULT_USERNAME, password)
                 } else
                     getCredentials()
             }

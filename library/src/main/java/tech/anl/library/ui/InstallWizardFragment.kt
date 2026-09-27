@@ -43,6 +43,7 @@ import tech.anl.library.companion.CompanionInstaller
 import tech.anl.library.companion.CompanionState
 import tech.anl.library.companion.PhantomProcessKiller
 import tech.anl.library.databinding.FragInstallWizardBinding
+import tech.anl.library.utils.DeclaredPermissions
 import java.io.File
 
 /**
@@ -79,6 +80,9 @@ class InstallWizardFragment : DialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Full screen (non-floating theme), so edge-to-edge: keep the content clear of the bars and IME.
+        SystemBarInsets.prepareFullScreenDialog(dialog?.window)
+        SystemBarInsets.padForSystemBars(binding.root)
         binding.installWizardTitle.text = when (job) {
             Job.INSTALL -> getString(R.string.companion_wizard_title_install, appName())
             Job.UPDATE, Job.UPDATE_REQUIRED -> getString(R.string.companion_wizard_title_update, appName())
@@ -191,6 +195,8 @@ class InstallWizardFragment : DialogFragment() {
         val a = app
         return when {
             job == Job.PHANTOM_FIX && Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> getString(R.string.companion_wizard_no_wireless_debugging)
+            a != null && !DeclaredPermissions.canInstallCompanionApps(requireContext()) ->
+                getString(R.string.companion_not_installable_message, appName())
             a != null && !CompanionInstaller.isSupportedOnThisDevice(requireContext(), a) -> getString(
                 if (a == CompanionApp.VM) R.string.companion_wizard_unsupported_vm else R.string.companion_wizard_unsupported_qemu,
                 appName()
@@ -292,7 +298,9 @@ class InstallWizardFragment : DialogFragment() {
          */
         suspend fun ensureCompanionReady(activity: FragmentActivity, app: CompanionApp): Boolean {
             val installer = CompanionInstaller(activity)
-            return when (installer.state(app, CompanionChannel.get(activity))) {
+            val state = installer.state(app, CompanionChannel.get(activity))
+            if (!DeclaredPermissions.canInstallCompanionApps(activity)) return explainWithoutInstalling(activity, app, state)
+            return when (state) {
                 CompanionState.NOT_INSTALLED -> { show(activity, Job.INSTALL, app); false }
                 CompanionState.UPDATE_REQUIRED -> { show(activity, Job.UPDATE_REQUIRED, app); false }
                 CompanionState.UPDATE_AVAILABLE -> {
@@ -310,6 +318,28 @@ class InstallWizardFragment : DialogFragment() {
                 }
                 CompanionState.READY -> true
             }
+        }
+
+        /**
+         * The Play build may not download or install apps, so it never shows the wizard for a
+         * companion: a missing or too-old one is only explained, and an optional update is not
+         * offered. A companion the user installed themselves keeps working.
+         */
+        private fun explainWithoutInstalling(activity: FragmentActivity, app: CompanionApp, state: CompanionState): Boolean {
+            val (title, message) = when (state) {
+                CompanionState.NOT_INSTALLED -> R.string.companion_not_installable_title to R.string.companion_not_installable_message
+                CompanionState.UPDATE_REQUIRED -> R.string.companion_too_old_title to R.string.companion_too_old_message
+                CompanionState.UPDATE_AVAILABLE, CompanionState.READY -> return true
+            }
+            if (!activity.isFinishing && !activity.isDestroyed) {
+                val name = activity.getString(if (app == CompanionApp.VM) R.string.companion_name_vm else R.string.companion_name_qemu)
+                AlertDialog.Builder(activity)
+                    .setTitle(activity.getString(title, name))
+                    .setMessage(activity.getString(message, name))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+            return false
         }
     }
 }

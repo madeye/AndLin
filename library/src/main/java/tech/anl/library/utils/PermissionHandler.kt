@@ -50,7 +50,10 @@ class PermissionHandler {
             val prefs = activity.getSharedPreferences("permissions", Context.MODE_PRIVATE)
             if (prefs.getBoolean(optionalPermissionsAskedPref, false)) return
             val wanted = mutableListOf<String>()
-            if (BuildConfig.USES_MICROPHONE) wanted += Manifest.permission.RECORD_AUDIO
+            // The Play build does not declare RECORD_AUDIO; never request an undeclared permission.
+            if (BuildConfig.USES_MICROPHONE && DeclaredPermissions.canRecordAudio(activity)) {
+                wanted += Manifest.permission.RECORD_AUDIO
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 wanted += Manifest.permission.POST_NOTIFICATIONS
             }

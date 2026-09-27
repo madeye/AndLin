@@ -6,11 +6,11 @@ plugins {
 android {
     namespace 'tech.anl.customlibrary'
 
-    compileSdkVersion 35
+    compileSdkVersion 36
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
 
@@ -142,7 +142,6 @@ android {
             buildConfigField 'boolean', 'ENABLE_QEMU_BACKEND', 'false'
 
             //Need unique provider authorities
-            buildConfigField 'String', 'PROVIDER_AUTHORITY', "\"tech.anl.provider.fileprovider\""
         }
     }
     buildFeatures.buildConfig true

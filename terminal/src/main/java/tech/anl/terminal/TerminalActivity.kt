@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -18,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import tech.anl.terminal.TerminalLauncher.getSpec
 import tech.anl.terminal.view.ExtraKeysView
 import tech.anl.terminal.view.TerminalView
@@ -48,14 +50,26 @@ class TerminalActivity : AppCompatActivity(), TerminalSession.Listener, Terminal
         val savedSp = prefs.getFloat(PREF_FONT_SP, TerminalView.DEFAULT_FONT_SP)
         terminalView.setFontSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, savedSp, resources.displayMetrics))
 
+        // Drawn edge-to-edge (enforced from target SDK 35): the toolbar extends under the status
+        // bar so that area takes its color, and the rest stays clear of the bars and the IME.
         val root = findViewById<View>(R.id.terminal_root)
+        val toolbarMinHeight = toolbar.minimumHeight
         ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
-            v.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
+            v.setPadding(bars.left, 0, bars.right, maxOf(bars.bottom, ime.bottom))
+            toolbar.setPadding(toolbar.paddingLeft, bars.top, toolbar.paddingRight, toolbar.paddingBottom)
+            toolbar.updateLayoutParams { height = toolbarMinHeight + bars.top }
             setKeyboardVisible(insets.isVisible(WindowInsetsCompat.Type.ime()))
             WindowInsetsCompat.CONSUMED
         }
+
+        // Predictive back never delivers KEYCODE_BACK to the view: clear a selection from here.
+        val clearSelectionOnBack = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() = terminalView.clearSelection()
+        }
+        onBackPressedDispatcher.addCallback(this, clearSelectionOnBack)
+        terminalView.onSelectionChanged = { clearSelectionOnBack.isEnabled = it }
 
         TerminalSessions.addObserver(this)
         // A recreated activity or a relaunch from recents must not restart an exited session.

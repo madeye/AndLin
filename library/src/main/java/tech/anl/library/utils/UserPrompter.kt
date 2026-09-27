@@ -147,7 +147,7 @@ class UserFeedbackPrompter(private val activity: Activity, private val viewGroup
         get() = userHasGivenFeedback
 
     private val sendReviewIntent = {
-        val playStoreURI = "https://play.google.com/store/apps/details?id=tech.anl"
+        val playStoreURI = "https://play.google.com/store/apps/details?id=${activity.packageName}"
         val intent = Intent("android.intent.action.VIEW", Uri.parse(playStoreURI))
         activity.startActivity(intent)
     }

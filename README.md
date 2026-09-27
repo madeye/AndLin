@@ -6,6 +6,10 @@ An old phone is a small, quiet, low-power computer with a battery backup and Wi-
 ServerBox puts a real Linux distribution on it and keeps an SSH server running, so you can use
 it like any other box on your network: host services, run scripts and cron jobs, or tinker.
 
+ServerBox is a fork of [UserLAnd](https://github.com/CypherpunkArmory/UserLAnd) by
+CypherpunkArmory (UserLAnd Technologies, LLC) and, like UserLAnd, is licensed under the
+[GPLv3](LICENSE).
+
 ## What it does
 
 - **Linux distributions without root.** Alpine, Arch, Debian, Kali and Ubuntu run in user space
@@ -25,6 +29,12 @@ it like any other box on your network: host services, run scripts and cron jobs,
   asks for access to a folder the first time a program uses it.
 - **Virtual machines where supported.** On phones with the Android Virtualization Framework,
   distributions can also run in a real VM through a companion app.
+
+## Screenshots
+
+| Distributions | New filesystem | Server settings |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/apps.png" alt="Apps tab listing the Linux distributions" width="240"> | <img src="docs/screenshots/filesystem-edit.png" alt="Creating a filesystem with a user name and password" width="240"> | <img src="docs/screenshots/settings.png" alt="Server settings: start on boot, SSH from the network, authorized keys" width="240"> |
 
 ## Download
 
@@ -98,5 +108,9 @@ and published to `ghcr.io/madeye/serverbox-<distro>`.
 
 ## Credits
 
-ServerBox is based on [UserLAnd](https://github.com/CypherpunkArmory/UserLAnd) by
-CypherpunkArmory and is released under the GPLv3 (see [LICENSE](LICENSE)).
+ServerBox is forked from [UserLAnd](https://github.com/CypherpunkArmory/UserLAnd) and its
+library (UserLAndLibrary) by
+CypherpunkArmory (UserLAnd Technologies, LLC), who hold the copyright on the original code.
+ServerBox's changes are copyright Max Lv. Like UserLAnd, ServerBox is released under the
+GNU General Public License v3; the full text is in [LICENSE](LICENSE) and the copyright
+notices are in [COPYRIGHT](COPYRIGHT).

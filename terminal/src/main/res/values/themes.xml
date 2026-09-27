@@ -5,7 +5,8 @@
         <item name="colorPrimaryDark">#FF000000</item>
         <item name="colorAccent">#FF4FC3F7</item>
         <item name="android:windowBackground">@android:color/black</item>
-        <item name="android:statusBarColor">@android:color/black</item>
+        <!-- Transparent so the toolbar, padded under it, colors the status bar area. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 </resources>
