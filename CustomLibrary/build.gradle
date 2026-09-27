@@ -55,17 +55,10 @@ android {
             buildConfigField 'boolean', 'USE_DEFAULT_CREDS', 'true'
             buildConfigField 'boolean', 'USE_RANDOM_SSH_PASSWORD', 'true'
             buildConfigField "String", "DEFAULT_SSH_PASSWORD", "\"sshpass\""
-            buildConfigField 'boolean', 'USE_RANDOM_VNC_PASSWORD', 'true'
-            buildConfigField "String", "DEFAULT_VNC_PASSWORD", "\"vncpass\""
             buildConfigField "String", "DEFAULT_USERNAME", "\"serverbox\""
 
-            //controls whether to ask for session type or not
-            buildConfigField 'boolean', 'USE_DEFAULT_SERVICE_TYPE', 'false'
-            buildConfigField "String", "DEFAULT_LAUNCH_TYPE", "\"ssh\""
             buildConfigField 'boolean', 'DEFAULT_SOUND_SUPPORT', 'true'
             buildConfigField 'boolean', 'DEFAULT_MICROPHONE_SUPPORT', 'true'
-
-            buildConfigField "String", "VNC_DISPLAY", "\"51\""
 
             //default settings for associated preferences
             //this can be used to hide bottom navigation
@@ -86,15 +79,6 @@ android {
             //this is the default custom filesystem url
             buildConfigField "String", "DEFAULT_FILESYSTEM_URL", "\"https://github.com/CypherpunkArmory/UserLAnd-Assets-Debian/releases/download/v7.7.9\""
             resValue "string", "default_filesystem_url", "\"https://github.com/CypherpunkArmory/UserLAnd-Assets-Debian/releases/download/v7.7.9\""
-            //this can be used the hide the toolbar within the VNC viewer
-            buildConfigField 'boolean', 'DEFAULT_HIDE_VNC_TOOLBAR', 'false'
-            resValue "string", "default_hide_vnc_toolbar", "false"
-            //this can be used the hide the extra keys within the VNC viewer
-            buildConfigField 'boolean', 'DEFAULT_HIDE_VNC_EXTRA_KEYS', 'false'
-            resValue "string", "default_hide_vnc_extra_keys", "false"
-            //this is the default input mode in the VNC viewer
-            buildConfigField "String", 'DEFAULT_VNC_INPUT_MODE', "\"Direct, Hold Pan\""
-            resValue "string", "default_vnc_input_mode", "\"Direct, Hold Pan\""
             //this is the default hostname to get written to the hosts and hostname file
             buildConfigField "String", "DEFAULT_HOSTNAME", "\"android-device\""
             resValue "string", "pref_hostname_default", "\"android-device\""
@@ -105,12 +89,6 @@ android {
             //this can be used the hide the settings menu
             buildConfigField 'boolean', 'DEFAULT_HIDE_SETTINGS', 'false'
             resValue "string", "pref_hide_settings_default", "false"
-
-            //these are used to help determine the resolution
-            //TODO rework these into the math before next Relag merge
-            buildConfigField 'boolean', 'FORCE_PORTRAIT_GEOMETRY', 'true'
-            buildConfigField 'int', "MAX_DIMENSION", "10000"
-            buildConfigField 'int', "MIN_DIMENSION", "360"
 
             //these can be used to turn off certain prompts we present to users
             buildConfigField 'boolean', 'HAS_LOGGER', 'false'

@@ -6,9 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 fun String.toServiceType(): ServiceType {
     return when (this) {
-        "ssh" -> ServiceType.Ssh
-        "vnc" -> ServiceType.Vnc
-        "xsdl" -> ServiceType.Xsdl
+        // "vnc" and "xsdl" were stored by builds with graphical desktop sessions; SSH replaces them.
+        "ssh", "vnc", "xsdl" -> ServiceType.Ssh
         else -> ServiceType.Unselected
     }
 }
@@ -25,20 +24,6 @@ sealed class ServiceType : Parcelable {
     object Ssh : ServiceType() {
         override fun toString(): String {
             return "ssh"
-        }
-    }
-
-    @Parcelize
-    object Vnc : ServiceType() {
-        override fun toString(): String {
-            return "vnc"
-        }
-    }
-
-    @Parcelize
-    object Xsdl : ServiceType() {
-        override fun toString(): String {
-            return "xsdl"
         }
     }
 }
@@ -75,11 +60,11 @@ data class Session(
     var active: Boolean = false,
     var username: String = "",
     var password: String = "",
-    var vncPassword: String = "",
+    var vncPassword: String = "", // Legacy: unused since VNC sessions were removed; kept for the schema.
     var serviceType: ServiceType = ServiceType.Unselected,
     var port: Long = 2022, // TODO This can be removed. Any eventual port managing should be done at a high     er abstraction.
     var pid: Long = 0,
-    var geometry: String = "",
+    var geometry: String = "", // Legacy: the VNC screen size; unused, kept for the schema.
     val isAppsSession: Boolean = false,
     var isProtected: Boolean = false
 ) : Parcelable {

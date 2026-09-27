@@ -20,11 +20,9 @@ import tech.anl.library.R
 import tech.anl.library.model.entities.Filesystem
 import tech.anl.library.model.entities.ServiceType
 import tech.anl.library.model.entities.Session
-import tech.anl.library.model.entities.toServiceType
 import tech.anl.library.model.repositories.AnlDatabase
 import tech.anl.library.viewmodel.SessionEditViewModel
 import tech.anl.library.viewmodel.SessionEditViewmodelFactory
-import java.util.*
 
 class SessionEditFragment : Fragment() {
 
@@ -121,10 +119,8 @@ class SessionEditFragment : Fragment() {
 
         fragSessionEditBinding.sessionProtected.isChecked = session.isProtected
 
-        for (i in 0 until fragSessionEditBinding.spinnerSessionServiceType.adapter.count) {
-            val item = fragSessionEditBinding.spinnerSessionServiceType.adapter.getItem(i).toString().toLowerCase(Locale.ENGLISH)
-            if (item == session.serviceType.toString()) fragSessionEditBinding.spinnerSessionServiceType.setSelection(i)
-        }
+        // SSH is the only session type.
+        session.serviceType = ServiceType.Ssh
 
         fragSessionEditBinding.textInputSessionName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
@@ -156,16 +152,6 @@ class SessionEditFragment : Fragment() {
                         }
                     }
                 }
-            }
-        }
-
-        fragSessionEditBinding.spinnerSessionServiceType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedServiceType = parent?.getItemAtPosition(position).toString().toServiceType()
-                session.serviceType = selectedServiceType
             }
         }
 
@@ -207,13 +193,6 @@ class SessionEditFragment : Fragment() {
         navController.popBackStack()
     }
 
-    private fun getDefaultServicePort(selectedServiceType: ServiceType): Long {
-        return when (selectedServiceType) {
-            ServiceType.Vnc -> 51
-            else -> 2022
-        }
-    }
-
     private fun getListDifferenceAndSetNewFilesystem(prevFilesystems: List<Filesystem>, currentFilesystems: List<Filesystem>) {
         val uniqueFilesystems = currentFilesystems.subtract(prevFilesystems)
         if (prevFilesystems.isNotEmpty() && uniqueFilesystems.isNotEmpty()) {
@@ -225,7 +204,6 @@ class SessionEditFragment : Fragment() {
         session.filesystemName = filesystem.name
         session.username = filesystem.defaultUsername
         session.password = filesystem.defaultPassword
-        session.vncPassword = filesystem.defaultVncPassword
         session.filesystemId = filesystem.id
     }
 }

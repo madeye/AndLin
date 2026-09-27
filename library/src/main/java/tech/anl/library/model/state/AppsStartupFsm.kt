@@ -15,7 +15,6 @@ class AppsStartupFsm(
     anlDatabase: AnlDatabase,
     private val filesystemManager: FilesystemManager,
     private val anlFiles: AnlFiles,
-    private val desktopEnabledProvider: () -> Boolean = { false },
     private val executionTypeSupported: (ExecutionType) -> Boolean = { it.isSupportedOnThisDevice() },
     private val logger: Logger = LogcatLogger()
 ) {
@@ -44,7 +43,6 @@ class AppsStartupFsm(
             is CheckAppsFilesystemCredentials -> currentState is FilesystemFlavorSet
             is SubmitAppsFilesystemCredentials -> currentState is AppsFilesystemRequiresCredentials
             is CheckAppSessionServiceType -> currentState is AppsFilesystemHasCredentials
-            is SubmitAppSessionServiceType -> currentState is AppRequiresServiceType
             is CopyAppScriptToFilesystem -> currentState is AppHasServiceTypeSet
             is SyncDatabaseEntries -> currentState is AppScriptCopySucceeded
             is ResetAppState -> true
@@ -64,10 +62,9 @@ class AppsStartupFsm(
             is SubmitFilesystemFlavor -> setFilesystemFlavor(event.filesystem, event.flavor, event.executionType)
             is CheckAppsFilesystemCredentials -> checkAppsFilesystemCredentials(event.appsFilesystem)
             is SubmitAppsFilesystemCredentials -> {
-                setAppsFilesystemCredentials(event.filesystem, event.username, event.password, event.vncPassword)
+                setAppsFilesystemCredentials(event.filesystem, event.username, event.password)
             }
             is CheckAppSessionServiceType -> checkServiceType(event.appSession)
-            is SubmitAppSessionServiceType -> setServiceType(event.appSession, event.serviceType)
             is CopyAppScriptToFilesystem -> copyAppScriptToFilesystem(event.app, event.filesystem)
             is SyncDatabaseEntries -> updateAppSession(event.app, event.session, event.filesystem)
             is ResetAppState -> state.postValue(WaitingForAppSelection)
@@ -86,28 +83,25 @@ class AppsStartupFsm(
     }
 
     /**
-     * A new apps filesystem starts without a flavor. The user picks one (and, where this build and
-     * device support it, whether it runs under PRoot or in a VM) before anything is downloaded,
-     * since the choice decides which image gets fetched and by whom.
+     * A new apps filesystem starts without a flavor. Every new filesystem gets the headless server
+     * image; where this build and device support it, the user picks whether a distribution runs
+     * under PRoot or in a VM before anything is downloaded, since that decides who fetches it.
      */
-    private val desktopEnabled: Boolean get() = desktopEnabledProvider()
-
     private suspend fun checkFilesystemFlavor(app: App, appsFilesystem: Filesystem) {
         if (appsFilesystem.flavor.isNotEmpty()) {
             state.postValue(FilesystemFlavorSet)
             return
         }
-        val flavors = FilesystemFlavor.readForApp(anlFiles.filesDir, app.name, desktopEnabled)
-        val isDistribution = java.io.File(anlFiles.filesDir, "apps/${app.name}/flavors.txt").exists()
+        val isDistribution = app.category.equals("distribution", ignoreCase = true)
         val executionTypes = availableExecutionTypes(isDistribution)
-        if (flavors.size == 1 && executionTypes.size == 1) {
-            setFilesystemFlavor(appsFilesystem, flavors.first().name, executionTypes.first())
+        if (executionTypes.size == 1) {
+            setFilesystemFlavor(appsFilesystem, FilesystemFlavor.SERVER, executionTypes.first())
             return
         }
-        state.postValue(FilesystemFlavorRequired(appsFilesystem, flavors, executionTypes))
+        state.postValue(FilesystemFlavorRequired(appsFilesystem, executionTypes))
     }
 
-    // Only distributions that ship a flavors.txt can run in a VM; plain apps always use PRoot.
+    // Only distributions can run in a VM; plain apps always use PRoot.
     private fun availableExecutionTypes(isDistribution: Boolean): List<ExecutionType> {
         val types = mutableListOf(ExecutionType.PROOT)
         if (!isDistribution) return types
@@ -125,8 +119,7 @@ class AppsStartupFsm(
 
     private fun checkAppsFilesystemCredentials(appsFilesystem: Filesystem) {
         val credentialsAreSet = appsFilesystem.defaultUsername.isNotEmpty() &&
-                appsFilesystem.defaultPassword.isNotEmpty() &&
-                appsFilesystem.defaultVncPassword.isNotEmpty()
+                appsFilesystem.defaultPassword.isNotEmpty()
         if (credentialsAreSet) {
             state.postValue(AppsFilesystemHasCredentials)
             return
@@ -134,10 +127,11 @@ class AppsStartupFsm(
         state.postValue(AppsFilesystemRequiresCredentials(appsFilesystem))
     }
 
-    private fun checkServiceType(appSession: Session) {
-        if (appSession.serviceType == ServiceType.Unselected) {
-            state.postValue(AppRequiresServiceType)
-            return
+    // Apps always run as SSH sessions; a new app session is switched to SSH here.
+    private suspend fun checkServiceType(appSession: Session) {
+        if (appSession.serviceType != ServiceType.Ssh) {
+            appSession.serviceType = ServiceType.Ssh
+            withContext(Dispatchers.IO) { sessionDao.updateSession(appSession) }
         }
         state.postValue(AppHasServiceTypeSet)
     }
@@ -152,12 +146,6 @@ class AppsStartupFsm(
         } catch (err: Exception) {
             state.postValue(AppScriptCopyFailed)
         }
-    }
-
-    private suspend fun setServiceType(appSession: Session, serviceType: ServiceType) = withContext(Dispatchers.IO) {
-        appSession.serviceType = serviceType
-        sessionDao.updateSession(appSession)
-        state.postValue(AppHasServiceTypeSet)
     }
 
     @Throws(NoSuchElementException::class) // If second database call fails
@@ -188,10 +176,9 @@ class AppsStartupFsm(
         return@withContext sessionDao.findAppsSession(app.name).first()
     }
 
-    private suspend fun setAppsFilesystemCredentials(filesystem: Filesystem, username: String, password: String, vncPassword: String) {
+    private suspend fun setAppsFilesystemCredentials(filesystem: Filesystem, username: String, password: String) {
         filesystem.defaultUsername = username
         filesystem.defaultPassword = password
-        filesystem.defaultVncPassword = vncPassword
         withContext(Dispatchers.IO) { filesystemDao.updateFilesystem(filesystem) }
         state.postValue(AppsFilesystemHasCredentials)
     }
@@ -202,7 +189,6 @@ class AppsStartupFsm(
         appSession.filesystemName = appsFilesystem.name
         appSession.username = appsFilesystem.defaultUsername
         appSession.password = appsFilesystem.defaultPassword
-        appSession.vncPassword = appsFilesystem.defaultVncPassword
         withContext(Dispatchers.IO) { sessionDao.updateSession(appSession) }
         state.postValue(AppDatabaseEntriesSynced(app, appSession, appsFilesystem))
     }
@@ -214,12 +200,11 @@ object WaitingForAppSelection : AppsStartupState()
 object FetchingDatabaseEntries : AppsStartupState()
 data class DatabaseEntriesFetched(val appsFilesystem: Filesystem, val appSession: Session) : AppsStartupState()
 object DatabaseEntriesFetchFailed : AppsStartupState()
-data class FilesystemFlavorRequired(val appsFilesystem: Filesystem, val flavors: List<FilesystemFlavor>, val executionTypes: List<ExecutionType>) : AppsStartupState()
+data class FilesystemFlavorRequired(val appsFilesystem: Filesystem, val executionTypes: List<ExecutionType>) : AppsStartupState()
 object FilesystemFlavorSet : AppsStartupState()
 object AppsFilesystemHasCredentials : AppsStartupState()
 data class AppsFilesystemRequiresCredentials(val appsFilesystem: Filesystem) : AppsStartupState()
 object AppHasServiceTypeSet : AppsStartupState()
-object AppRequiresServiceType : AppsStartupState()
 object CopyingAppScript : AppsStartupState()
 object AppScriptCopySucceeded : AppsStartupState()
 object AppScriptCopyFailed : AppsStartupState()
@@ -231,9 +216,8 @@ data class AppSelected(val app: App) : AppsStartupEvent()
 data class CheckFilesystemFlavor(val app: App, val appsFilesystem: Filesystem) : AppsStartupEvent()
 data class SubmitFilesystemFlavor(val filesystem: Filesystem, val flavor: String, val executionType: ExecutionType) : AppsStartupEvent()
 data class CheckAppsFilesystemCredentials(val appsFilesystem: Filesystem) : AppsStartupEvent()
-data class SubmitAppsFilesystemCredentials(val filesystem: Filesystem, val username: String, val password: String, val vncPassword: String) : AppsStartupEvent()
+data class SubmitAppsFilesystemCredentials(val filesystem: Filesystem, val username: String, val password: String) : AppsStartupEvent()
 data class CheckAppSessionServiceType(val appSession: Session) : AppsStartupEvent()
-data class SubmitAppSessionServiceType(val appSession: Session, val serviceType: ServiceType) : AppsStartupEvent()
 data class CopyAppScriptToFilesystem(val app: App, val filesystem: Filesystem) : AppsStartupEvent()
 data class SyncDatabaseEntries(val app: App, val session: Session, val filesystem: Filesystem) : AppsStartupEvent()
 object ResetAppState : AppsStartupEvent()

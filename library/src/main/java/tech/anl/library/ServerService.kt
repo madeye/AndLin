@@ -20,7 +20,6 @@ import tech.anl.library.model.repositories.AnlDatabase
 import tech.anl.library.utils.*
 import tech.anl.terminal.TerminalLauncher
 import tech.anl.terminal.TerminalSpec
-import tech.anl.library.desktop.DesktopViewer
 import tech.anl.library.companion.VmEndpoints
 import tech.anl.library.companion.VmLaunchOptions
 import tech.anl.library.companion.VmResult
@@ -439,7 +438,6 @@ class ServerService : Service(), CoroutineScope {
     private fun startClient(session: Session) {
         when (session.serviceType) {
             ServiceType.Ssh -> startSshClient(session)
-            ServiceType.Vnc -> startVncClient(session)
             else -> sendDialogBroadcast("unhandledSessionServiceType")
         }
         sendSessionActivatedBroadcast()
@@ -472,25 +470,6 @@ class ServerService : Service(), CoroutineScope {
             banner = if (session.id in vmEndpoints) getString(R.string.vm_terminal_banner) else null
         )
         TerminalLauncher.launch(this, spec)
-    }
-
-    private fun startVncClient(session: Session) {
-        if (!DesktopSupport.isEnabled(this)) {
-            sendDialogBroadcast("desktopUnavailable")
-            return
-        }
-        val prefs = this.defaultSharedPreferences
-        DesktopViewer.launch(
-            context = this,
-            host = "127.0.0.1",
-            port = vmEndpoints[session.id]?.vncPort ?: (5900 + BuildConfig.VNC_DISPLAY.toInt()),
-            password = session.vncPassword,
-            inputMode = prefs.getString("pref_default_vnc_input_mode", BuildConfig.DEFAULT_VNC_INPUT_MODE)
-                ?: BuildConfig.DEFAULT_VNC_INPUT_MODE,
-            hideToolbar = prefs.getBoolean("pref_hide_vnc_toolbar", BuildConfig.DEFAULT_HIDE_VNC_TOOLBAR),
-            hideExtraKeys = prefs.getBoolean("pref_hide_vnc_extra_keys", BuildConfig.DEFAULT_HIDE_VNC_EXTRA_KEYS),
-            title = session.name
-        )
     }
 
     private fun cleanUpFilesystem(filesystemId: Long) {

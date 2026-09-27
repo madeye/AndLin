@@ -41,7 +41,6 @@
     <string name="hint_session_name">Name der Sitzung</string>
     <string name="hint_username">Benutzername</string>
     <string name="hint_password">Passwort</string>
-    <string name="hint_vnc_password">VNC-Passwort</string>
     
     <!-- Errors -->
     <string name="error_session_name">Sitzungsname muss angegeben werden</string>
@@ -49,10 +48,8 @@
     <string name="error_username">Benutzername muss angegeben werden</string>
     <string name="error_empty_field">Jedes Eingabefeld muss ausgefüllt werden!</string>
     <string name="error_app_description_not_found">Zu dieser App kann keine Beschreibung gefunden werden. Bitte neu laden.</string>
-    <string name="error_vnc_password_length_incorrect">Das VNC-Passwort muss zwischen 6 und 8 Zeichen lang sein!</string>
     <string name="error_username_invalid">Der Benutzername enthält ungültige Zeichen</string>
     <string name="error_password_invalid">Das Passwort enthält ungültige Zeichen</string>
-    <string name="error_vnc_password_invalid">Das VNC-Passwort enthält ungültige Zeichen</string>
     <string name="error_username_invalid_characters">Der Benutzername muss 1 bis 30 Zeichen lang sein, mit Kleinbuchstaben und/oder Ziffern.</string>
     <string name="error_username_in_blacklist">Dieser Benutzername ist möglicherweise von Linux reserviert und kann nicht als Benutzername im Dateisystem verwendet werden.</string>
     <string name="error_filesystem_name_invalid_characters">Der Dateisystemname muss zwischen 1 und 50 Zeichen lang sein und darf Zeichen wie \"/:*\\| nicht enthalten.</string>
@@ -94,7 +91,6 @@
     <string name="illegal_state_no_selections_when_permissions_granted">Weder eine Sitzung noch eine App wurden ausgewählt, als Berechtigungen zugeteilt wurden.</string>
 
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">Anmeldedaten für ein Dateisystem wurden übermittelt, aber es ist keines ausgewählt.</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">Einstellungen für die App wurden übermittelt, aber es ist keine ausgewählt.</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">Es wurde versucht, den Start der App vorzubereiten, aber es ist keine App ausgewählt.</string>
     <string name="illegal_state_error_fetching_app_database_entries">Datenbankeneinträge für Apps konnten nicht abgefragt werden.</string>
     <string name="illegal_state_error_copying_app_script">App-Skript konnte nicht kopiert werden.</string>
@@ -119,9 +115,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">Dateisystem:</string>
-    <string name="prompt_service_type">Service-Typ:</string>
-    <string name="prompt_client_type">Client-Typ:</string>
-    <string name="prompt_app_connection_type_preference">Bitte Verbindungstyp auswählen: </string>
     <string name="prompt_select_backup">Sicherungsdatei des Dateisystems auswählen</string>
     <string name="prompt_install_file_manager">Bitte einen Dateimanager installieren</string>
 
@@ -171,12 +164,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
-    <string name="client_xsdl">XSDL</string>
 
     <!-- Alerts -->
     <string name="button_yes">Ja!</string>
@@ -205,8 +194,6 @@
     <string name="alert_play_service_error_message">Wir haben Probleme, den Google Play Store Service zur Fertigstellung der Aktion zu erreichen. Bitte später erneut versuchen, und falls das Problem weiterhin besteht, melden Sie es bitte einem Entwickler.</string>
     <string name="alert_play_store_required">Kostenpflichtige Apps benötigen Zugriff auf den Google Play Store, um die Zahlung zu verifizieren. Bitte installieren Sie diesen, um fortzufahren.</string>
     <string name="alert_subscriptions_unsupported_message">Die Version des Play Stores ist anscheinend zu alt, um Abonnements zu unterstützen. Bitte aktualisieren Sie ihn um fortzufahren.</string>
-    <string name="alert_need_client_app_title">Keine Client-App gefunden!</string>
-    <string name="alert_need_client_app_message">Sie benötigen einen SSH, VNC oder XSDL Client-App um diese Aktion zu vollenden. Anscheinend ist der Play Store nicht installiert. \n\nBitte eine Client-App (SSH/VNC/XSDL) passend zum Sitzungstyp installieren.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; benötigt Berechtigungen!</string>
@@ -246,8 +233,6 @@
     <string name="custom_sessions">Benutzerdefinierte Sitzungen</string>
     <string name="apps_sessions">App-Sitzungen</string>
     <string name="info_finish_app_setup">Vervollständigen Sie die App-Einrichtung, um diese Optionen verfügbar zu machen.</string>
-    <string name="info_stop_app">Stoppen Sie diese App, um die Einstellungen zu ändern.</string>
-    <string name="info_xsdl_support">XSDL ist auf Android 9.0 und darüber noch nicht vollständig unterstützt</string>
     <string name="no_backup_selected">Kein Dateisystem-Import ausgewählt</string>
     
     <!-- Review request -->
@@ -280,7 +265,7 @@
     </string>
 
     <!-- Advanced options -->
-    <string name="desc_import_backups_should_use_same_settings">Bitte gleich ausfüllen: \n\n\u2022 Nutzername \n\u2022 Passwort \n\u2022 VNC-Passwort \n\u2022 Distribution \n\n wie beim Backup, um einen reibungslosen Ablauf sicherzustellen</string>
+    <string name="desc_import_backups_should_use_same_settings">Bitte gleich ausfüllen: \n\n\u2022 Nutzername \n\u2022 Passwort \n\u2022 Distribution \n\n wie beim Backup, um einen reibungslosen Ablauf sicherzustellen</string>
     <string name="pref_clear_auto_start_title">Autostart Einstellungen löschen</string>
     <string name="pref_clear_auto_start_summary">Keine App mehr automatisch starten, bis wieder aktiviert wird.</string>
     <string name="pref_hide_sessions_filesystems_title">Untere Navigationsleiste ausblenden</string>
@@ -299,15 +284,6 @@
     <string name="pref_custom_filesystem_enabled_title">Benutzerdefinierte URL für den Dateisystem-Server verwenden</string>
     <string name="pref_custom_filesystem_enabled_summary">Erlaubt die Verwendung einer benutzerdefinierten URL für den Server, welcher die Dateisysteme zur Verfügung stellt.</string>
     <string name="pref_filesystem_title">URL für den Dateisystem-Server festlegen</string>
-    <string name="pref_custom_scaling_enabled_title">Benuterdefinierten Skalierfaktor verwenden</string>
-    <string name="pref_custom_scaling_enabled_summary">Erlaubt das Einstellen eines benutzerdefinierten Skalierfaktors, um die Display Auflösung der VNC Sitzung zu verringern.</string>
-    <string name="pref_scaling_title">Skalierfaktor festlegen</string>
-    <string name="pref_hide_custom_toolbar_title">VNC Symbolleiste ausblenden</string>
-    <string name="pref_hide_custom_toolbar_summary">Die Symbolleiste innerhalb der VNC-Sitzung wird nicht mehr angezeigt.</string>
-    <string name="pref_default_vnc_input_mode_title">Standard Eingabe Modus für VNC</string>
-    <string name="pref_default_vnc_input_mode_summary">Legt den Standard Modus für die Eingabe in VNC fest. Kann über die Symbolleiste immerhalb der VNC-Sitzung übersteuert werden.</string>
-    <string name="pref_hide_vnc_extra_keys_title">VNC Zusatztasten ausblenden</string>
-    <string name="pref_hide_vnc_extra_keys_summary">Zusätzliche Steuertasten (Tab, Esc, Steuerkreuz) ausblenden, die zusammen mit der Software Tastatur angezeigt werden.</string>
     <string name="auto_start_checkbox">Autostart aktivieren</string>
     <string name="filesystem_protected_text">Schreibschutz:</string>
 

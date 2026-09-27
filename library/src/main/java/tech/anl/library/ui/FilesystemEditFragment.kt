@@ -132,17 +132,14 @@ class FilesystemEditFragment : Fragment() {
             val suggestedPassword = DefaultCredentials.randomPassword()
             filesystem.defaultUsername = DefaultCredentials.USERNAME
             filesystem.defaultPassword = suggestedPassword
-            if (filesystem.defaultVncPassword.isEmpty()) filesystem.defaultVncPassword = suggestedPassword
         }
         fragFilesystemEditBinding.inputFilesystemName.setText(filesystem.name)
         fragFilesystemEditBinding.inputFilesystemUsername.setText(filesystem.defaultUsername)
         fragFilesystemEditBinding.inputFilesystemPassword.setText(filesystem.defaultPassword)
-        fragFilesystemEditBinding.inputFilesystemVncpassword.setText(filesystem.defaultVncPassword)
 
         if (editExisting) {
             fragFilesystemEditBinding.inputFilesystemUsername.isEnabled = false
             fragFilesystemEditBinding.inputFilesystemPassword.isEnabled = false
-            fragFilesystemEditBinding.inputFilesystemVncpassword.isEnabled = false
         }
 
         if (filesystem.isAppsFilesystem) {
@@ -171,15 +168,6 @@ class FilesystemEditFragment : Fragment() {
         fragFilesystemEditBinding.inputFilesystemPassword.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 filesystem.defaultPassword = p0.toString()
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
-
-        fragFilesystemEditBinding.inputFilesystemVncpassword.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                filesystem.defaultVncPassword = p0.toString()
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -258,12 +246,10 @@ class FilesystemEditFragment : Fragment() {
         val filesystemName = filesystem.name
         val username = filesystem.defaultUsername
         val password = filesystem.defaultPassword
-        val vncPassword = filesystem.defaultVncPassword
 
         val filesystemNameCredentials = validator.validateFilesystemName(filesystemName)
         val usernameCredentials = validator.validateUsername(username, blacklistedUsernames)
         val passwordCredentials = validator.validatePassword(password)
-        val vncPasswordCredentials = validator.validateVncPassword(vncPassword)
 
         when {
             !filesystemNameCredentials.credentialIsValid ->
@@ -272,8 +258,6 @@ class FilesystemEditFragment : Fragment() {
                 Toast.makeText(activityContext, usernameCredentials.errorMessageId, Toast.LENGTH_LONG).show()
             !passwordCredentials.credentialIsValid ->
                 Toast.makeText(activityContext, passwordCredentials.errorMessageId, Toast.LENGTH_LONG).show()
-            !vncPasswordCredentials.credentialIsValid ->
-                Toast.makeText(activityContext, vncPasswordCredentials.errorMessageId, Toast.LENGTH_LONG).show()
             else ->
                 return true
         }

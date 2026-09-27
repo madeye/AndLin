@@ -40,7 +40,6 @@
     <string name="hint_session_name">Nome da Sessão</string>
     <string name="hint_username">Usuário</string>
     <string name="hint_password">Senha</string>
-    <string name="hint_vnc_password">Senha VNC</string>
     
     <!-- Errors -->
     <string name="error_session_name">Você deve fornecer um nome de sessão</string>
@@ -48,10 +47,8 @@
     <string name="error_username">Você deve fornecer um nome de usuário</string>
     <string name="error_empty_field">Todos os campos devem ser preenchidos!</string>
     <string name="error_app_description_not_found">Não foi possível encontrar uma descrição para este aplicativo. Tente atualizar.</string>
-    <string name="error_vnc_password_length_incorrect">A senha do VNC deve ter entre 6 e 8 caracteres!</string>
     <string name="error_username_invalid">O nome de usuário tem caracteres inválidos</string>
     <string name="error_password_invalid">Senha tem caracteres inválidos</string>
-    <string name="error_vnc_password_invalid">Senha do VNC possui caracteres inválidos</string>
     <string name="error_username_invalid_characters">Os caracteres no nome de usuário devem ter de 1 a 30 caracteres com letras minúsculas e/ou números.</string>
     <string name="error_username_in_blacklist">Esse nome de usuário é possivelmente reservado pelo Linux e não pode ser usado como um nome de usuário do sistema de arquivos.</string>
     <string name="error_filesystem_name_invalid_characters">Os caracteres no nome do sistema de arquivos devem ter de 1 a 50 caracteres sem caracteres, como \"/:*\\|</string>
@@ -67,7 +64,6 @@
     <string name="illegal_state_no_selections_when_permissions_granted">Nem uma sessão nem um aplicativo foram selecionados quando as permissões foram concedidas.</string>
 
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">Credenciais foram submetidas para um sistema de arquivos, mas uma não foi selecionada.</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">Preferência de App enviada, mas uma não foi selecionada.</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">Tentando iniciar a preparação do App, mas nenhum App foi selecionado.</string>
     <string name="illegal_state_error_fetching_app_database_entries">Não foi possível buscar as entradas do banco de dados do App.</string>
     <string name="illegal_state_error_copying_app_script">Não foi possível copiar o script do App.</string>
@@ -94,9 +90,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">Sistema de arquivo:</string>
-    <string name="prompt_service_type">Tipo de serviço:</string>
-    <string name="prompt_client_type">Tipo de cliente:</string>
-    <string name="prompt_app_connection_type_preference">Por favor, selecione um tipo de conexão: </string>
     <string name="prompt_select_backup">Selecione o backup do sistema de arquivos</string>
     <string name="prompt_install_file_manager">Por favor, instale um gerenciador de arquivos</string>
 
@@ -145,12 +138,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
-    <string name="client_xsdl">XSDL</string>
 
     <!-- Alerts -->
     <string name="button_yes">Sim!</string>
@@ -177,8 +166,6 @@
     <string name="alert_clear_support_files_clear_button">Limpar</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">Não é possível encontrar um App cliente!</string>
-    <string name="alert_need_client_app_message">Você precisará de um cliente SSH ou VNC ou XSDL para concluir essa ação, mas parece que você não tem a loja de jogos instalada. \n\nPor favor, instale o aplicativo cliente (SSH/VNC/XSDL) associado ao tipo de cliente da sessão para continuar.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; requer permissões!</string>
@@ -212,7 +199,6 @@
     <!-- Misc -->
     <string name="custom_sessions">Sessões Customizadas</string>
     <string name="apps_sessions">Sessões de Aplicativos</string>
-    <string name="info_xsdl_support">XSDL não é totalmente suportado no \nAndroid 9.0 ou superior</string>
     <string name="no_backup_selected">Nenhuma importação de sistema de arquivos selecionada</string>
     
     <!-- Review request -->
@@ -221,6 +207,6 @@
     <string name="review_ask_for_feedback">Você se importaria de nos dar algum feedback sobre o Github?</string>
 
     <!-- Advanced options -->
-    <string name="desc_import_backups_should_use_same_settings">Preencha o mesmo: \n\n\u2022 usuário \n\u2022 senha \n\u2022 senha do VNC \n\u2022 distribuição  \n\n como o backup para garantir uma boa funcionalidade</string>
+    <string name="desc_import_backups_should_use_same_settings">Preencha o mesmo: \n\n\u2022 usuário \n\u2022 senha \n\u2022 distribuição  \n\n como o backup para garantir uma boa funcionalidade</string>
   
 </resources>

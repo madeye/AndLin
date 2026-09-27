@@ -39,7 +39,6 @@
     <string name="hint_session_name">Nombre de Sesión</string>
     <string name="hint_username">Nombre de Usuario</string>
     <string name="hint_password">Contraseña</string>
-    <string name="hint_vnc_password">Contraseña de VNC</string>
     
     <!-- Errors -->
     <string name="error_session_name">Debes especificar un nombre de sesión</string>
@@ -47,10 +46,8 @@
     <string name="error_username">Debes especificar un nombre de usuario</string>
     <string name="error_empty_field">¡Todos los campos deben ser rellenados!</string>
     <string name="error_app_description_not_found">No se ha encontrado la descripción de esta aplicación. Prueba actualizando la lista.</string>
-    <string name="error_vnc_password_length_incorrect">¡La contraseña de VNC debe tener entre 6 y 8 caracteres!</string>
     <string name="error_username_invalid">El nombre de usuario contiene caracteres inválidos.</string>
     <string name="error_password_invalid">La contraseña contiene caracteres inválidos.</string>
-    <string name="error_vnc_password_invalid">La contraseña de VNC contiene caracteres inválidos.</string>
     <string name="error_username_invalid_characters">La longitud del nombre de usuario deben ser de entre 1 y 30 caracteres y solo contener minúsculas y/o números</string>
     <string name="error_username_in_blacklist">Este nombre de usuario puede estar reservado por Linux y no puede ser usado como nombre de usuario para el sistema de archivos.</string>
     <string name="error_filesystem_name_invalid_characters">La longitud de el nombre del sistema de archivos debe ser entre 1 y 50 caracteres excluyendo caracteres como \"/:*\\|</string>
@@ -66,7 +63,6 @@
     <string name="illegal_state_no_selections_when_permissions_granted">Ninguna sesión ó aplicación fueron seleccionadas cuando los permisos fueron concedidos.</string>
 
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">Las credenciales fueron guardadas para un sistema de archivos, pero ningún sistema de archivos fue seleccionado.</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">Los ajustes de la Aplicación fueron guardados, pero ninguna app fue seleccionada.</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">Intentando iniciar la preparación de la aplicación, pero ninguna app fue seleccionada.</string>
     <string name="illegal_state_error_fetching_app_database_entries">No se pudieron obtener las entradas de las bases de datos de las aplicaciones.</string>
     <string name="illegal_state_error_copying_app_script">No se pudo copiar el script de la aplicación.</string>
@@ -85,9 +81,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">Sistema de Archivos:</string>
-    <string name="prompt_service_type">Tipo de Servicio:</string>
-    <string name="prompt_client_type">Tipo de Cliente:</string>
-    <string name="prompt_app_connection_type_preference">Seleccione el tipo de conexión: </string>
 
     <!-- Notification strings -->
     <string name="services_notification_channel_name">Servicios</string>
@@ -132,11 +125,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
 
     <!-- Alerts -->
     <string name="button_ok">¡OK!</string>
@@ -154,8 +144,6 @@
     <string name="alert_clear_support_files_clear_button">Borrar</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">¡No se ha encontrado una aplicación de cliente!</string>
-    <string name="alert_need_client_app_message">Necesitará una aplicación cliente de SSH o VNC para completar esta acción, pero parece que no tiene instalado Google Play Store. Por favor, instale una aplicación cliente para continuar.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">¡&appname; requiere la concesión de permisos para funcionar!</string>

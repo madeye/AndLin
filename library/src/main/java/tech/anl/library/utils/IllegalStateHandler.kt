@@ -15,8 +15,6 @@ object IllegalStateHandler {
                 LocalizationData(R.string.illegal_state_no_selections_when_permissions_granted)
             is NoFilesystemSelectedWhenCredentialsSubmitted ->
                 LocalizationData(R.string.illegal_state_no_filesystem_selected_when_credentials_selected)
-            is NoAppSelectedWhenPreferenceSubmitted ->
-                LocalizationData(R.string.illegal_state_no_app_selected_when_preference_submitted)
             is NoAppSelectedWhenTransitionNecessary ->
                 LocalizationData(R.string.illegal_state_no_app_selected_when_preparation_started)
             is ErrorFetchingAppDatabaseEntries ->

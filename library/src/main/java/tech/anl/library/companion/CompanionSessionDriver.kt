@@ -56,7 +56,7 @@ data class CompanionDriverStrings(
     val companionDied: String = "The companion app stopped unexpectedly.",
     val companionUnreachable: String = "Could not reach the companion app. Make sure it is installed and try again.",
     val portInUse: String = "Another virtual machine session is still using the network ports. Stop it and try again.",
-    val unsupportedServiceType: String = "Virtual machine sessions support only SSH and VNC."
+    val unsupportedServiceType: String = "Virtual machine sessions support only SSH."
 )
 
 /** Arguments of the companion `start` command, already validated. */
@@ -75,6 +75,11 @@ data class CompanionStartParams(
     val memoryBytes: Long,
     val useAllCores: Boolean
 ) {
+    companion object {
+        /** Sent when a session has no screen size of its own (every SSH session). */
+        const val DEFAULT_GEOMETRY = "1280x720"
+    }
+
     fun toFields(fsId: String): Map<String, Any?> = linkedMapOf(
         "fsId" to fsId,
         "serviceType" to serviceType,
@@ -227,7 +232,7 @@ class CompanionSessionDriver(
     // ---------------------------------------------------------------- start
 
     suspend fun start(fsId: String, params: CompanionStartParams, onProgress: (String) -> Unit): VmResult {
-        if (params.serviceType != "ssh" && params.serviceType != "vnc") {
+        if (params.serviceType != "ssh") {
             return VmResult.Failure(strings.unsupportedServiceType)
         }
         val validation = CompanionInputValidator.validate(params.username, params.password, params.vncPassword, params.geometry)
@@ -304,11 +309,9 @@ class CompanionSessionDriver(
             when (statusOrUnknown(fsId)) {
                 CompanionStatus.RUNNING -> {
                     val ssh = port(fsId, "ssh")
-                    val vnc = port(fsId, "vnc")
-                    val wanted = if (params.serviceType == "ssh") ssh else vnc
-                    if (wanted <= 0) return VmResult.Failure(lastErrorOr(fsId, strings.startFailed))
+                    if (ssh <= 0) return VmResult.Failure(lastErrorOr(fsId, strings.startFailed))
                     store.add(fsId)
-                    return VmResult.Success(VmEndpoints(ssh, vnc))
+                    return VmResult.Success(VmEndpoints(ssh))
                 }
                 CompanionStatus.WEDGED -> {
                     if (attempt < traits.wedgedRetries) {
@@ -362,8 +365,8 @@ class CompanionSessionDriver(
         if (!conn.isReachable()) return false
         val status = statusOrUnknown(fsId)
         if (status != CompanionStatus.RUNNING) return false
-        // The VM companion never clears "running" when the VM dies; the forwarded ports tell.
-        return portProbe(VmEndpoints.DEFAULT.sshPort) || portProbe(VmEndpoints.DEFAULT.vncPort)
+        // The VM companion never clears "running" when the VM dies; the forwarded SSH port tells.
+        return portProbe(VmEndpoints.DEFAULT.sshPort)
     }
 
     suspend fun stopOrphans(activeFsIds: Set<String>) {

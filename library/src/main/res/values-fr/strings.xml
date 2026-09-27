@@ -35,7 +35,6 @@
     <string name="hint_session_name">Nom de la session</string>
     <string name="hint_username">Nom d\'utilisateur</string>
     <string name="hint_password">Mot de passe</string>
-    <string name="hint_vnc_password">Mot de passe pour VNC</string>
 
     <!-- Errors -->
     <string name="error_session_name">Vous devez fournir un nom de session</string>
@@ -43,16 +42,11 @@
     <string name="error_username">Vous devez fournir un nom d\'utilisateur</string>
     <string name="error_empty_field">Chaque champ doit être rempli !</string>
     <string name="error_app_description_not_found">Descriptif de l’appli introuvable. Essayez d’actualiser.</string>
-    <string name="error_vnc_password_length_incorrect">Le mot de passe pour VNC doit contenir entre 6 et 8 caractères !</string>
     <string name="error_username_invalid">Le nom d’utilisateur contient des caractères non valides</string>
     <string name="error_password_invalid">Le mot de passe contient des caractères non valides</string>
-    <string name="error_vnc_password_invalid">Le mot de passe pour VNC contient des caractères non valides</string>
 
     <!-- Prompts -->
     <string name="prompt_filesystem">Système de fichiers :</string>
-    <string name="prompt_service_type">Type de service :</string>
-    <string name="prompt_client_type">Type de client :</string>
-    <string name="prompt_app_connection_type_preference">Veuillez choisir un type de connexion :</string>
 
     <!-- Notification strings -->
     <string name="services_notification_channel_name">Services</string>
@@ -93,11 +87,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
 
     <!-- Alerts -->
     <string name="button_ok">OK !</string>
@@ -105,8 +96,6 @@
     <string name="filesystem_credentials_reasoning">Nous créons un système de fichiers pour vos applis. Veuillez fournir les informations pertinentes demandées ; nous les utiliserons par défaut pour ce système de fichiers.</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">Aucune appli client n’est trouvable !</string>
-    <string name="alert_need_client_app_message">ous aurez besoin d’un client SSH ou VNC pour terminer, mais Google Play n’est sans doute pas installé sur votre mobile. Veuillez installer une application client SSH ou VNC pour poursuivre.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; a besoin de permissions !</string>

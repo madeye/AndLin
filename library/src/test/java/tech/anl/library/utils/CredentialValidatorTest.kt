@@ -141,47 +141,11 @@ class CredentialValidatorTest {
     }
 
     @Test
-    fun `Validation fails appropriately if vnc password is empty`() {
-        val vncPassword = ""
-
-        credential = credentialValidator.validateVncPassword(vncPassword)
-        assertFalse(credential.credentialIsValid)
-        assertEquals(credential.errorMessageId, R.string.error_empty_field)
-    }
-
-    @Test
-    fun `Validation fails appropriately if vnc password is too long`() {
-        val vncPassword = "abcdefghijklmnop"
-
-        credential = credentialValidator.validateVncPassword(vncPassword)
-        assertFalse(credential.credentialIsValid)
-        assertEquals(credential.errorMessageId, R.string.error_vnc_password_length_incorrect)
-    }
-
-    @Test
-    fun `Validation fails appropriately if vnc password is too short`() {
-        val vncPassword = "abc"
-
-        credential = credentialValidator.validateVncPassword(vncPassword)
-        assertFalse(credential.credentialIsValid)
-        assertEquals(credential.errorMessageId, R.string.error_vnc_password_length_incorrect)
-    }
-
-    @Test
     fun `Validation fails appropriately if password has a space`() {
         val password = "pass word"
 
         credential = credentialValidator.validatePassword(password)
         assertFalse(credential.credentialIsValid)
         assertEquals(credential.errorMessageId, R.string.error_password_invalid)
-    }
-
-    @Test
-    fun `Validation fails appropriately if vnc password has a space`() {
-        val vncPassword = "te sting"
-
-        credential = credentialValidator.validateVncPassword(vncPassword)
-        assertFalse(credential.credentialIsValid)
-        assertEquals(credential.errorMessageId, R.string.error_vnc_password_invalid)
     }
 }

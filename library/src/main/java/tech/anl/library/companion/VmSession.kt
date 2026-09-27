@@ -17,10 +17,10 @@ data class VmLaunchOptions(val shareStorage: Boolean, val memoryBytes: Long, val
 }
 
 /** Host-side (127.0.0.1) ports a running VM session is reachable on. */
-data class VmEndpoints(val sshPort: Int, val vncPort: Int) {
+data class VmEndpoints(val sshPort: Int) {
     companion object {
-        /** The ports both companions forward; used when no session has been asked for yet. */
-        val DEFAULT = VmEndpoints(2022, 5901)
+        /** The SSH port both companions forward; used when no session has been asked for yet. */
+        val DEFAULT = VmEndpoints(2022)
     }
 }
 
@@ -39,7 +39,7 @@ interface VmSessionManager {
     suspend fun setupFilesystem(filesystem: Filesystem, imageRef: String, onProgress: (String) -> Unit): VmResult
 
     /**
-     * Boots [filesystem]'s VM and starts [session]'s ssh/vnc server in it. Assumes
+     * Boots [filesystem]'s VM and starts [session]'s SSH server in it. Assumes
      * [setupFilesystem] has succeeded. The VM backend is retried once when the guest shell wedges.
      */
     suspend fun startSession(

@@ -7,7 +7,7 @@ import tech.anl.library.utils.defaultSharedPreferences
 
 /**
  * Android 12+ kills "phantom" (non-app child) processes beyond a small budget, which is exactly
- * what proot, Xtightvnc and everything a user runs inside a proot session are. The symptom is the
+ * what proot, the SSH server and everything a user runs inside a proot session are. The symptom is the
  * session silently dying mid-work. It can be turned off once through ADB; see
  * [tech.anl.library.adb.AdbJobs.disablePhantomProcessKiller].
  */

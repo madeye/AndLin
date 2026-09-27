@@ -41,7 +41,6 @@
     <string name="hint_session_name">اسم الجلسة</string>
     <string name="hint_username">اسم المستخدم</string>
     <string name="hint_password">كلمة السر</string>
-    <string name="hint_vnc_password">\u200FVNC كلمة السر</string>
     
     <!-- Errors -->
     <string name="error_session_name">يجب تقديم اسم الجلسة</string>
@@ -49,10 +48,8 @@
     <string name="error_username">يجب تقديم اسم مستخدم</string>
     <string name="error_empty_field">يجب إدخال كل الحقول!</string>
     <string name="error_app_description_not_found">لا يمكن العثور على وصف لهذا التطبيق.  حاول انعاشه</string>
-    <string name="error_vnc_password_length_incorrect">يجب أن تكون كلمة مرور VNC بين 6 إلى 8 أحرف!</string>
     <string name="error_username_invalid">اسم المستخدم يحتوي على أحرف غير صالحة</string>
     <string name="error_password_invalid">كلمة المرور تحتوي على أحرف غير صالحة</string>
-    <string name="error_vnc_password_invalid">كلمة مرور VNC بها أحرف غير صالحة</string>
     <string name="error_username_invalid_characters">يجب أن تتكون الأحرف في اسم المستخدم من 1 إلى 30 حرفًا بأحرف صغيرة و / أو أرقام.</string>
     <string name="error_username_in_blacklist">ربما يكون اسم المستخدم محجوزًا بواسطة Linux ولا يمكن استخدامه كاسم مستخدم لنظام ملفات.</string>
     <string name="error_filesystem_name_invalid_characters">يجب أن تكون الأحرف في اسم نظام الملفات من 1 إلى 50 حرفًا بدون أحرف مثل \"/:*\\|</string>
@@ -87,7 +84,6 @@
     <string name="illegal_state_too_many_selections_when_permissions_granted">تم اختيار كل من الجلسة والتطبيق عند منح الأذونات.</string>
     <string name="illegal_state_no_selections_when_permissions_granted">لم يتم تحديد جلسة أو تطبيق عند منح الأذونات.</string>
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">تم إرسال بيانات الاعتماد نظام الملفات، ولكن لم يتم تحديدها.</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">تم إرسال تفضيل التطبيق ، ولكن لم يتم اختيار واحد.</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">جارٍ محاولة بدء إعداد التطبيق ، ولكن لم يتم تحديد أي تطبيق.</string>
     <string name="illegal_state_error_fetching_app_database_entries">لا يمكن جلب إدخالات قاعدة بيانات التطبيقات.</string>
     <string name="illegal_state_error_copying_app_script">لا يمكن نسخ البرنامج النصي للتطبيق.</string>
@@ -114,9 +110,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">ملفات النظام:</string>
-    <string name="prompt_service_type">نوع الخدمة:</string>
-    <string name="prompt_client_type">نوع العميل:</string>
-    <string name="prompt_app_connection_type_preference">يرجى تحديد نوع الاتصال: </string>
     <string name="prompt_select_backup">حدد ملف النسخة الاحتياطية لنظام الملفات</string>
     <string name="prompt_install_file_manager">الرجاء تثبيت مدير الملفات</string>
 
@@ -167,12 +160,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
-    <string name="client_xsdl">XSDL</string>
 
     <!-- Alerts -->
     <string name="button_yes">موافق!</string>
@@ -196,8 +185,6 @@
     <string name="alert_clear_support_files_clear_button">مسح</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">لا يمكن العثور على تطبيق العميل!</string>
-    <string name="alert_need_client_app_message">ستحتاج إلى عميل SSH أو VNC أو XSDL لإكمال هذا الإجراء ، ولكن يبدو أنك لم تقم بتثبيت متجر Play. \n \n الرجاء تثبيت تطبيق العميل (SSH / VNC / XSDL) المقترن بنوع العميل للجلسة للمتابعة.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; يتطلب أذونات!</string>
@@ -237,8 +224,6 @@
     <string name="custom_sessions">جلسات مخصصة</string>
     <string name="apps_sessions">جلسات التطبيقات</string>
     <string name="info_finish_app_setup">إنهاء إعداد التطبيق لتوفير هذه الخيارات.</string>
-    <string name="info_stop_app">أوقف هذا التطبيق لتغيير إعداداته.</string>
-    <string name="info_xsdl_support">XSDL غير مدعوم بشكل كامل على \nAndroid 9.0 ما بعد</string>
     <string name="no_backup_selected">لم يتم تحديد نظام استيراد الملفات</string>
 
     <!-- Review request -->
@@ -264,6 +249,6 @@
     </string>
 
     <!-- Advanced options -->
-    <string name="desc_import_backups_should_use_same_settings">املأ نفسه: \n\n\u2022 اسم المستخدم \n\u2022 كلمة المرور \n\u2022 كلمة مرور VNC \n\u2022 التوزيع \n\n كنسخة احتياطية لضمان الأداء الوظيفي السلس</string>
+    <string name="desc_import_backups_should_use_same_settings">املأ نفسه: \n\n\u2022 اسم المستخدم \n\u2022 كلمة المرور \n\u2022 التوزيع \n\n كنسخة احتياطية لضمان الأداء الوظيفي السلس</string>
   
 </resources>

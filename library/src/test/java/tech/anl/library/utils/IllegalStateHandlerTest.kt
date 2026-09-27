@@ -64,17 +64,6 @@ class IllegalStateHandlerTest {
     }
 
     @Test
-    fun `NoAppSelectedWhenPreferenceSubmitted returns correct id and strings`() {
-        val state = NoAppSelectedWhenPreferenceSubmitted
-
-        val result = illegalStateHandler.getLocalizationData(state)
-
-        val resId = R.string.illegal_state_no_app_selected_when_preference_submitted
-        val expectedResult = LocalizationData(resId, listOf())
-        assertEquals(expectedResult, result)
-    }
-
-    @Test
     fun `NoAppSelectedWhenTransitionNecessary returns correct id and strings`() {
         val state = NoAppSelectedWhenTransitionNecessary
 

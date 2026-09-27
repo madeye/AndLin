@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="filesystem_setup_title">Set up filesystem</string>
-    <string name="filesystem_flavor_title">Desktop</string>
     <string name="execution_type_title">Run as</string>
     <string name="execution_type_proot">Standard</string>
     <string name="execution_type_avf">Virtual Machine</string>

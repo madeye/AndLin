@@ -40,7 +40,6 @@
     <string name="hint_session_name">工作階段名稱</string>
     <string name="hint_username">使用者名稱</string>
     <string name="hint_password">密碼</string>
-    <string name="hint_vnc_password">VNC 密碼</string>
     
     <!-- Errors -->
     <string name="error_session_name">您必須提供工作階段名稱</string>
@@ -48,10 +47,8 @@
     <string name="error_username">您必須提供使用者名稱</string>
     <string name="error_empty_field">每個欄位都必須輸入！</string>
     <string name="error_app_description_not_found">找不到此應用程式的描述。嘗試重新整理。</string>
-    <string name="error_vnc_password_length_incorrect">VNC 密碼必須在6到8個字元之間！</string>
     <string name="error_username_invalid">使用者名稱有無效的字元</string>
     <string name="error_password_invalid">密碼有無效的字元</string>
-    <string name="error_vnc_password_invalid">VNC 密碼有無效的字元</string>
     <string name="error_username_invalid_characters">使用者名字必須是1到30個字元的小寫字母或數字。</string>
     <string name="error_username_in_blacklist">使用者名稱可能被 Linux 保留，不能用於檔案系統的使用者名稱。</string>
     <string name="error_filesystem_name_invalid_characters">檔案系統名稱必須在1到50個字元間，且不能有如 \"/:*\\| 等符號</string>
@@ -66,7 +63,6 @@
     <string name="illegal_state_no_selections_when_permissions_granted">在授予權限時，沒有選取任何工作階段與應用程式。</string>
 
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">已為檔案系統遞交憑證，但並未選取任何一個。</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">應用程式偏好設定已遞交，但並未選取任何一個。</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">嘗試開始準備應用程式，但並未選取任何一個。</string>
     <string name="illegal_state_error_fetching_app_database_entries">無法擷取資料庫項目。</string>
     <string name="illegal_state_error_copying_app_script">無法複製應用程式指令稿。</string>
@@ -92,9 +88,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">檔案系統：</string>
-    <string name="prompt_service_type">服務類型：</string>
-    <string name="prompt_client_type">客戶端類型：</string>
-    <string name="prompt_app_connection_type_preference">請選取連線類型：</string>
     <string name="prompt_select_backup">選取檔案系統備份檔</string>
     <string name="prompt_install_file_manager">請安裝檔案管理員</string>
 
@@ -142,12 +135,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
-    <string name="client_xsdl">XSDL</string>
 
     <!-- Alerts -->
     <string name="button_yes">是的！</string>
@@ -174,8 +163,6 @@
     <string name="alert_clear_support_files_clear_button">清除</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">找不到客戶端應用程式！</string>
-    <string name="alert_need_client_app_message">您將會需要 SSH 或 VNC 或 XSDL 客戶端來完成這個動作，但看起來您並未安裝 Play 商店。\n\n請安裝與工作階段類型相關的客戶端應用程式 (SSH/VNC/XSDL) 以繼續。</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; 需要權限！</string>
@@ -205,7 +192,6 @@
     <!-- Misc -->
     <string name="custom_sessions">自訂工作階段</string>
     <string name="apps_sessions">應用程式工作階段</string>
-    <string name="info_xsdl_support">XSDL 尚未完整支援\nAndroid 9.0 或更新的版本</string>
     <string name="no_backup_selected">未選擇要匯入的檔案系統</string>
     
     <!-- Review request -->
@@ -214,6 +200,6 @@
     <string name="review_ask_for_feedback">您介意在 GitHub 上給我們一些回饋嗎？</string>
     
     <!-- Advanced options -->
-    <string name="desc_import_backups_should_use_same_settings">填入相同的東西：\n\n\u2022 使用者名稱 \n\u2022 密碼 \n\u2022 VNC 密碼 \n\u2022 散佈版 \n\n 作為備份以確保功能運作順暢</string>
+    <string name="desc_import_backups_should_use_same_settings">填入相同的東西：\n\n\u2022 使用者名稱 \n\u2022 密碼 \n\u2022 散佈版 \n\n 作為備份以確保功能運作順暢</string>
   
 </resources>

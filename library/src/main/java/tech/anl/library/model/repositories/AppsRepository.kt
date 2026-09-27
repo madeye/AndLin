@@ -64,7 +64,6 @@ class AppsRepository(
                     remoteAppsSource.fetchAppIcon(app)
                     remoteAppsSource.fetchAppDescription(app)
                     remoteAppsSource.fetchAppScript(app)
-                    remoteAppsSource.fetchAppFlavors(app)
                     appsDao.insertApp(app) // Insert the db element last to force observer refresh
             }) }
         } catch (err: Exception) {

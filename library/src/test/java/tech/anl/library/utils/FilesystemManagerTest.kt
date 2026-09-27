@@ -55,7 +55,7 @@ class FilesystemManagerTest {
         val filesystemDirName = "${filesystem.id}"
 
         val defaultEnvironmentalVariables = hashMapOf("INITIAL_USERNAME" to "username",
-                "INITIAL_PASSWORD" to "password", "INITIAL_VNC_PASSWORD" to "vncpass")
+                "INITIAL_PASSWORD" to "password")
         if (BuildConfig.FILESYSTEM_ONLY_ASSET)
             defaultEnvironmentalVariables["EXCLUDE_SUPPORT"] = "--exclude support/common"
         else
@@ -96,7 +96,7 @@ class FilesystemManagerTest {
         val filesystemDirName = "${filesystem.id}"
 
         val defaultEnvironmentalVariables = hashMapOf("INITIAL_USERNAME" to "username",
-                "INITIAL_PASSWORD" to "password", "INITIAL_VNC_PASSWORD" to "vncpass")
+                "INITIAL_PASSWORD" to "password")
         if (BuildConfig.FILESYSTEM_ONLY_ASSET)
             defaultEnvironmentalVariables["EXCLUDE_SUPPORT"] = "--exclude support/common"
         else

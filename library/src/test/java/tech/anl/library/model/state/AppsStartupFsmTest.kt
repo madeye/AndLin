@@ -12,7 +12,6 @@ import org.junit.Assert.* // ktlint-disable no-wildcard-imports
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
@@ -27,7 +26,6 @@ import tech.anl.library.model.entities.Session
 import tech.anl.library.model.repositories.AnlDatabase
 import tech.anl.library.utils.* // ktlint-disable no-wildcard-imports
 import tech.anl.library.utils.preferences.AppsPreferences
-import java.io.File
 import java.io.IOException
 
 @RunWith(MockitoJUnitRunner::class)
@@ -35,7 +33,6 @@ class AppsStartupFsmTest {
 
     @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule val tempFolder = TemporaryFolder()
 
     // Mocks
 
@@ -65,11 +62,12 @@ class AppsStartupFsmTest {
     val defaultUsername = "user"
     val defaultPassword = "password"
     private val appsFilesystem = Filesystem(id = 0, name = appsFilesystemName, distributionType = appsFilesystemType, isAppsFilesystem = true)
-    private val appsFilesystemWithCredentials = Filesystem(id = 0, name = appsFilesystemName, distributionType = appsFilesystemType, isAppsFilesystem = true, defaultUsername = defaultUsername, defaultPassword = defaultPassword, defaultVncPassword = defaultPassword)
+    private val appsFilesystemWithCredentials = Filesystem(id = 0, name = appsFilesystemName, distributionType = appsFilesystemType, isAppsFilesystem = true, defaultUsername = defaultUsername, defaultPassword = defaultPassword)
 
     private val appSession = Session(id = 0, name = appName, filesystemId = 0, isAppsSession = true)
 
     private val app = App(name = appName, filesystemRequired = appsFilesystemType)
+    private val distribution = App(name = "debian", category = "Distribution", filesystemRequired = appsFilesystemType)
 
     private val incorrectTransitionEvent = AppSelected(app)
     private val incorrectTransitionState = FetchingDatabaseEntries
@@ -78,9 +76,8 @@ class AppsStartupFsmTest {
             CheckFilesystemFlavor(app, appsFilesystem),
             SubmitFilesystemFlavor(appsFilesystem, "flavor", ExecutionType.PROOT),
             CheckAppsFilesystemCredentials(appsFilesystem),
-            SubmitAppsFilesystemCredentials(appsFilesystem, "", "", ""),
+            SubmitAppsFilesystemCredentials(appsFilesystem, "", ""),
             CheckAppSessionServiceType(appSession),
-            SubmitAppSessionServiceType(appSession, ServiceType.Unselected),
             CopyAppScriptToFilesystem(app, appsFilesystem),
             SyncDatabaseEntries(app, appSession, appsFilesystem),
             ResetAppState
@@ -90,12 +87,11 @@ class AppsStartupFsmTest {
             WaitingForAppSelection,
             FetchingDatabaseEntries,
             DatabaseEntriesFetched(appsFilesystem, appSession),
-            FilesystemFlavorRequired(appsFilesystem, listOf(), listOf()),
+            FilesystemFlavorRequired(appsFilesystem, listOf()),
             FilesystemFlavorSet,
             AppsFilesystemHasCredentials,
             AppsFilesystemRequiresCredentials(appsFilesystem),
             AppHasServiceTypeSet,
-            AppRequiresServiceType,
             CopyingAppScript,
             AppScriptCopySucceeded,
             AppScriptCopyFailed,
@@ -126,7 +122,6 @@ class AppsStartupFsmTest {
                     event is CheckAppsFilesystemCredentials && state is FilesystemFlavorSet -> assertTrue(result)
                     event is SubmitAppsFilesystemCredentials && state is AppsFilesystemRequiresCredentials -> assertTrue(result)
                     event is CheckAppSessionServiceType && state is AppsFilesystemHasCredentials -> assertTrue(result)
-                    event is SubmitAppSessionServiceType && state is AppRequiresServiceType -> assertTrue(result)
                     event is CopyAppScriptToFilesystem && state is AppHasServiceTypeSet -> assertTrue(result)
                     event is SyncDatabaseEntries && state is AppScriptCopySucceeded -> assertTrue(result)
                     event is ResetAppState -> assertTrue(result)
@@ -273,18 +268,6 @@ class AppsStartupFsmTest {
     }
 
     @Test
-    fun `Requires credentials to be set if vnc password is missing`() {
-        appsFsm.setState(FilesystemFlavorSet)
-        appsFsm.getState().observeForever(mockStateObserver)
-
-        val filesystemWithoutVncPassword = appsFilesystemWithCredentials
-        filesystemWithoutVncPassword.defaultVncPassword = ""
-        runBlocking { appsFsm.submitEvent(CheckAppsFilesystemCredentials(filesystemWithoutVncPassword), this) }
-
-        verify(mockStateObserver).onChanged(AppsFilesystemRequiresCredentials(filesystemWithoutVncPassword))
-    }
-
-    @Test
     fun `State is AppsFilesystemHasCredentials if they are set`() {
         appsFsm.setState(FilesystemFlavorSet)
         appsFsm.getState().observeForever(mockStateObserver)
@@ -301,6 +284,7 @@ class AppsStartupFsmTest {
         appsFsm.setState(DatabaseEntriesFetched(appsFilesystem, appSession))
         appsFsm.getState().observeForever(mockStateObserver)
 
+        // Includes legacy desktop flavors recorded by older builds.
         val filesystemWithFlavor = appsFilesystem.copy(flavor = "xfce")
         runBlocking { appsFsm.submitEvent(CheckFilesystemFlavor(app, filesystemWithFlavor), this) }
 
@@ -310,18 +294,16 @@ class AppsStartupFsmTest {
 
     @Test
     fun `CheckFilesystemFlavor auto-selects the only flavor and execution type when there is no choice to make`() {
-        whenever(mockAnlFiles.filesDir).thenReturn(tempFolder.root)
         appsFsm.setState(DatabaseEntriesFetched(appsFilesystem, appSession))
         appsFsm.getState().observeForever(mockStateObserver)
 
-        // No apps/<name>/flavors.txt on disk => not a distribution => PROOT is the only
-        // execution type, and (with desktop sessions disabled by default) the headless server
-        // image is the only flavor. checkFilesystemFlavor() should auto-select both.
+        // Not a distribution => PROOT is the only execution type, and every new filesystem gets
+        // the headless server image. checkFilesystemFlavor() should auto-select both.
         val filesystemWithoutFlavor = appsFilesystem.copy(flavor = "")
         runBlocking { appsFsm.submitEvent(CheckFilesystemFlavor(app, filesystemWithoutFlavor), this) }
 
         val expectedFilesystem = filesystemWithoutFlavor.copy(
-            flavor = FilesystemFlavor.serverFlavor.name,
+            flavor = FilesystemFlavor.SERVER,
             executionType = ExecutionType.PROOT
         )
         verify(mockFilesystemDao).updateFilesystem(expectedFilesystem)
@@ -329,42 +311,33 @@ class AppsStartupFsmTest {
     }
 
     @Test
-    fun `CheckFilesystemFlavor posts FilesystemFlavorRequired when the app is a distribution with desktop sessions enabled`() {
-        whenever(mockAnlFiles.filesDir).thenReturn(tempFolder.root)
-        val flavorsFile = File(tempFolder.root, "apps/${app.name}/flavors.txt")
-        flavorsFile.parentFile!!.mkdirs()
-        flavorsFile.writeText("Release Name, Display Name, isPaid\nxfce, XFCE, false\n")
-
-        val desktopEnabledFsm = AppsStartupFsm(
+    fun `CheckFilesystemFlavor offers the execution types for a distribution when a VM backend is supported`() {
+        val vmFsm = AppsStartupFsm(
             mockAnlDatabase,
             mockFilesystemManager,
             mockAnlFiles,
-            desktopEnabledProvider = { true },
+            executionTypeSupported = { true },
             logger = mockLogger
         )
-        desktopEnabledFsm.setState(DatabaseEntriesFetched(appsFilesystem, appSession))
-        desktopEnabledFsm.getState().observeForever(mockStateObserver)
+        vmFsm.setState(DatabaseEntriesFetched(appsFilesystem, appSession))
+        vmFsm.getState().observeForever(mockStateObserver)
 
         val filesystemWithoutFlavor = appsFilesystem.copy(flavor = "")
-        runBlocking { desktopEnabledFsm.submitEvent(CheckFilesystemFlavor(app, filesystemWithoutFlavor), this) }
+        runBlocking { vmFsm.submitEvent(CheckFilesystemFlavor(distribution, filesystemWithoutFlavor), this) }
 
-        verify(mockStateObserver).onChanged(
-            FilesystemFlavorRequired(
-                filesystemWithoutFlavor,
-                listOf(FilesystemFlavor.serverFlavor, FilesystemFlavor("xfce", "XFCE", isPaid = false)),
-                listOf(ExecutionType.PROOT)
-            )
-        )
-        verify(mockFilesystemDao, never()).updateFilesystem(any())
+        val expectedTypes = mutableListOf(ExecutionType.PROOT)
+        if (tech.anl.customlibrary.BuildConfig.ENABLE_AVF_BACKEND) expectedTypes += ExecutionType.AVF
+        if (tech.anl.customlibrary.BuildConfig.ENABLE_QEMU_BACKEND) expectedTypes += ExecutionType.QEMU
+        if (expectedTypes.size > 1) {
+            verify(mockStateObserver).onChanged(FilesystemFlavorRequired(filesystemWithoutFlavor, expectedTypes))
+            verify(mockFilesystemDao, never()).updateFilesystem(any())
+        } else {
+            verify(mockStateObserver).onChanged(FilesystemFlavorSet)
+        }
     }
 
     @Test
     fun `CheckFilesystemFlavor auto-selects PROOT for a distribution when no VM backend is supported`() {
-        whenever(mockAnlFiles.filesDir).thenReturn(tempFolder.root)
-        val flavorsFile = File(tempFolder.root, "apps/${app.name}/flavors.txt")
-        flavorsFile.parentFile!!.mkdirs()
-        flavorsFile.writeText("Release Name, Display Name, isPaid\nxfce, XFCE, false\n")
-
         val noVmFsm = AppsStartupFsm(
             mockAnlDatabase,
             mockFilesystemManager,
@@ -376,24 +349,25 @@ class AppsStartupFsmTest {
         noVmFsm.getState().observeForever(mockStateObserver)
 
         val filesystemWithoutFlavor = appsFilesystem.copy(flavor = "")
-        runBlocking { noVmFsm.submitEvent(CheckFilesystemFlavor(app, filesystemWithoutFlavor), this) }
+        runBlocking { noVmFsm.submitEvent(CheckFilesystemFlavor(distribution, filesystemWithoutFlavor), this) }
 
         assertEquals(ExecutionType.PROOT, filesystemWithoutFlavor.executionType)
+        assertEquals(FilesystemFlavor.SERVER, filesystemWithoutFlavor.flavor)
         verify(mockFilesystemDao).updateFilesystem(filesystemWithoutFlavor)
         verify(mockStateObserver).onChanged(FilesystemFlavorSet)
     }
 
     @Test
     fun `SubmitFilesystemFlavor updates the filesystem and posts FilesystemFlavorSet`() {
-        appsFsm.setState(FilesystemFlavorRequired(appsFilesystem, listOf(), listOf()))
+        appsFsm.setState(FilesystemFlavorRequired(appsFilesystem, listOf()))
         appsFsm.getState().observeForever(mockStateObserver)
 
         val filesystemToUpdate = appsFilesystem.copy(flavor = "")
         runBlocking {
-            appsFsm.submitEvent(SubmitFilesystemFlavor(filesystemToUpdate, "xfce", ExecutionType.PROOT), this)
+            appsFsm.submitEvent(SubmitFilesystemFlavor(filesystemToUpdate, FilesystemFlavor.SERVER, ExecutionType.AVF), this)
         }
 
-        val expectedFilesystem = filesystemToUpdate.copy(flavor = "xfce", executionType = ExecutionType.PROOT)
+        val expectedFilesystem = filesystemToUpdate.copy(flavor = FilesystemFlavor.SERVER, executionType = ExecutionType.AVF)
         verify(mockFilesystemDao).updateFilesystem(expectedFilesystem)
         verify(mockStateObserver).onChanged(FilesystemFlavorSet)
     }
@@ -403,7 +377,7 @@ class AppsStartupFsmTest {
         appsFsm.setState(AppsFilesystemRequiresCredentials(appsFilesystem))
         appsFsm.getState().observeForever(mockStateObserver)
 
-        runBlocking { appsFsm.submitEvent(SubmitAppsFilesystemCredentials(appsFilesystem, defaultUsername, defaultPassword, defaultPassword), this) }
+        runBlocking { appsFsm.submitEvent(SubmitAppsFilesystemCredentials(appsFilesystem, defaultUsername, defaultPassword), this) }
 
         verify(mockFilesystemDao).updateFilesystem(appsFilesystemWithCredentials)
         verify(mockStateObserver).onChanged(AppsFilesystemHasCredentials)
@@ -417,30 +391,20 @@ class AppsStartupFsmTest {
 
         runBlocking { appsFsm.submitEvent(CheckAppSessionServiceType(appSession), this) }
 
+        verify(mockSessionDao, never()).updateSession(any())
         verify(mockStateObserver).onChanged(AppHasServiceTypeSet)
     }
 
     @Test
-    fun `State is AppRequiresServiceType is it is not set`() {
+    fun `Switches an unset service type to SSH automatically`() {
         appsFsm.setState(AppsFilesystemHasCredentials)
         appsFsm.getState().observeForever(mockStateObserver)
-        appSession.serviceType = ServiceType.Unselected
+        val newSession = appSession.copy(serviceType = ServiceType.Unselected)
 
-        runBlocking { appsFsm.submitEvent(CheckAppSessionServiceType(appSession), this) }
+        runBlocking { appsFsm.submitEvent(CheckAppSessionServiceType(newSession), this) }
 
-        verify(mockStateObserver).onChanged(AppRequiresServiceType)
-    }
-
-    @Test
-    fun `Sets service preference on event submission`() {
-        appsFsm.setState(AppRequiresServiceType)
-        appsFsm.getState().observeForever(mockStateObserver)
-
-        runBlocking { appsFsm.submitEvent(SubmitAppSessionServiceType(appSession, ServiceType.Ssh), this) }
-
-        val expectedSession = appSession
-        expectedSession.serviceType = ServiceType.Ssh
-        verify(mockSessionDao).updateSession(expectedSession)
+        assertEquals(ServiceType.Ssh, newSession.serviceType)
+        verify(mockSessionDao).updateSession(newSession)
         verify(mockStateObserver).onChanged(AppHasServiceTypeSet)
     }
 
@@ -481,7 +445,6 @@ class AppsStartupFsmTest {
         updatedAppSession.filesystemName = appsFilesystemWithCredentials.name
         updatedAppSession.username = appsFilesystemWithCredentials.defaultUsername
         updatedAppSession.password = appsFilesystemWithCredentials.defaultPassword
-        updatedAppSession.vncPassword = appsFilesystemWithCredentials.defaultVncPassword
 
         verify(mockSessionDao).updateSession(updatedAppSession)
         verify(mockStateObserver).onChanged(SyncingDatabaseEntries)

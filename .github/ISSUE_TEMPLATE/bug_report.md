@@ -14,7 +14,7 @@ to your issue, either write 'N/A' or something similar below the header or consi
 # Describe the bug
 
 A clear and concise description of what the bug is, and what expected behavior is. Include whether the bug occurs **before** 
-or **after** entering a terminal or vnc client session.
+or **after** entering a terminal session.
 
 # Steps to reproduce the behavior:
 

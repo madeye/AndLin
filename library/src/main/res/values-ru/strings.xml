@@ -36,7 +36,6 @@
     <string name="hint_session_name">Имя сессии</string>
     <string name="hint_username">Имя пользователя</string>
     <string name="hint_password">Пароль</string>
-    <string name="hint_vnc_password">Пароль VNC</string>
 
     <!-- Errors -->
     <string name="error_session_name">Необходимо ввести имя сессии</string>
@@ -44,10 +43,8 @@
     <string name="error_username">Необходимо ввести имя пользователя</string>
     <string name="error_empty_field">Каждое поле нужно заполнить!</string>
     <string name="error_app_description_not_found">Не удалось найти описание приложения. Попробуйте обновить список.</string>
-    <string name="error_vnc_password_length_incorrect">Пароль VNC должен быть от 6 до 8 знаков!</string>
     <string name="error_username_invalid">Имя пользователя содержит недопустимые знаки</string>
     <string name="error_password_invalid">Пароль содержит недопустимые знаки</string>
-    <string name="error_vnc_password_invalid">Пароль VNC содержит недопустимые знаки</string>
 
     <!-- Illegal State Dialog -->
     <string name="illegal_state_title">Приложение &appname; перешло в некорректное состояние!</string>
@@ -58,7 +55,6 @@
     <string name="illegal_state_no_selections_when_permissions_granted">При предоставлении разрешений не были выбраны ни приложение, ни сессия.</string>
 
     <string name="illegal_state_no_filesystem_selected_when_credentials_selected">Параметры файловой системы были отправлены, но не была выбрана конкретная файловая система.</string>
-    <string name="illegal_state_no_app_selected_when_preference_submitted">Параметры приложения были отправлены, но не было выбрано конкретное приложение.</string>
     <string name="illegal_state_no_app_selected_when_preparation_started">Попытка подготовить приложение без указания какого именно.</string>
     <string name="illegal_state_error_fetching_app_database_entries">Не удалось скачать записи базы данных приложений.</string>
     <string name="illegal_state_error_copying_app_script">Не удалось скопировать скрипт приложения.</string>
@@ -77,9 +73,6 @@
 
     <!-- Prompts -->
     <string name="prompt_filesystem">Файловая система:</string>
-    <string name="prompt_service_type">Тип службы:</string>
-    <string name="prompt_client_type">Тип клиента:</string>
-    <string name="prompt_app_connection_type_preference">Тип соединения:</string>
 
     <!-- Notification strings -->
     <string name="services_notification_channel_name">Службы</string>
@@ -124,11 +117,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH — Dropbear</string>
-    <string name="support_tightvnc">VNC — TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
 
     <!-- Alerts -->
     <string name="button_ok">OK!</string>
@@ -146,8 +136,6 @@
     <string name="alert_clear_support_files_clear_button">Очистить</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">Не удалось найти приложение-клиент!</string>
-    <string name="alert_need_client_app_message">Для данного действия необходим клиент SSH или VNC, который у вас не обнаружен. Установите поддерживаемый клиент, чтобы продожить.</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; необходимы разрешения!</string>

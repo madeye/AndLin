@@ -35,7 +35,6 @@
     <string name="hint_session_name">セッション名</string>
     <string name="hint_username">ユーザー名</string>
     <string name="hint_password">パスワード</string>
-    <string name="hint_vnc_password">VNCのパスワード</string>
     
     <!-- Errors -->
     <string name="error_session_name">セッション名を入力してください</string>
@@ -43,16 +42,11 @@
     <string name="error_username">ユーザ名を入力してください</string>
     <string name="error_empty_field">全ての欄に入力してください!</string>
     <string name="error_app_description_not_found">このアプリの説明が見つかりません。更新してください。</string>
-    <string name="error_vnc_password_length_incorrect">VNCのパスワードは６文字以上８文字以下でなくてはなりません!</string>
     <string name="error_username_invalid">ユーザー名に使用不可能な文字が含まれています</string>
     <string name="error_password_invalid">パスワードに使用不可能な文字が含まれています</string>
-    <string name="error_vnc_password_invalid">VNCのパスワードに使用不可能な文字が含まれています</string>
 
     <!-- Prompts -->
     <string name="prompt_filesystem">ファイルシステム:</string>
-    <string name="prompt_service_type">サービスの種類:</string>
-    <string name="prompt_client_type">クライエントの種類:</string>
-    <string name="prompt_app_connection_type_preference">接続方法を選択してください:</string>
 
     <!-- Notification strings -->
     <string name="services_notification_channel_name">サービス</string>
@@ -93,11 +87,8 @@
 
     <!-- Supported Services -->
     <string name="support_dropbear">SSH - Dropbear</string>
-    <string name="support_tightvnc">VNC - TightVNC</string>
 
     <!-- Client Types -->
-    <string name="client_ssh">SSH</string>
-    <string name="client_vnc">VNC</string>
 
     <!-- Alerts -->
     <string name="button_ok">OK!</string>
@@ -105,8 +96,6 @@
     <string name="filesystem_credentials_reasoning">アプリのファイルシステムを作成します。このファイルシステムのデフォルト値を設定するので、関連する必要な情報を入力してください。</string>
 
     <!-- Play service error alerts -->
-    <string name="alert_need_client_app_title">クライエントアプリが見つかりません!</string>
-    <string name="alert_need_client_app_message">この動作を完了するにはSSHかVNC のクライエントが必要ですが、play storeがインストールされていないようです。続行するには、SSHかVNCのアプリをインストールしてください。</string>
 
     <!-- Permissions necessary alert -->
     <string name="alert_permissions_necessary_title">&appname; には権限が必要です!</string>

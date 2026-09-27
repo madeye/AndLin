@@ -24,18 +24,6 @@
         <item>Ubuntu</item>
     </string-array>
 
-    <string-array name="supported_services">
-        <item>ssh</item>
-        <item>vnc</item>
-        <item>xsdl</item>
-    </string-array>
-
-    <string-array name="supported_services_and_types">
-        <item>SSH - Dropbear</item>
-        <item>VNC - TightVNC</item>
-        <item>SDL - XSDL</item>
-    </string-array>
-
     <string-array name="blacklisted_usernames">
         <item>adm</item>
         <item>audio</item>
@@ -103,14 +91,5 @@
         <item>voice</item>
         <item>wheel</item>
         <item>www-data</item>
-    </string-array>
-
-    <!-- Also defined by the :vnc module; kept here so no-VNC builds still resolve it. The values
-         are what tech.anl.vnc.app.InputMode.fromPref() expects, so they are not translated. -->
-    <string-array name="vnc_input_modes" translatable="false">
-        <item>Direct, Hold Pan</item>
-        <item>Direct, Swipe Pan</item>
-        <item>Touchpad</item>
-        <item>Single Handed</item>
     </string-array>
 </resources>

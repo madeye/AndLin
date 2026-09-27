@@ -6,8 +6,3 @@ project(':CustomLibrary').projectDir = new File('CustomLibrary')
 
 // Replacement for the termux-app terminal.
 include ':terminal'
-
-// The VNC desktop viewer; left out of builds made with -PserverboxVnc=false.
-if ((providers.gradleProperty('serverboxVnc').getOrElse('true')).toBoolean()) {
-    include ':vnc'
-}

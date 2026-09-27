@@ -7,18 +7,12 @@ plugins {
     id 'de.undercouch.download'
 }
 
-// ServerBox is a Linux server first. -PserverboxVnc=false builds it without the VNC viewer and
-// every desktop-session option.
-ext.serverboxVnc = (findProperty('serverboxVnc') ?: 'true').toString().toBoolean()
-
 android {
     namespace 'tech.anl.library'
 
     compileSdkVersion 35
 
     defaultConfig {
-        // Whether the VNC desktop viewer is built in; see serverboxVnc in the root gradle.properties.
-        buildConfigField 'boolean', 'VNC_ENABLED', "$serverboxVnc"
         minSdkVersion 26
         targetSdkVersion 35
 
@@ -56,7 +50,6 @@ android {
     }
 
     sourceSets {
-        main.java.srcDirs += serverboxVnc ? 'src/vnc/java' : 'src/novnc/java'
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
@@ -138,9 +131,6 @@ dependencies {
 
     api project(':CustomLibrary')
     implementation project(':terminal')
-    if (serverboxVnc) {
-        implementation project(':vnc')
-    }
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -194,11 +184,4 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
     androidTestImplementation "androidx.room:room-testing:$room_version"
-    androidTestImplementation 'androidx.test:rules:1.7.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.7.0'
-    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
-    androidTestImplementation('com.adevinta.android:barista:4.3.0') {
-        exclude group: 'org.jetbrains.kotlin'
-    }
 }
