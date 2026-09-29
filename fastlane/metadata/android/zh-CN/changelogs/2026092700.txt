@@ -1,0 +1,1 @@
+ServerBox 首次登陆 Google Play：将 Alpine、Arch、Debian、Kali 和 Ubuntu 作为无图形界面的 Linux 服务器运行，SSH 服务器始终在线，附带内置终端、开机启动、自启动脚本和手机存储访问。无需 root。

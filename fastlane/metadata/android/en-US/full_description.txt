@@ -1,0 +1,22 @@
+An old phone is a small, quiet, low-power computer with a battery backup and Wi-Fi built in. ServerBox puts a real Linux distribution on it and keeps an SSH server running, so you can use it like any other box on your network: host services, run scripts and cron jobs, or tinker.
+
+• Linux without root. Alpine, Arch, Debian, Kali and Ubuntu run in user space through PRoot. Each one is a headless server image with an SSH server, an editor and the usual tools.
+
+• SSH out of the box. Every distribution runs an SSH server on port 2022. The Sessions tab shows the command, user and password. Allow SSH from the network in Settings to connect from your computer, and add your public keys (optionally allowing key logins only).
+
+• Built-in terminal. Open a shell on the phone itself, with an extra-keys row for Esc, Tab, Ctrl, Alt and arrows.
+
+• Stays up. Servers keep running with the screen off and after the app is closed. ServerBox holds a wake lock and a Wi-Fi lock, restarts a server that stops unexpectedly, and can start your servers again after a reboot.
+
+• Your services start with it. Executables in /etc/serverbox/autostart.d inside the distribution run each time its server starts: the place for databases, web servers and other daemons.
+
+• Phone storage. Shared storage is available at /sdcard inside the distribution; ServerBox asks for access to a folder the first time a program uses it.
+
+• Free and open source. ServerBox is released under the GPLv3 and based on UserLAnd. It has no ads and collects no data.
+
+Tips for keeping a server running:
+– Allow ServerBox to ignore battery optimization when it asks.
+– On Xiaomi / HyperOS / MIUI phones, set Battery saver to "No restrictions" and turn on Autostart for ServerBox.
+– Keep the phone on a charger, and reserve its IP address in your router so the SSH address stays the same.
+
+Source code, documentation and issue tracker: https://github.com/madeye/ServerBox

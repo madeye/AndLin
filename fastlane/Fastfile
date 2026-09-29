@@ -1,0 +1,65 @@
+default_platform(:android)
+
+AAB = "app/build/outputs/bundle/ServerBoxPlayRelease/app-ServerBox-playRelease.aab"
+
+platform :android do
+  desc "Build the signed Google Play bundle"
+  lane :bundle do
+    gradle(task: "bundle", flavor: "ServerBox", build_type: "PlayRelease")
+  end
+
+  desc "Deploy to Google Play internal testing track"
+  lane :internal do
+    upload_to_play_store(
+      track: "internal",
+      release_status: "draft",
+      aab: AAB,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to Google Play closed testing (alpha) track"
+  lane :alpha do
+    upload_to_play_store(
+      track: "alpha",
+      release_status: "draft",
+      aab: AAB,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to Google Play open testing track"
+  lane :beta do
+    upload_to_play_store(
+      track: "beta",
+      release_status: "draft",
+      aab: AAB,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Promote internal to production"
+  lane :production do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production"
+    )
+  end
+
+  desc "Update store listing metadata only"
+  lane :metadata do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+end

@@ -26,7 +26,7 @@
     <color name="barcode_field_value">#797979</color>
     <color name="barcode_field_box_stroke">#757575</color>
     <!-- Setup progress overlay: a dimmed backdrop with an opaque terminal log. -->
-    <color name="setup_overlay_background">#CC000000</color>
+    <color name="setup_overlay_background">#FF000000</color>
     <color name="setup_terminal_background">#FF101010</color>
     <color name="setup_terminal_text">#FFE0E0E0</color>
 </resources>
