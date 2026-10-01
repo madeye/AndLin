@@ -37,9 +37,9 @@ CypherpunkArmory (UserLAnd Technologies, LLC) and, like UserLAnd, is licensed un
 
 ## Screenshots
 
-| Distributions | New filesystem | Server settings |
+| Apps | New filesystem | Server settings |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/apps.png" alt="Apps tab listing the Linux distributions" width="240"> | <img src="docs/screenshots/filesystem-edit.png" alt="Creating a filesystem with a user name and password" width="240"> | <img src="docs/screenshots/settings.png" alt="Server settings: start on boot, SSH from the network, authorized keys" width="240"> |
+| <img src="docs/screenshots/apps.png" alt="Apps tab listing the Linux distributions and the coding agents" width="240"> | <img src="docs/screenshots/filesystem-edit.png" alt="Creating a filesystem with a user name and password" width="240"> | <img src="docs/screenshots/settings.png" alt="Server settings: start on boot, SSH from the network, authorized keys" width="240"> |
 
 ## Download
 
