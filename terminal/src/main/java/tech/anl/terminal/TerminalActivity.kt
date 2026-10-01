@@ -1,10 +1,12 @@
 package tech.anl.terminal
 
 import android.app.ActivityManager
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
@@ -210,6 +212,17 @@ class TerminalActivity : AppCompatActivity(), TerminalSession.Listener, Terminal
     override fun onFontSizeChanged(sizePx: Float) {
         val sp = sizePx / TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 1f, resources.displayMetrics)
         prefs.edit().putFloat(PREF_FONT_SP, sp).apply()
+    }
+
+    override fun onOpenUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            // No browser: copy it instead so it can be opened elsewhere.
+            terminalView.copyToClipboard(url)
+            Toast.makeText(this, R.string.terminal_link_copied, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCloseSession() {

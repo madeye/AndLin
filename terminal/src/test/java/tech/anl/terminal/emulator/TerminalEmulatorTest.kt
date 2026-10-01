@@ -643,4 +643,47 @@ class TerminalEmulatorTest {
         assertEquals("\u001bx", KeyEncoder.encodeChar('x'.code, ctrl = false, alt = true))
         assertEquals("\u001b\u0001", KeyEncoder.encodeChar('a'.code, ctrl = true, alt = true))
     }
+    // ---------------------------------------------------------------- links
+
+    @Test
+    fun linkOnOneRow() {
+        val e = emulator(rows = 3, cols = 40)
+        e.feed("see https://example.com/a?b=1. ok")
+        assertNull(e.linkAt(0, 2))
+        val link = e.linkAt(0, 10)!!
+        assertEquals("https://example.com/a?b=1", link.url) // trailing period trimmed
+        assertEquals(0, link.startY)
+        assertEquals(4, link.startX)
+        assertEquals(28, link.endX)
+        assertNull(e.linkAt(0, 31))
+    }
+
+    @Test
+    fun linkAcrossAutowrappedRows() {
+        val e = emulator(rows = 4, cols = 10)
+        e.feed("https://example.com/xyz")
+        assertEquals("https://example.com/xyz", e.linkAt(2, 1)!!.url)
+        assertEquals("https://example.com/xyz", e.linkAt(0, 0)!!.url)
+    }
+
+    @Test
+    fun linkHardBrokenAtTerminalWidth() {
+        // Full-screen apps break long lines themselves: CRLF after each full row, no autowrap.
+        val e = emulator(rows = 4, cols = 10)
+        e.feed("https://ex\r\nample.com/\r\nlogin\r\n")
+        val link = e.linkAt(1, 3)!!
+        assertEquals("https://example.com/login", link.url)
+        assertEquals(0, link.startY)
+        assertEquals(2, link.endY)
+        assertEquals(4, link.endX)
+    }
+
+    @Test
+    fun shortRowsAreNotJoined() {
+        val e = emulator(rows = 3, cols = 20)
+        e.feed("https://a.example\r\nnext")
+        assertEquals("https://a.example", e.linkAt(0, 5)!!.url)
+        assertNull(e.linkAt(1, 0))
+    }
 }
+
