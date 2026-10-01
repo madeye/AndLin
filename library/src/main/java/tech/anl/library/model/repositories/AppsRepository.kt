@@ -7,6 +7,7 @@ import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 import tech.anl.customlibrary.BuildConfig
 import tech.anl.library.model.daos.AppsDao
 import tech.anl.library.model.entities.App
+import tech.anl.library.model.entities.hasOwnImage
 import tech.anl.library.model.remote.GithubAppsFetcher
 import tech.anl.library.utils.*
 import tech.anl.library.utils.preferences.AppsPreferences
@@ -17,7 +18,9 @@ class AppsRepository(
     private val remoteAppsSource: GithubAppsFetcher,
     private val appsPreferences: AppsPreferences,
     private val sharedPreferences: SharedPreferences,
-    private val logger: Logger = LogcatLogger()
+    private val logger: Logger = LogcatLogger(),
+    // Apps whose image has no build for this device (e.g. a 64-bit-only one) are left out.
+    private val isAvailable: (App) -> Boolean = { true }
 ) {
     private val className = "AppsRepository"
 
@@ -58,12 +61,13 @@ class AppsRepository(
         }
 
         try {
-            val apps = remoteAppsSource.fetchAppsList()
+            val apps = remoteAppsSource.fetchAppsList().filter(isAvailable)
             // Inserts only replace rows, so apps dropped from the list would otherwise linger.
             if (apps.isNotEmpty()) appsDao.deleteAppsNotIn(apps.map { it.name })
             apps.forEach { app ->
                 jobs.add(scope.launch {
-                    if (app.category.toLowerCase(Locale.ENGLISH) == "distribution") distributionsList.add(app.name)
+                    // Filesystem types the Filesystems tab can create: everything with its own image.
+                    if (app.hasOwnImage()) distributionsList.add(app.filesystemRequired)
                     remoteAppsSource.fetchAppIcon(app)
                     remoteAppsSource.fetchAppDescription(app)
                     remoteAppsSource.fetchAppScript(app)

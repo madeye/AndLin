@@ -1,6 +1,8 @@
 package tech.anl.library.utils
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FilesystemImagesTest {
@@ -13,6 +15,21 @@ class FilesystemImagesTest {
     fun `legacy desktop flavors keep resolving to the UserLAnd images they were built from`() {
         assertEquals("ghcr.io/cypherpunkarmory/userland-debian:latest", FilesystemImages.imageRef("debian", "default", "latest"))
         assertEquals("ghcr.io/cypherpunkarmory/userland-kali_xfce:latest", FilesystemImages.imageRef("Kali", "XFCE", "latest"))
+    }
+
+    @Test
+    fun `coding agent images resolve like distributions`() {
+        assertEquals("ghcr.io/madeye/serverbox-claude:latest", FilesystemImages.imageRef("claude", "server", "latest"))
+        assertEquals("ghcr.io/madeye/serverbox-codex:latest", FilesystemImages.imageRef("Codex", "server", "latest"))
+    }
+
+    @Test
+    fun `coding agent images exist for 64-bit ABIs only`() {
+        assertTrue(FilesystemImages.isAvailableFor("claude", "arm64-v8a"))
+        assertTrue(FilesystemImages.isAvailableFor("codex", "x86_64"))
+        assertFalse(FilesystemImages.isAvailableFor("claude", "armeabi-v7a"))
+        assertFalse(FilesystemImages.isAvailableFor("Codex", "x86"))
+        assertTrue(FilesystemImages.isAvailableFor("debian", "armeabi-v7a"))
     }
 
     @Test

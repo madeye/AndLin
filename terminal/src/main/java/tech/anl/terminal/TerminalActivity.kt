@@ -53,13 +53,20 @@ class TerminalActivity : AppCompatActivity(), TerminalSession.Listener, Terminal
         // Drawn edge-to-edge (enforced from target SDK 35): the toolbar extends under the status
         // bar so that area takes its color, and the rest stays clear of the bars and the IME.
         val root = findViewById<View>(R.id.terminal_root)
-        val toolbarMinHeight = toolbar.minimumHeight
+        // An exact height (see below) must still fit the title plus the subtitle (the session's
+        // live title), which the 48dp minHeight doesn't: use the action bar height for that.
+        val actionBarSize = TypedValue().let { tv ->
+            if (theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)) {
+                TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+            } else 0
+        }
+        val toolbarHeight = maxOf(toolbar.minimumHeight, actionBarSize)
         ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(bars.left, 0, bars.right, maxOf(bars.bottom, ime.bottom))
             toolbar.setPadding(toolbar.paddingLeft, bars.top, toolbar.paddingRight, toolbar.paddingBottom)
-            toolbar.updateLayoutParams { height = toolbarMinHeight + bars.top }
+            toolbar.updateLayoutParams { height = toolbarHeight + bars.top }
             setKeyboardVisible(insets.isVisible(WindowInsetsCompat.Type.ime()))
             WindowInsetsCompat.CONSUMED
         }

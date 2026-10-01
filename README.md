@@ -27,6 +27,11 @@ CypherpunkArmory (UserLAnd Technologies, LLC) and, like UserLAnd, is licensed un
   the place for databases, web servers and other daemons in guests without a working init.
 - **Phone storage.** Shared storage is available at `/sdcard` inside the distribution; ServerBox
   asks for access to a folder the first time a program uses it.
+- **Coding agents, ready to go.** The **Claude** and **Codex** apps are Debian with Anthropic's
+  [Claude Code](https://www.anthropic.com/claude-code) or OpenAI's
+  [Codex CLI](https://github.com/openai/codex) preinstalled, along with Node.js, git and ripgrep.
+  SSH in and run `claude` or `codex`; you sign in with your own account or API key. 64-bit phones
+  only.
 - **Virtual machines where supported.** On phones with the Android Virtualization Framework,
   distributions can also run in a real VM through a companion app.
 

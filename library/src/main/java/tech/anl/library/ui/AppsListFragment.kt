@@ -60,7 +60,11 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
 
         val githubFetcher = GithubAppsFetcher("${activityContext.filesDir}", activityContext.assets, activityContext.defaultSharedPreferences)
 
-        val appsRepository = AppsRepository(appsDao, githubFetcher, appsPreferences, activityContext.defaultSharedPreferences)
+        val abi = AnlFiles(activityContext, activityContext.applicationInfo.nativeLibraryDir).getAbi()
+        val appsRepository = AppsRepository(
+            appsDao, githubFetcher, appsPreferences, activityContext.defaultSharedPreferences,
+            isAvailable = { app -> FilesystemImages.isAvailableFor(app.filesystemRequired, abi) }
+        )
         ViewModelProvider(this, AppsListViewModelFactory(appsRepository))                .get(AppsListViewModel::class.java)
     }
 
