@@ -4,3 +4,5 @@ Debian, Distribution, debian, true, true, false, false, 1
 Arch, Distribution, arch, true, true, false, false, 1
 Kali, Distribution, kali, true, true, false, false, 1
 Alpine, Distribution, alpine, true, true, false, false, 1
+Claude, Coding Agent, claude, true, false, false, false, 1
+Codex, Coding Agent, codex, true, false, false, false, 1

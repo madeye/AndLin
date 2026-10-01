@@ -50,6 +50,8 @@ class TerminalView @JvmOverloads constructor(
         fun onRequestKeyboard()
         fun onFontSizeChanged(sizePx: Float)
         fun onCloseSession()
+        /** A tap landed on [url], an http(s) link in the output. */
+        fun onOpenUrl(url: String) {}
     }
 
     var listener: Listener? = null
@@ -392,10 +394,34 @@ class TerminalView @JvmOverloads constructor(
         return Pair(bufferRow + e.scrolledOut, col)
     }
 
+    /** The link under (x, y), if any. */
+    private fun linkAt(x: Float, y: Float): TerminalEmulator.Link? {
+        val e = session?.emulator ?: return null
+        synchronized(e) {
+            val (line, col) = cellAt(x, y)
+            return e.linkAt((line - e.scrolledOut).toInt(), col)
+        }
+    }
+
     private fun startSelection(x: Float, y: Float) {
         val e = session?.emulator ?: return
         synchronized(e) {
             val (line, col) = cellAt(x, y)
+            val link = e.linkAt((line - e.scrolledOut).toInt(), col)
+            if (link != null) {
+                // A long press on a link selects all of it, across rows, ready to copy.
+                selStartLine = link.startY + e.scrolledOut
+                selStartCol = link.startX
+                selEndLine = link.endY + e.scrolledOut
+                selEndCol = link.endX
+                selecting = true
+                draggingHandle = HANDLE_NONE
+                draggingFromHandle = false
+                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                showActionMode()
+                invalidate()
+                return
+            }
             val row = e.buffer.row((line - e.scrolledOut).toInt())
             fun isWordCell(c: Int) = row.text[c] != TerminalRow.EMPTY && row.text[c] != ' '.code
             var start = col
@@ -706,6 +732,11 @@ class TerminalView @JvmOverloads constructor(
                 return true
             }
             val s = session ?: return true
+            linkAt(e.x, e.y)?.let { link ->
+                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                listener?.onOpenUrl(link.url)
+                return true
+            }
             val emu = s.emulator
             if (emu.mouseTracking != TerminalEmulator.MOUSE_NONE) {
                 val col = (e.x / cellWidth).toInt()

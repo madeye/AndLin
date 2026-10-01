@@ -32,6 +32,17 @@ object FilesystemImages {
         }
     }
 
+    /**
+     * Images published only for 64-bit platforms (amd64, arm64): the coding agents ship no 32-bit
+     * binaries. Keep in sync with the platforms in ServerBox-Images' build-<name>.yml.
+     */
+    private val SIXTY_FOUR_BIT_ONLY = setOf("claude", "codex")
+    private val SIXTY_FOUR_BIT_ABIS = setOf("arm64-v8a", "x86_64")
+
+    /** Whether [distribution]'s image has a build for [abi], the ABI images are pulled for. */
+    fun isAvailableFor(distribution: String, abi: String): Boolean =
+        distribution.lowercase(Locale.ENGLISH) !in SIXTY_FOUR_BIT_ONLY || abi.trim() in SIXTY_FOUR_BIT_ABIS
+
     /** DEFAULT_OCI_TAG is either one tag ("latest") or per-distribution pairs ("ubuntu:20260626,..."). */
     internal fun tagFor(ociTag: String, distribution: String): String {
         if (!ociTag.contains(':')) return ociTag.ifBlank { "latest" }

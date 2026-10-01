@@ -51,7 +51,7 @@ class AppsRepositoryTest {
     @Mock lateinit var mockEditor: SharedPreferences.Editor
 
     private val inactiveAppName = "inactive"
-    private val inactiveApp = App(name = inactiveAppName, category = "distribution")
+    private val inactiveApp = App(name = inactiveAppName, category = "distribution", filesystemRequired = inactiveAppName)
     private val activeAppName = "active"
     private val activeApp = App(name = activeAppName)
     private val appsList = listOf(inactiveApp)
@@ -116,6 +116,32 @@ class AppsRepositoryTest {
         verify(mockAppsPreferences).setDistributionsList(setOf(inactiveAppName))
         verify(mockRefreshStatusObserver).onChanged(RefreshStatus.ACTIVE)
         verify(mockRefreshStatusObserver).onChanged(RefreshStatus.FINISHED)
+    }
+
+    @Test
+    fun `Coding agents are filesystem types, other apps are not, and unavailable apps are dropped`() {
+        val agent = App(name = "claude", category = "coding agent", filesystemRequired = "claude")
+        val plainApp = App(name = "zork", category = "game", filesystemRequired = "debian")
+        val unavailable = App(name = "codex", category = "coding agent", filesystemRequired = "codex")
+        runBlocking {
+            whenever(mockGithubAppsFetcher.fetchAppsList()).thenReturn(listOf(inactiveApp, agent, plainApp, unavailable))
+        }
+        appsRepository = AppsRepository(
+                mockAppsDao,
+                mockGithubAppsFetcher,
+                mockAppsPreferences,
+                mockSharedPreferences,
+                mockLogger,
+                isAvailable = { it.name != "codex" }
+        )
+
+        runBlocking {
+            appsRepository.refreshData(this)
+        }
+
+        verify(mockAppsDao).deleteAppsNotIn(listOf(inactiveAppName, "claude", "zork"))
+        verify(mockAppsDao, never()).insertApp(unavailable)
+        verify(mockAppsPreferences).setDistributionsList(setOf(inactiveAppName, "claude"))
     }
 
     @Test

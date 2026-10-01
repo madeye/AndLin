@@ -20,5 +20,6 @@
 
     <string name="terminal_hint">Tip: long-press the terminal to select text and open the menu. Pinch to change the font size.</string>
     <string name="terminal_copied">Copied to clipboard</string>
+    <string name="terminal_link_copied">No app can open this link; copied it instead</string>
     <string name="terminal_clip_label">Terminal text</string>
 </resources>

@@ -1,10 +1,12 @@
 package tech.anl.terminal
 
 import android.app.ActivityManager
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
@@ -53,13 +55,20 @@ class TerminalActivity : AppCompatActivity(), TerminalSession.Listener, Terminal
         // Drawn edge-to-edge (enforced from target SDK 35): the toolbar extends under the status
         // bar so that area takes its color, and the rest stays clear of the bars and the IME.
         val root = findViewById<View>(R.id.terminal_root)
-        val toolbarMinHeight = toolbar.minimumHeight
+        // An exact height (see below) must still fit the title plus the subtitle (the session's
+        // live title), which the 48dp minHeight doesn't: use the action bar height for that.
+        val actionBarSize = TypedValue().let { tv ->
+            if (theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)) {
+                TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+            } else 0
+        }
+        val toolbarHeight = maxOf(toolbar.minimumHeight, actionBarSize)
         ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(bars.left, 0, bars.right, maxOf(bars.bottom, ime.bottom))
             toolbar.setPadding(toolbar.paddingLeft, bars.top, toolbar.paddingRight, toolbar.paddingBottom)
-            toolbar.updateLayoutParams { height = toolbarMinHeight + bars.top }
+            toolbar.updateLayoutParams { height = toolbarHeight + bars.top }
             setKeyboardVisible(insets.isVisible(WindowInsetsCompat.Type.ime()))
             WindowInsetsCompat.CONSUMED
         }
@@ -203,6 +212,17 @@ class TerminalActivity : AppCompatActivity(), TerminalSession.Listener, Terminal
     override fun onFontSizeChanged(sizePx: Float) {
         val sp = sizePx / TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 1f, resources.displayMetrics)
         prefs.edit().putFloat(PREF_FONT_SP, sp).apply()
+    }
+
+    override fun onOpenUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            // No browser: copy it instead so it can be opened elsewhere.
+            terminalView.copyToClipboard(url)
+            Toast.makeText(this, R.string.terminal_link_copied, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCloseSession() {

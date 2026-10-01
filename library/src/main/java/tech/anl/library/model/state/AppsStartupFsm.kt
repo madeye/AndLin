@@ -92,8 +92,7 @@ class AppsStartupFsm(
             state.postValue(FilesystemFlavorSet)
             return
         }
-        val isDistribution = app.category.equals("distribution", ignoreCase = true)
-        val executionTypes = availableExecutionTypes(isDistribution)
+        val executionTypes = availableExecutionTypes(app.hasOwnImage())
         if (executionTypes.size == 1) {
             setFilesystemFlavor(appsFilesystem, FilesystemFlavor.SERVER, executionTypes.first())
             return
@@ -101,10 +100,11 @@ class AppsStartupFsm(
         state.postValue(FilesystemFlavorRequired(appsFilesystem, executionTypes))
     }
 
-    // Only distributions can run in a VM; plain apps always use PRoot.
-    private fun availableExecutionTypes(isDistribution: Boolean): List<ExecutionType> {
+    // Only filesystems with their own image (distributions, coding agents) can run in a VM; apps
+    // installed into a distribution always use PRoot.
+    private fun availableExecutionTypes(hasOwnImage: Boolean): List<ExecutionType> {
         val types = mutableListOf(ExecutionType.PROOT)
-        if (!isDistribution) return types
+        if (!hasOwnImage) return types
         if (BuildConfig.ENABLE_AVF_BACKEND && executionTypeSupported(ExecutionType.AVF)) types.add(ExecutionType.AVF)
         if (BuildConfig.ENABLE_QEMU_BACKEND && executionTypeSupported(ExecutionType.QEMU)) types.add(ExecutionType.QEMU)
         return types

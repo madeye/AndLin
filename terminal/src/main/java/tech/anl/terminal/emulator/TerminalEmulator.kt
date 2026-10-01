@@ -1031,11 +1031,75 @@ class TerminalEmulator(
         return sb.toString()
     }
 
+    /** A URL on screen and the cells it covers, rows in buffer coordinates. */
+    data class Link(val url: String, val startY: Int, val startX: Int, val endY: Int, val endX: Int)
+
+    /**
+     * The http(s) URL covering cell ([x], [y]), if any (rows in buffer coordinates). A URL may
+     * span rows: autowrapped rows are joined, and so is a row filled to the last column with URL
+     * characters when the next row starts with one, since full-screen apps (Claude Code among
+     * them) break long lines at the terminal width themselves rather than relying on autowrap.
+     */
+    fun linkAt(y: Int, x: Int): Link? {
+        val firstRow = -buffer.historySize
+        if (y < firstRow || y >= rows || x < 0 || x >= cols) return null
+        fun continues(r: Int): Boolean {
+            if (r + 1 >= rows) return false
+            val row = buffer.row(r)
+            if (row.wrapped) return true
+            return isUrlChar(row.text[row.cols - 1]) && isUrlChar(buffer.row(r + 1).text[0])
+        }
+        var top = y
+        while (top - 1 >= firstRow && y - top < MAX_LINK_ROWS && continues(top - 1)) top--
+        var bottom = y
+        while (bottom - y < MAX_LINK_ROWS && continues(bottom)) bottom++
+
+        val sb = StringBuilder()
+        val cells = ArrayList<Long>() // (row, col) of each char in sb, packed
+        var tapIndex = -1
+        for (r in top..bottom) {
+            val row = buffer.row(r)
+            for (c in 0 until row.cols) {
+                val cp = row.text[c]
+                if (r == y && c == x) tapIndex = if (cp == TerminalRow.WIDE_TAIL) sb.length - 1 else sb.length
+                if (cp == TerminalRow.WIDE_TAIL) continue
+                val before = sb.length
+                if (cp == EMPTY) sb.append(' ') else sb.appendCodePoint(cp)
+                repeat(sb.length - before) { cells.add((r.toLong() shl 32) or c.toLong()) }
+            }
+        }
+        if (tapIndex < 0) return null
+        for (match in URL_PATTERN.findAll(sb)) {
+            var end = match.range.last + 1
+            while (end > match.range.first && trimTrailing(sb, match.range.first, end)) end--
+            if (tapIndex < match.range.first || tapIndex >= end) continue
+            val start = cells[match.range.first]
+            val last = cells[end - 1]
+            return Link(sb.substring(match.range.first, end), (start shr 32).toInt(), start.toInt(), (last shr 32).toInt(), last.toInt())
+        }
+        return null
+    }
+
+    /** Whether the URL ending before [end] should lose its last char (sentence punctuation). */
+    private fun trimTrailing(sb: CharSequence, start: Int, end: Int): Boolean = when (sb[end - 1]) {
+        '.', ',', ';', ':', '!', '?', '\'', '"' -> true
+        ')' -> sb.subSequence(start, end).count { it == '(' } < sb.subSequence(start, end).count { it == ')' }
+        else -> false
+    }
+
+    private fun isUrlChar(cp: Int): Boolean =
+        cp != EMPTY && cp != TerminalRow.WIDE_TAIL && cp < 0x80 && URL_CHARS.indexOf(cp.toChar()) >= 0
+
     /** Scrollback plus screen as text, without trailing empty lines. */
     fun getAllText(): String = getText(-buffer.historySize, 0, rows - 1, cols - 1).trimEnd('\n')
 
     companion object {
         const val DEFAULT_SCROLLBACK = 2000
+
+        private const val MAX_LINK_ROWS = 64
+        private const val URL_CHARS =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%"
+        private val URL_PATTERN = Regex("https?://[A-Za-z0-9\\-._~:/?#\\[\\]@!$&'()*+,;=%]+")
 
         const val MOUSE_NONE = 0
         const val MOUSE_X10 = 9

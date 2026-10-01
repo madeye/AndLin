@@ -1,0 +1,1 @@
+Claude Code is Anthropic's coding agent for the terminal. This filesystem is Debian with Claude Code, Node.js, git and ripgrep preinstalled.

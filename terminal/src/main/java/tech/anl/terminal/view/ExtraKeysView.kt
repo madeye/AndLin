@@ -14,8 +14,10 @@ import android.widget.TextView
 import tech.anl.terminal.emulator.KeyEncoder
 
 /**
- * A single row of keys the soft keyboard lacks: ESC, TAB, latching CTRL/ALT, arrows and
- * navigation keys. Arrow and navigation keys auto-repeat while held.
+ * Keys the soft keyboard lacks, in two rows of six: ESC, TAB, latching CTRL/ALT, arrows (laid
+ * out as an inverted T) and navigation keys. Arrow and navigation keys auto-repeat while held.
+ * Two rows keep each key wide and tall enough to hit reliably on a phone; one row of twelve
+ * made them narrower than a fingertip.
  */
 class ExtraKeysView @JvmOverloads constructor(
     context: Context,
@@ -41,23 +43,35 @@ class ExtraKeysView @JvmOverloads constructor(
     private val modifierViews = HashMap<Action, TextView>()
 
     init {
-        orientation = HORIZONTAL
+        orientation = VERTICAL
         setBackgroundColor(BACKGROUND)
-        val buttons = listOf(
-            Button("ESC", Action.Send(KeyEncoder.Key.ESCAPE, false)),
-            Button("TAB", Action.Send(KeyEncoder.Key.TAB, false)),
-            Button("CTRL", Action.Ctrl),
-            Button("ALT", Action.Alt),
-            Button("←", Action.Send(KeyEncoder.Key.LEFT, true)),
-            Button("↓", Action.Send(KeyEncoder.Key.DOWN, true)),
-            Button("↑", Action.Send(KeyEncoder.Key.UP, true)),
-            Button("→", Action.Send(KeyEncoder.Key.RIGHT, true)),
-            Button("HOME", Action.Send(KeyEncoder.Key.HOME, false)),
-            Button("END", Action.Send(KeyEncoder.Key.END, false)),
-            Button("PGUP", Action.Send(KeyEncoder.Key.PAGE_UP, true)),
-            Button("PGDN", Action.Send(KeyEncoder.Key.PAGE_DOWN, true)),
+        val rows = listOf(
+            listOf(
+                Button("ESC", Action.Send(KeyEncoder.Key.ESCAPE, false)),
+                Button("CTRL", Action.Ctrl),
+                Button("HOME", Action.Send(KeyEncoder.Key.HOME, false)),
+                Button("↑", Action.Send(KeyEncoder.Key.UP, true)),
+                Button("END", Action.Send(KeyEncoder.Key.END, false)),
+                Button("PGUP", Action.Send(KeyEncoder.Key.PAGE_UP, true)),
+            ),
+            listOf(
+                Button("TAB", Action.Send(KeyEncoder.Key.TAB, false)),
+                Button("ALT", Action.Alt),
+                Button("←", Action.Send(KeyEncoder.Key.LEFT, true)),
+                Button("↓", Action.Send(KeyEncoder.Key.DOWN, true)),
+                Button("→", Action.Send(KeyEncoder.Key.RIGHT, true)),
+                Button("PGDN", Action.Send(KeyEncoder.Key.PAGE_DOWN, true)),
+            ),
         )
-        val height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40f, resources.displayMetrics).toInt()
+        val height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, KEY_HEIGHT_DP, resources.displayMetrics).toInt()
+        for (buttons in rows) {
+            val row = LinearLayout(context).apply { orientation = HORIZONTAL }
+            addView(row, LayoutParams(LayoutParams.MATCH_PARENT, height))
+            addButtons(row, buttons)
+        }
+    }
+
+    private fun addButtons(row: LinearLayout, buttons: List<Button>) {
         for (button in buttons) {
             val view = TextView(context).apply {
                 text = button.label
@@ -65,14 +79,14 @@ class ExtraKeysView @JvmOverloads constructor(
                 setTextColor(TEXT_COLOR)
                 typeface = Typeface.MONOSPACE
                 // Glyph arrows read better a little larger than the text labels.
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (button.label.length == 1) 17f else 11f)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (button.label.length == 1) 20f else 14f)
                 maxLines = 1
                 isClickable = true
                 isFocusable = false
             }
             view.setOnTouchListener { v, event -> onKeyTouch(v as TextView, button.action, event) }
             if (button.action is Action.Ctrl || button.action is Action.Alt) modifierViews[button.action] = view
-            addView(view, LayoutParams(0, height, 1f))
+            row.addView(view, LayoutParams(0, LayoutParams.MATCH_PARENT, 1f))
         }
     }
 
@@ -124,6 +138,7 @@ class ExtraKeysView @JvmOverloads constructor(
         const val TEXT_COLOR = 0xFFEEEEEE.toInt()
         const val PRESSED = 0xFF424242.toInt()
         const val LATCHED = 0xFF1565C0.toInt()
+        const val KEY_HEIGHT_DP = 44f
         const val REPEAT_DELAY_MS = 400L
         const val REPEAT_INTERVAL_MS = 60L
     }
